@@ -1,8 +1,8 @@
 -- =====================================================================
 -- ropros · initial schema (Supabase / PostgreSQL 15+)
 -- Passwords live only in Supabase Auth (auth.users). public.users holds the public profile.
--- Clients get read access + narrow column grants; all scoring (XP, likes, progress)
--- happens inside SECURITY DEFINER functions, so it can't be faked from the browser.
+-- Clients get read access + narrow column grants, all scoring (XP, likes, progress)
+-- happens inside SECURITY DEFINER functions, so it cannot be faked from the browser.
 -- =====================================================================
 
 -- ---------- Types ----------

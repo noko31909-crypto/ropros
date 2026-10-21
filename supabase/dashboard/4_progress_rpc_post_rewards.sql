@@ -1,5 +1,5 @@
 -- ---------- RPC used by POST /api/progress ----------
--- The caller is always auth.uid(); the client never sends a user id.
+-- The caller is always auth.uid(), the client never sends a user id.
 create function public.record_progress(p_project uuid, p_action text)
 returns table (status public.progress_status, is_completed boolean, xp integer, level integer)
 language plpgsql security definer set search_path = '' as $fn$
@@ -47,16 +47,16 @@ begin
      where up.user_id = uid and up.project_id = p_project;
 end $fn$;
 
--- XP for sharing a build (once per post; extra once if it works).
+-- XP for sharing a build (once per post, extra once if it works).
 -- Farm protection: at most 3 rewarded posts per user per UTC day, so delete/re-post loops earn nothing.
--- 'post_working' is only paid for a post that itself earned the base 'post' reward.
+-- post_working is only paid for a post that itself earned the base post reward.
 create function public.reward_post() returns trigger
 language plpgsql security definer set search_path = '' as $fn$
 declare
   rewarded_today integer;
   base_rewarded  boolean;
 begin
-  -- Serialize awards per user so concurrent inserts can't all pass the daily check.
+  -- Serialize awards per user so concurrent inserts cannot all pass the daily check.
   perform pg_advisory_xact_lock(hashtextextended('reward_post:' || new.user_id::text, 0));
 
   select exists (select 1 from public.xp_events

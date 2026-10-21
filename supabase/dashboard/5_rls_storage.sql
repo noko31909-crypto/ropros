@@ -6,7 +6,7 @@ alter table public.community_posts enable row level security;
 alter table public.post_likes      enable row level security;
 alter table public.xp_events       enable row level security;
 
--- users: public profile fields readable by everyone; email is NOT granted to clients.
+-- users: public profile fields readable by everyone, email is NOT granted to clients.
 revoke all on public.users from anon, authenticated;
 grant select (id, name, avatar_url, xp, level, created_at) on public.users to anon, authenticated;
 grant update (name, avatar_url) on public.users to authenticated;
@@ -14,17 +14,17 @@ create policy users_read        on public.users for select using (true);
 create policy users_update_self on public.users for update to authenticated
   using (id = auth.uid()) with check (id = auth.uid());
 
--- projects: read published only; writes go through the service role (admin tooling).
+-- projects: read published only, writes go through the service role (admin tooling).
 revoke all on public.projects from anon, authenticated;
 grant select on public.projects to anon, authenticated;
 create policy projects_read on public.projects for select using (is_published);
 
--- user_progress: each user reads only their own rows; writes only via record_progress().
+-- user_progress: each user reads only their own rows, writes only via record_progress().
 revoke all on public.user_progress from anon, authenticated;
 grant select on public.user_progress to authenticated;
 create policy progress_read_own on public.user_progress for select to authenticated using (user_id = auth.uid());
 
--- community_posts: public feed; authors create/edit/delete their own; likes_count is not writable.
+-- community_posts: public feed, authors create/edit/delete their own, likes_count is not writable.
 revoke all on public.community_posts from anon, authenticated;
 grant select on public.community_posts to anon, authenticated;
 grant insert (user_id, project_id, title, status, image_url) on public.community_posts to authenticated;
@@ -33,7 +33,7 @@ grant delete on public.community_posts to authenticated;
 create policy posts_read       on public.community_posts for select using (true);
 create policy posts_insert_own on public.community_posts for insert to authenticated
   with check (user_id = auth.uid()
-              and image_url like auth.uid()::text || '/%');   -- image must live in the author's folder
+              and image_url like auth.uid()::text || '/%');   -- image must live in the authors folder
 create policy posts_update_own on public.community_posts for update to authenticated
   using (user_id = auth.uid()) with check (user_id = auth.uid());
 create policy posts_delete_own on public.community_posts for delete to authenticated using (user_id = auth.uid());

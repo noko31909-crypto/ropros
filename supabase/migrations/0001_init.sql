@@ -1,8 +1,8 @@
 -- =====================================================================
 -- ropros · initial schema (Supabase / PostgreSQL 15+)
 -- Passwords live only in Supabase Auth (auth.users). public.users holds the public profile.
--- Clients get read access + narrow column grants; all scoring (XP, likes, progress)
--- happens inside SECURITY DEFINER functions, so it can't be faked from the browser.
+-- Clients get read access + narrow column grants, all scoring (XP, likes, progress)
+-- happens inside SECURITY DEFINER functions, so it cannot be faked from the browser.
 -- =====================================================================
 
 -- ---------- Types ----------
@@ -80,7 +80,7 @@ create table public.community_posts (
   project_id   uuid references public.projects (id) on delete set null,
   title        text not null check (length(title) between 1 and 80),
   status       public.build_status not null default 'working',
-  image_url    text not null,           -- storage path inside the 'community' bucket
+  image_url    text not null,           -- storage path inside the community bucket
   likes_count  integer not null default 0 check (likes_count >= 0),
   created_at   timestamptz not null default now()
 );
@@ -95,7 +95,7 @@ create table public.post_likes (
   primary key (post_id, user_id)
 );
 
--- likes_count is maintained atomically by triggers; clients can't write it.
+-- likes_count is maintained atomically by triggers, clients cannot write it.
 create function public.sync_likes_count() returns trigger
 language plpgsql security definer set search_path = '' as $fn$
 begin
@@ -134,7 +134,7 @@ begin
 end $fn$;
 
 -- ---------- RPC used by POST /api/progress ----------
--- The caller is always auth.uid(); the client never sends a user id.
+-- The caller is always auth.uid(), the client never sends a user id.
 create function public.record_progress(p_project uuid, p_action text)
 returns table (status public.progress_status, is_completed boolean, xp integer, level integer)
 language plpgsql security definer set search_path = '' as $fn$
@@ -182,16 +182,16 @@ begin
      where up.user_id = uid and up.project_id = p_project;
 end $fn$;
 
--- XP for sharing a build (once per post; extra once if it works).
+-- XP for sharing a build (once per post, extra once if it works).
 -- Farm protection: at most 3 rewarded posts per user per UTC day, so delete/re-post loops earn nothing.
--- 'post_working' is only paid for a post that itself earned the base 'post' reward.
+-- post_working is only paid for a post that itself earned the base post reward.
 create function public.reward_post() returns trigger
 language plpgsql security definer set search_path = '' as $fn$
 declare
   rewarded_today integer;
   base_rewarded  boolean;
 begin
-  -- Serialize awards per user so concurrent inserts can't all pass the daily check.
+  -- Serialize awards per user so concurrent inserts cannot all pass the daily check.
   perform pg_advisory_xact_lock(hashtextextended('reward_post:' || new.user_id::text, 0));
 
   select exists (select 1 from public.xp_events
@@ -226,7 +226,7 @@ alter table public.community_posts enable row level security;
 alter table public.post_likes      enable row level security;
 alter table public.xp_events       enable row level security;
 
--- users: public profile fields readable by everyone; email is NOT granted to clients.
+-- users: public profile fields readable by everyone, email is NOT granted to clients.
 revoke all on public.users from anon, authenticated;
 grant select (id, name, avatar_url, xp, level, created_at) on public.users to anon, authenticated;
 grant update (name, avatar_url) on public.users to authenticated;
@@ -234,17 +234,17 @@ create policy users_read        on public.users for select using (true);
 create policy users_update_self on public.users for update to authenticated
   using (id = auth.uid()) with check (id = auth.uid());
 
--- projects: read published only; writes go through the service role (admin tooling).
+-- projects: read published only, writes go through the service role (admin tooling).
 revoke all on public.projects from anon, authenticated;
 grant select on public.projects to anon, authenticated;
 create policy projects_read on public.projects for select using (is_published);
 
--- user_progress: each user reads only their own rows; writes only via record_progress().
+-- user_progress: each user reads only their own rows, writes only via record_progress().
 revoke all on public.user_progress from anon, authenticated;
 grant select on public.user_progress to authenticated;
 create policy progress_read_own on public.user_progress for select to authenticated using (user_id = auth.uid());
 
--- community_posts: public feed; authors create/edit/delete their own; likes_count is not writable.
+-- community_posts: public feed, authors create/edit/delete their own, likes_count is not writable.
 revoke all on public.community_posts from anon, authenticated;
 grant select on public.community_posts to anon, authenticated;
 grant insert (user_id, project_id, title, status, image_url) on public.community_posts to authenticated;
@@ -253,7 +253,7 @@ grant delete on public.community_posts to authenticated;
 create policy posts_read       on public.community_posts for select using (true);
 create policy posts_insert_own on public.community_posts for insert to authenticated
   with check (user_id = auth.uid()
-              and image_url like auth.uid()::text || '/%');   -- image must live in the author's folder
+              and image_url like auth.uid()::text || '/%');   -- image must live in the authors folder
 create policy posts_update_own on public.community_posts for update to authenticated
   using (user_id = auth.uid()) with check (user_id = auth.uid());
 create policy posts_delete_own on public.community_posts for delete to authenticated using (user_id = auth.uid());

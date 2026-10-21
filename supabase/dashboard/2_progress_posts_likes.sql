@@ -19,7 +19,7 @@ create table public.community_posts (
   project_id   uuid references public.projects (id) on delete set null,
   title        text not null check (length(title) between 1 and 80),
   status       public.build_status not null default 'working',
-  image_url    text not null,           -- storage path inside the 'community' bucket
+  image_url    text not null,           -- storage path inside the community bucket
   likes_count  integer not null default 0 check (likes_count >= 0),
   created_at   timestamptz not null default now()
 );
@@ -34,7 +34,7 @@ create table public.post_likes (
   primary key (post_id, user_id)
 );
 
--- likes_count is maintained atomically by triggers; clients can't write it.
+-- likes_count is maintained atomically by triggers, clients cannot write it.
 create function public.sync_likes_count() returns trigger
 language plpgsql security definer set search_path = '' as $fn$
 begin
