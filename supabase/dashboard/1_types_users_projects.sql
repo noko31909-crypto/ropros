@@ -16,7 +16,7 @@ create type public.build_status     as enum ('working', 'debugging');
 create table public.users (
   id          uuid primary key references auth.users (id) on delete cascade,
   email       text not null unique,
-  name        text not null check (name ~ '^[A-Za-z0-9_.]{3,24}$'),
+  name        text not null check (name ~ '^[A-Za-z0-9_.]{3,24}\Z'),
   avatar_url  text check (avatar_url is null or avatar_url ~ '^https://'),
   xp          integer not null default 0 check (xp >= 0),
   -- Level is derived from XP, so it can never disagree with it.
@@ -45,7 +45,7 @@ create trigger on_auth_user_created after insert on auth.users
 -- ---------- projects ----------
 create table public.projects (
   id                   uuid primary key default gen_random_uuid(),
-  slug                 text not null unique check (slug ~ '^[a-z0-9-]{3,64}$'),
+  slug                 text not null unique check (slug ~ '^[a-z0-9-]{3,64}\Z'),
   title                text not null check (length(title) between 1 and 120),
   platform             public.platform_type not null,
   difficulty           public.difficulty_level not null,
