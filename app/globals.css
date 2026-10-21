@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+/* ropros design tokens — dark by default, deep slate surfaces, neon orange accent */
+@theme {
+  --color-ink-950: #07090c;   /* page background */
+  --color-ink-900: #0b0f14;   /* raised background */
+  --color-ink-850: #10151c;   /* cards */
+  --color-ink-800: #161c25;   /* hover / inputs */
+  --color-ink-700: #202834;   /* strong borders */
+  --color-line: #1c2430;      /* hairlines */
+  --color-fg: #e9eef3;        /* primary text */
+  --color-fg-muted: #8b98a9;  /* secondary text */
+  --color-fg-subtle: #5d6a7b; /* tertiary text */
+
+  --color-accent: #ff7a1a;        /* neon orange: primary actions */
+  --color-accent-hover: #ff9446;
+  --color-accent-soft: #ff7a1a1f;
+  --color-signal: #2ee6c9;        /* electric teal: AI + live states only */
+  --color-signal-soft: #2ee6c91a;
+
+  --color-brand-from: #efb3a3;    /* logo gradient (peach) */
+  --color-brand-to: #a5a57a;      /* logo gradient (olive) */
+
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-display: var(--font-gloock), Georgia, serif;
+
+  --radius-card: 1rem;
+
+  --animate-shimmer: shimmer 2.6s ease-in-out infinite;
+  --animate-scan: scan 1.4s ease-in-out infinite;
+  --animate-tag-in: tag-in 180ms cubic-bezier(.2,.8,.2,1);
+  --animate-fade-up: fade-up 400ms cubic-bezier(.2,.8,.2,1) both;
+  --animate-blink: blink 1s steps(2) infinite;
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes shimmer { 0% { transform: translateX(-120%) skewX(-20deg); } 60%,100% { transform: translateX(220%) skewX(-20deg); } }
+  @keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }
+  @keyframes tag-in { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  --shadow-glow: 0 0 0 1px #ff7a1a33, 0 12px 40px -12px #ff7a1a55;
+}
+
+@layer base {
+  :root { color-scheme: dark; }
+  html { background: var(--color-ink-950); }
+  body {
+    @apply bg-ink-950 font-sans text-fg antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  ::selection { background: var(--color-accent); color: #0b0f14; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; border-radius: 6px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+/* Faint engineering grid used behind hero areas */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, #ffffff08 1px, transparent 1px),
+    linear-gradient(to bottom, #ffffff08 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+@utility text-brand-gradient {
+  background-image: linear-gradient(90deg, var(--color-brand-from), var(--color-brand-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
