@@ -5,6 +5,7 @@ import { Heart } from "lucide-react";
 import { Avatar } from "@/components/auth/avatar";
 import { useMessages } from "@/components/i18n/locale-provider";
 import { community } from "@/lib/i18n/messages/community";
+import { DeletePost } from "./delete-post";
 import { StatusBadge, type BuildStatus } from "./status-badge";
 
 export type FeedPost = {
@@ -12,7 +13,7 @@ export type FeedPost = {
   author: string; authorLevel?: number; signedUrl?: string;
 };
 
-export function PostCard({ post, liked, mine, onLike }: { post: FeedPost; liked: boolean; mine: boolean; onLike: () => void }) {
+export function PostCard({ post, liked, mine, onLike, onDeleted }: { post: FeedPost; liked: boolean; mine: boolean; onLike: () => void; onDeleted?: (id: string) => void }) {
   const t = useMessages(community);
   return (
     <article className="group mb-3 break-inside-avoid overflow-hidden rounded-[20px] border border-line bg-ink-850 transition-all duration-300 hover:border-ink-700 sm:mb-6 sm:rounded-[28px]">
@@ -27,7 +28,7 @@ export function PostCard({ post, liked, mine, onLike }: { post: FeedPost; liked:
         </div>
         <h3 className="absolute inset-x-3 bottom-2.5 text-[13px] font-semibold leading-snug text-fg drop-shadow sm:inset-x-4 sm:bottom-3 sm:text-[17px]">{post.title}</h3>
       </div>
-      <div className="flex items-center gap-2 p-2.5 sm:gap-3 sm:p-4">
+      <div className="flex flex-wrap items-center gap-2 p-2.5 sm:gap-3 sm:p-4">
         <span className="hidden sm:inline-flex"><Avatar name={post.author} size="sm" level={post.authorLevel} /></span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[12px] font-semibold text-fg sm:text-sm">@{post.author}</p>
@@ -39,6 +40,7 @@ export function PostCard({ post, liked, mine, onLike }: { post: FeedPost; liked:
           <Heart className={clsx("h-[18px] w-[18px]", liked && "fill-current")} aria-hidden />
           <span>{post.likes_count}</span>
         </button>
+        {mine && onDeleted && <DeletePost id={post.id} title={post.title} imagePath={post.image_url} onDeleted={onDeleted} />}
       </div>
     </article>
   );

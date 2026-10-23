@@ -133,7 +133,8 @@ export function CommunityShowcase() {
           </div>
         ) : (
           <div className="columns-2 gap-3 sm:gap-6 lg:columns-3 2xl:columns-4">
-            {list.map((p) => <PostCard key={p.id} post={p} liked={liked.has(p.id)} mine={p.user_id === userId} onLike={() => void toggleLike(p)} />)}
+            {list.map((p) => <PostCard key={p.id} post={p} liked={liked.has(p.id)} mine={!!userId && p.user_id === userId} onLike={() => void toggleLike(p)}
+              onDeleted={(id) => setPosts((ps) => ps?.filter((x) => x.id !== id) ?? null)} />)}
           </div>
         )}
       </Container>

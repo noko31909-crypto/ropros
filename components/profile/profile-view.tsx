@@ -12,6 +12,11 @@ import { useLocale, useMessages } from "@/components/i18n/locale-provider";
 import { LOCALE_TAG } from "@/lib/i18n/config";
 import { common } from "@/lib/i18n/messages/common";
 import { profile as profileMsgs } from "@/lib/i18n/messages/profile";
+import { DeletePost } from "@/components/community/delete-post";
+import { Cover } from "@/components/cards/covers";
+import { PlatformPill } from "@/components/cards/project-card";
+import { getProject, projectHref } from "@/lib/projects";
+import { useSavedBuilds } from "@/lib/saved";
 import { StatusBadge, type BuildStatus } from "@/components/community/status-badge";
 
 type Stats = { simulated: number; completed: number; posts: number; working: number; debugging: number; likes: number };
@@ -44,6 +49,8 @@ export function ProfileView() {
   const [history, setHistory] = useState<XpEvent[]>([]);
   const [posts, setPosts] = useState<OwnPost[]>([]);
   const [error, setError] = useState(false);
+  const { saved } = useSavedBuilds();
+  const savedProjects = saved.map((s) => getProject(s)).filter((p) => p !== undefined);
 
   useEffect(() => {
     if (!userId) { setStats(null); setHistory([]); setPosts([]); return; }
@@ -161,6 +168,34 @@ export function ProfileView() {
           <p className="mt-5 text-sm text-fg-subtle">{t.howTo}</p>
         </section>
 
+        <section id="saved" className="scroll-mt-24">
+          <div className="mb-5 flex items-baseline justify-between gap-3">
+            <div className="flex items-baseline gap-3">
+              <h2 className="text-xl font-semibold text-fg">{t.savedTitle}</h2>
+              <span className="font-mono text-xs text-fg-subtle">{t.savedNote}</span>
+            </div>
+            <Link href="/projects" className="text-sm font-semibold text-accent hover:underline">{t.savedBrowse}</Link>
+          </div>
+          {savedProjects.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-ink-700 p-8 text-center text-sm text-fg-subtle">{t.savedEmpty}</p>
+          ) : (
+            <div className="columns-2 gap-4 sm:columns-3 lg:columns-4">
+              {savedProjects.map((p) => (
+                <Link key={p.slug} href={projectHref(p)}
+                  className="group mb-4 block break-inside-avoid overflow-hidden rounded-[28px] border border-line bg-ink-850 transition-colors hover:border-accent/40">
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Cover id={p.cover} title={p.title} className="absolute inset-0 h-full w-full" />
+                  </div>
+                  <div className="flex flex-col gap-2 p-4">
+                    <PlatformPill board={p.board} />
+                    <p className="font-semibold leading-snug text-fg group-hover:text-accent">{p.title}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
         <div className="grid gap-12 lg:grid-cols-[1fr_2fr]">
           <section>
             <h2 className="mb-5 text-xl font-semibold text-fg">{t.historyTitle}</h2>
@@ -194,12 +229,13 @@ export function ProfileView() {
                         : <div className="aspect-square bg-ink-800" />}
                       <div className="absolute left-2 top-2 origin-top-left scale-90"><StatusBadge status={p.status} label={t.status[p.status]} /></div>
                     </div>
-                    <div className="flex items-center justify-between gap-2 p-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 p-3">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-fg">{p.title}</p>
                         <p className="font-mono text-[11px] text-fg-subtle">{dateFmt.format(new Date(p.created_at))}</p>
                       </div>
                       <span className="inline-flex shrink-0 items-center gap-1 font-mono text-xs text-fg-muted"><Heart className="h-3.5 w-3.5" aria-hidden />{p.likes_count}</span>
+                      <DeletePost id={p.id} title={p.title} imagePath={p.image_url} onDeleted={(id) => setPosts((ps) => ps.filter((x) => x.id !== id))} />
                     </div>
                   </article>
                 ))}
