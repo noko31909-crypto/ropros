@@ -67,7 +67,6 @@ export default async function HomePage() {
               <div className="absolute inset-0 rounded-3xl bg-grid opacity-60" />
               <div className="relative flex h-full flex-col items-center justify-center gap-6">
                 <RobotMark className="h-40 w-40 drop-shadow-[0_20px_60px_rgba(255,122,26,0.25)]" />
-                <p className="font-mono text-xs text-fg-subtle">{t.heroSlot}</p>
               </div>
             </div>
           </div>

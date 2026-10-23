@@ -17,6 +17,10 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
   (Arduino teal, ESP32 orange, Raspberry Pi pink).
 
 ## Where things are
+- i18n (en / ru / kk): `lib/i18n/config.ts` (`defineMessages`), one namespace per area in `lib/i18n/messages/*`.
+  Server components: `ns[await getLocale()]` (`lib/i18n/server.ts`); client: `useMessages(ns)`. Locale = `lang` cookie,
+  switched by `components/i18n/locale-switcher.tsx`. Every new UI string goes into all three languages.
+- `components/auth/auth-provider.tsx` — session, profile (XP/level from `public.users`), sign-in modal (`useAuth()`)
 - `lib/nav.ts` — single nav config (header, mobile, footer)
 - `lib/finder/*` — part normalization + matcher (pure, tested in `tests/finder.test.ts`); API at `app/api/finder/route.ts`
 - `app/api/progress/route.ts` — saves progress via the `record_progress` RPC
