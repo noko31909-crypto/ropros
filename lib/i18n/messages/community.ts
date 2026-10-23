@@ -19,6 +19,7 @@ export const community = defineMessages({
     status: { working: "100% Working", debugging: "Debugging code…" },
     like: "Like", unlike: "Remove like",
     you: "Your build",
+    del: { action: (t: string) => `Delete post: ${t}`, confirm: "Delete? XP you earned stays.", yes: "Yes, delete", cancel: "Cancel", done: "Post deleted", error: "Could not delete the post. Try again." },
     authShare: "Sign in to share your build.",
     authLike: "Sign in to like builds.",
     modal: {
@@ -53,6 +54,7 @@ export const community = defineMessages({
     status: { working: "100% Working", debugging: "Debugging code…" },
     like: "Поставить лайк", unlike: "Убрать лайк",
     you: "Ваша сборка",
+    del: { action: (t: string) => `Удалить пост: ${t}`, confirm: "Удалить? Заработанный XP останется.", yes: "Да, удалить", cancel: "Отмена", done: "Пост удалён", error: "Не удалось удалить пост. Попробуйте ещё раз." },
     authShare: "Войдите, чтобы поделиться своей сборкой.",
     authLike: "Войдите, чтобы ставить лайки.",
     modal: {
@@ -87,6 +89,7 @@ export const community = defineMessages({
     status: { working: "100% Working", debugging: "Debugging code…" },
     like: "Лайк басу", unlike: "Лайкты алып тастау",
     you: "Сіздің құрастыруыңыз",
+    del: { action: (t: string) => `Жазбаны жою: ${t}`, confirm: "Жою керек пе? Жинаған XP сақталады.", yes: "Иә, жою", cancel: "Бас тарту", done: "Жазба жойылды", error: "Жазбаны жою мүмкін болмады. Қайталап көріңіз." },
     authShare: "Құрастыруыңызбен бөлісу үшін кіріңіз.",
     authLike: "Лайк басу үшін кіріңіз.",
     modal: {

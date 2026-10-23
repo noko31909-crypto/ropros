@@ -10,6 +10,14 @@ const ESP_CODE = "```cpp\nconst int PWMA = 25, AIN1 = 26, AIN2 = 27;\nconst int 
 /** Build Assistant UI + localised mock replies (front-end mock until the server route exists). */
 export const assistant = defineMessages({
   en: {
+    live: {
+      demo: "Demo mode: the AI isn't connected yet (no API key on the server), so this is a sample answer.",
+      signIn: "Sign in to chat with the Build Assistant.",
+      rateLimited: "Too many questions in a minute. Wait a moment and try again.",
+      refused: "The assistant can't help with that request.",
+      error: "Something went wrong. Please try again.",
+      truncated: "(answer cut short)",
+    },
     metaTitle: "Build Assistant",
     pageTitle: "Build Assistant",
     pageDescription: "Ask about wiring, code or debugging. On a guide page it reads that guide’s wiring and code; here it answers in general.",
@@ -49,6 +57,14 @@ export const assistant = defineMessages({
     } as Record<ReplyKey, string>,
   },
   ru: {
+    live: {
+      demo: "Демо-режим: AI пока не подключён (на сервере нет API-ключа), это пример ответа.",
+      signIn: "Войдите, чтобы общаться с Build Assistant.",
+      rateLimited: "Слишком много вопросов за минуту. Подождите немного и попробуйте снова.",
+      refused: "Ассистент не может помочь с этим запросом.",
+      error: "Что-то пошло не так. Попробуйте ещё раз.",
+      truncated: "(ответ обрезан)",
+    },
     metaTitle: "Build Assistant",
     pageTitle: "Build Assistant",
     pageDescription: "Спрашивайте о проводке, коде и отладке. На странице гайда ассистент читает его схему и код, здесь отвечает в общем.",
@@ -88,6 +104,14 @@ export const assistant = defineMessages({
     },
   },
   kk: {
+    live: {
+      demo: "Демо режимі: AI әлі қосылмаған (серверде API кілті жоқ), бұл жауап үлгісі.",
+      signIn: "Build Assistant-пен сөйлесу үшін кіріңіз.",
+      rateLimited: "Бір минутта тым көп сұрақ. Сәл күтіп, қайталап көріңіз.",
+      refused: "Ассистент бұл сұраныс бойынша көмектесе алмайды.",
+      error: "Бірдеңе дұрыс болмады. Қайталап көріңіз.",
+      truncated: "(жауап қысқартылды)",
+    },
     metaTitle: "Build Assistant",
     pageTitle: "Build Assistant",
     pageDescription: "Сымдар, код және жөндеу туралы сұраңыз. Нұсқаулық бетінде көмекші оның сызбасы мен кодын оқиды, мұнда жалпы жауап береді.",

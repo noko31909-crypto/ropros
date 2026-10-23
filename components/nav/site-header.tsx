@@ -13,7 +13,6 @@ import { Logo } from "@/components/brand/logo";
 import { Container } from "@/components/ui/container";
 import { Avatar } from "@/components/auth/avatar";
 import { levelBand, useAuth } from "@/components/auth/auth-provider";
-import { useToast } from "@/components/ui/toast";
 
 /** Accessible dropdown: opens on click, closes on Escape, outside click or route change. */
 function NavDropdown({ item, active }: { item: Extract<NavItem, { children: unknown }>; active: boolean }) {
@@ -95,7 +94,6 @@ export function SiteHeader() {
   const nav = buildNav(t);
   const section = sectionOf(pathname);
   const { profile, openAuth, signOut } = useAuth();
-  const toast = useToast();
   const [mobileOpen, setMobileOpen] = useState(false);
   useEffect(() => setMobileOpen(false), [pathname]);
 
@@ -124,10 +122,17 @@ export function SiteHeader() {
             <span className="w-40 text-left">{t.nav.search}</span>
           </Link>
           <LocaleSwitcher className="hidden sm:inline-flex" />
-          <button type="button" aria-label={t.nav.saved} onClick={() => (profile ? toast(t.nav.savedToast) : openAuth())}
-            className="hidden h-9 w-9 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-ink-800 hover:text-fg sm:inline-flex">
-            <Bookmark className="h-[18px] w-[18px]" aria-hidden />
-          </button>
+          {profile ? (
+            <Link href="/profile#saved" aria-label={t.nav.saved}
+              className="hidden h-9 w-9 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-ink-800 hover:text-fg sm:inline-flex">
+              <Bookmark className="h-[18px] w-[18px]" aria-hidden />
+            </Link>
+          ) : (
+            <button type="button" aria-label={t.nav.saved} onClick={() => openAuth()}
+              className="hidden h-9 w-9 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-ink-800 hover:text-fg sm:inline-flex">
+              <Bookmark className="h-[18px] w-[18px]" aria-hidden />
+            </button>
+          )}
           <AuthChip />
           <button type="button" onClick={() => setMobileOpen((v) => !v)} aria-expanded={mobileOpen} aria-controls="mobile-nav" aria-label={mobileOpen ? t.nav.close : t.nav.menu}
             className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line text-fg lg:hidden">

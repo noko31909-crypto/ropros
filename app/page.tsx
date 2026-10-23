@@ -55,7 +55,7 @@ export default async function HomePage() {
                 <span className="h-1.5 w-1.5 rounded-full bg-signal" />{t.eyebrow}
               </p>
               <h1 className="mt-6 text-[2.75rem] font-semibold leading-[1.02] tracking-[-0.035em] text-fg sm:text-7xl">
-                {t.titleA}<br /><span className="font-display font-normal tracking-normal text-brand-gradient">{t.titleB}</span>
+                {t.titleA}<br /><span className={locale === "en" ? "font-display font-normal tracking-normal text-brand-gradient" : "font-sans font-semibold italic tracking-tight text-brand-gradient"}>{t.titleB}</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-fg-muted">{t.subtitle}</p>
               <div className="mt-10 flex flex-wrap gap-3">

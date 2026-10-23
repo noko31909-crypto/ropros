@@ -29,7 +29,7 @@ export function CodeBlock({ files }: { files: CodeFile[] }) {
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-ink-900 px-4 py-2.5">
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="hidden gap-1.5 sm:flex" aria-hidden><i className="h-2.5 w-2.5 rounded-full bg-ink-700" /><i className="h-2.5 w-2.5 rounded-full bg-ink-700" /><i className="h-2.5 w-2.5 rounded-full bg-ink-700" /></span>
-          <div role="tablist" aria-label="Files" className="flex gap-1 overflow-x-auto [scrollbar-width:none] sm:ml-2">
+          <div role="tablist" aria-label={t.files} className="flex gap-1 overflow-x-auto [scrollbar-width:none] sm:ml-2">
             {files.map((f, i) => (
               <button key={f.filename} type="button" role="tab" aria-selected={i === idx} onClick={() => { setIdx(i); setCopied(null); }}
                 className={clsx("inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 font-mono text-xs transition-colors",

@@ -1,5 +1,7 @@
+import type { DiagramCaptions } from "./primitives";
+
 /** Breadboard wiring for the Obstacle Avoiding Robot (Arduino UNO, HC-SR04, SG90, L298N). Static, generated from the approved prototype. */
-export function ObstacleAvoidingRobotDiagram({ label }: { label: string }) {
+export function ObstacleAvoidingRobotDiagram({ label, c }: { label: string; c: DiagramCaptions }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1480 1224" width="1480" height="1224" role="img" aria-label={label} className="block h-auto min-w-[880px] w-full">
 <defs>
@@ -77,8 +79,8 @@ export function ObstacleAvoidingRobotDiagram({ label }: { label: string }) {
 <text x="798" y="429" fontFamily="JetBrains Mono, Menlo, monospace" fontSize="8.5" fontWeight="400" fill="#8A8A82" textAnchor="middle">55</text>
 <text x="858" y="276" fontFamily="JetBrains Mono, Menlo, monospace" fontSize="8.5" fontWeight="400" fill="#8A8A82" textAnchor="middle">60</text>
 <text x="858" y="429" fontFamily="JetBrains Mono, Menlo, monospace" fontSize="8.5" fontWeight="400" fill="#8A8A82" textAnchor="middle">60</text>
-<text x="932" y="440" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10" fontWeight="700" fill="#E53935">5V rail</text>
-<text x="932" y="452" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10" fontWeight="700" fill="#1E5AA8">GND rail</text>
+<text x="932" y="440" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10" fontWeight="700" fill="#E53935">{c.rail5v}</text>
+<text x="932" y="452" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10" fontWeight="700" fill="#1E5AA8">{c.railGnd}</text>
 <g transform="translate(180 695)">
 <rect x="0" y="0" width="400" height="300" rx="12" fill="#00878F" stroke="#00616A" strokeWidth="2"/>
 <circle cx="18" cy="44" r="7" fill="#F5F7F3" stroke="#B8C7C0"/>
@@ -199,10 +201,10 @@ export function ObstacleAvoidingRobotDiagram({ label }: { label: string }) {
 <circle cx="1364" cy="95" r="14" fill="#E0E0E0"/>
 <rect x="1320" y="90" width="70" height="10" rx="5" fill="#FAFAFA" stroke="#BDBDBD"/>
 <text x="1290" y="99" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10" fontWeight="700" fill="#fff">SG90</text>
-<text x="1392" y="146" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10.5" fontWeight="700" fill="#333" textAnchor="end">SG90 servo</text>
+<text x="1392" y="146" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10.5" fontWeight="700" fill="#333" textAnchor="end">{c.servo}</text>
 <rect x="1186" y="67" width="14" height="6" fill="#C9A43B"/>
 <rect x="1198" y="64" width="8" height="12" fill="#151515"/>
-<text x="1212" y="74" fontFamily="JetBrains Mono, Menlo, monospace" fontSize="9.5" fontWeight="400" fill="#333">Signal</text>
+<text x="1212" y="74" fontFamily="JetBrains Mono, Menlo, monospace" fontSize="9.5" fontWeight="400" fill="#333">{c.signal}</text>
 <rect x="1186" y="89" width="14" height="6" fill="#C9A43B"/>
 <rect x="1198" y="86" width="8" height="12" fill="#151515"/>
 <text x="1212" y="96" fontFamily="JetBrains Mono, Menlo, monospace" fontSize="9.5" fontWeight="400" fill="#333">V+</text>
@@ -277,7 +279,7 @@ export function ObstacleAvoidingRobotDiagram({ label }: { label: string }) {
 <rect x="1412" y="501" width="6" height="10" fill="#B0BEC5"/>
 <rect x="1234" y="526" width="180" height="32" rx="16" fill="#1E88E5"/>
 <rect x="1412" y="537" width="6" height="10" fill="#B0BEC5"/>
-<text x="1432" y="578" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10.5" fontWeight="700" fill="#333" textAnchor="end">Battery pack</text>
+<text x="1432" y="578" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10.5" fontWeight="700" fill="#333" textAnchor="end">{c.battery}</text>
 <rect x="1186" y="499" width="14" height="6" fill="#C9A43B"/>
 <rect x="1198" y="496" width="8" height="12" fill="#151515"/>
 <text x="1212" y="506" fontFamily="JetBrains Mono, Menlo, monospace" fontSize="9.5" fontWeight="400" fill="#333">+</text>
@@ -287,17 +289,17 @@ export function ObstacleAvoidingRobotDiagram({ label }: { label: string }) {
 <rect x="1272" y="639" width="78" height="44" rx="5" fill="#FBC02D" stroke="#C49000"/>
 <rect x="1350" y="645" width="44" height="32" rx="14" fill="#CFD8DC" stroke="#90A4AE"/>
 <rect x="1298" y="627" width="12" height="70" rx="3" fill="#FBC02D" stroke="#C49000"/>
-<text x="1412" y="702" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10.5" fontWeight="700" fill="#333" textAnchor="end">Left motor</text>
+<text x="1412" y="702" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10.5" fontWeight="700" fill="#333" textAnchor="end">{c.leftMotor}</text>
 <rect x="1186" y="643" width="14" height="6" fill="#C9A43B"/>
 <rect x="1198" y="640" width="8" height="12" fill="#151515"/>
-<text x="1212" y="650" fontFamily="JetBrains Mono, Menlo, monospace" fontSize="9.5" fontWeight="400" fill="#333">Terminals</text>
+<text x="1212" y="650" fontFamily="JetBrains Mono, Menlo, monospace" fontSize="9.5" fontWeight="400" fill="#333">{c.terminals}</text>
 <rect x="1272" y="763" width="78" height="44" rx="5" fill="#FBC02D" stroke="#C49000"/>
 <rect x="1350" y="769" width="44" height="32" rx="14" fill="#CFD8DC" stroke="#90A4AE"/>
 <rect x="1298" y="751" width="12" height="70" rx="3" fill="#FBC02D" stroke="#C49000"/>
-<text x="1412" y="826" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10.5" fontWeight="700" fill="#333" textAnchor="end">Right motor</text>
+<text x="1412" y="826" fontFamily="Atkinson Hyperlegible, Arial, sans-serif" fontSize="10.5" fontWeight="700" fill="#333" textAnchor="end">{c.rightMotor}</text>
 <rect x="1186" y="767" width="14" height="6" fill="#C9A43B"/>
 <rect x="1198" y="764" width="8" height="12" fill="#151515"/>
-<text x="1212" y="774" fontFamily="JetBrains Mono, Menlo, monospace" fontSize="9.5" fontWeight="400" fill="#333">Terminals</text>
+<text x="1212" y="774" fontFamily="JetBrains Mono, Menlo, monospace" fontSize="9.5" fontWeight="400" fill="#333">{c.terminals}</text>
 <rect x="168" y="118" width="204" height="154" rx="7" fill="#1E5AA8" stroke="rgba(0,0,0,.35)" strokeWidth="1.5"/>
 <circle cx="176" cy="126" r="3.5" fill="#E8EDEA" opacity=".85"/>
 <circle cx="364" cy="126" r="3.5" fill="#E8EDEA" opacity=".85"/>
