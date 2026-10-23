@@ -13,6 +13,15 @@ const wireHex = (c: string) => WIRE_HEX[c] ?? c;
 
 export type AutoDiagramCaptions = { rail5v?: string; railGnd?: string; rail3v3?: string };
 
+/** Printed pin label: registry labels may carry notes in parentheses ("5V (USB ~500 mA)"). */
+export const shortPin = (p: { id: string; label: string }) => { const t = p.label.replace(/\s*\(.*$/, "").trim(); return t && t.length <= 9 ? t : p.id; };
+/** Display name without parenthesised notes, cut at a word boundary. */
+const shortName = (name: string, max = 22) => {
+  const t = name.replace(/\s*\(.*?\)/g, "").trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max); const i = cut.lastIndexOf(" ");
+  return i > 4 ? cut.slice(0, i) : cut;
+};
 const pathD = (pts: [number, number][]) => pts.map(([x, y], i) => `${i ? "L" : "M"}${x} ${y}`).join("");
 
 function Headers({ c, ink }: { c: LayoutComponent; ink: string }) {
@@ -31,7 +40,7 @@ function Headers({ c, ink }: { c: LayoutComponent; ink: string }) {
     for (const p of pins) {
       out.push(<rect key={`p${p.id}`} x={p.x - 3} y={p.y - 3} width={6} height={6} fill="#C9A43B" stroke="#7A5A00" strokeWidth={0.6} />);
       if (tiny) continue;
-      const t = p.label;
+      const t = shortPin(p);
       if (side === "top") out.push(<text key={`l${p.id}`} x={p.x} y={p.y + 10} transform={`rotate(90 ${p.x} ${p.y + 10})`} dominantBaseline="central" fontFamily={MONO} fontSize={8} fill={ink}>{t}</text>);
       else if (side === "bottom") out.push(<text key={`l${p.id}`} x={p.x} y={p.y - 10} transform={`rotate(-90 ${p.x} ${p.y - 10})`} dominantBaseline="central" fontFamily={MONO} fontSize={8} fill={ink}>{t}</text>);
       else out.push(<text key={`l${p.id}`} x={side === "left" ? p.x + 10 : p.x - 10} y={p.y} dominantBaseline="central" textAnchor={side === "left" ? "start" : "end"} fontFamily={MONO} fontSize={8} fill={ink}>{t}</text>);
@@ -44,7 +53,7 @@ function Headers({ c, ink }: { c: LayoutComponent; ink: string }) {
 function freeBox(c: LayoutComponent) {
   let t = 0, b = 0, l = 0, r = 0;
   for (const p of c.pins) {
-    const len = 16 + p.label.length * 5;
+    const len = 16 + shortPin(p).length * 5;
     if (p.side === "top") t = Math.max(t, len); else if (p.side === "bottom") b = Math.max(b, len);
     else if (p.side === "left") l = Math.max(l, len); else r = Math.max(r, len);
   }
@@ -60,6 +69,14 @@ function Part({ c }: { c: LayoutComponent }) {
   const cx = box.x + box.w / 2, cy = box.y + box.h / 2;
   let caption: ReactNode = null;
   const outsideCaption = (text: string, sub?: string) => {
+    if (sides.has("top") && sides.has("bottom") && !sides.has("left") && !sides.has("right")) {
+      return (
+        <g>
+          <text x={x + w + 8} y={y + h / 2 + (sub ? -2 : 4)} fontFamily={SANS} fontSize={12} fontWeight={700} fill="#37474F">{text}</text>
+          {sub && <text x={x + w + 8} y={y + h / 2 + 11} fontFamily={MONO} fontSize={9} fill="#607D8B">{sub}</text>}
+        </g>
+      );
+    }
     const below = sides.has("top");
     const ty = below ? y + h + 16 : y - 18;
     return (
@@ -85,7 +102,7 @@ function Part({ c }: { c: LayoutComponent }) {
       deco.push(<circle key="dot" cx={cx - chipW / 2 + 6} cy={cy + 12} r={1.8} fill="#444" />);
     }
     caption = (
-      <text x={cx} y={cy - 4} fontFamily={SANS} fontSize={Math.max(11, Math.min(20, box.w / 9))} fontWeight={700} fill={ink} textAnchor="middle">{def.name}</text>
+      <text x={cx} y={cy - 4} fontFamily={SANS} fontSize={Math.max(10, Math.min(20, box.w / (shortName(def.name).length * 0.6)))} fontWeight={700} fill={ink} textAnchor="middle">{shortName(def.name)}</text>
     );
   } else {
     const small = box.w < 56 || box.h < 26;
@@ -97,13 +114,13 @@ function Part({ c }: { c: LayoutComponent }) {
         const o = (i + 1) * (vertical ? h : w) / 6;
         deco.push(vertical ? <rect key={b} x={x + 2} y={y + o} width={w - 4} height={4} fill={b} /> : <rect key={b} x={x + o} y={y + 2} width={4} height={h - 4} fill={b} />);
       });
-      caption = outsideCaption(sub ?? def.name);
+      caption = outsideCaption(sub ?? shortName(def.name));
     } else if (def.id === "led") {
       deco.push(<circle key="dome" cx={x + w / 2} cy={y + h * 0.38} r={Math.min(w, h) * 0.34} fill="#FFCDD2" opacity={0.75} />);
-      caption = outsideCaption(sub ?? def.name);
+      caption = outsideCaption(sub ?? shortName(def.name));
     } else if (def.id === "push-button") {
       deco.push(<circle key="cap" cx={x + w / 2} cy={y + h / 2} r={Math.min(w, h) * 0.3} fill="#1F1F1F" stroke="#90A4AE" />);
-      caption = outsideCaption(sub ?? def.name);
+      caption = outsideCaption(sub ?? shortName(def.name));
     } else if (def.id === "dc-motor") {
       const shaftRight = !sides.has("right");
       deco.push(<rect key="cap" x={shaftRight ? x + w : x - 26} y={y + 8} width={26} height={h - 16} rx={6} fill="#CFD8DC" stroke="#90A4AE" />);
@@ -119,9 +136,14 @@ function Part({ c }: { c: LayoutComponent }) {
       deco.push(<rect key="lbl" x={x + 4} y={y + h * 0.45} width={w - 8} height={h * 0.3} fill="#F2C200" />);
     }
     if (!caption) {
-      caption = small ? outsideCaption(def.name, sub) : (
+      const full = shortName(def.name);
+      const fitsIn = (t: string) => t.length * 0.6 * 11 <= box.w - 8 && box.h >= 22;
+      const first = full.split(" ")[0] ?? full;
+      const nm = fitsIn(full) || first.length < 4 || !fitsIn(first) ? full : first;
+      const fits = fitsIn(nm);
+      caption = small || !fits ? outsideCaption(nm, sub) : (
         <g>
-          <text x={cx} y={cy + (sub ? -1 : 4)} fontFamily={SANS} fontSize={Math.max(10, Math.min(14, box.w / 7))} fontWeight={700} fill={ink} textAnchor="middle">{def.name}</text>
+          <text x={cx} y={cy + (sub ? -1 : 4)} fontFamily={SANS} fontSize={Math.max(9, Math.min(14, box.w / (nm.length * 0.62)))} fontWeight={700} fill={ink} textAnchor="middle">{nm}</text>
           {sub && <text x={cx} y={cy + 13} fontFamily={MONO} fontSize={9} fill={ink} opacity={0.8} textAnchor="middle">{sub}</text>}
         </g>
       );

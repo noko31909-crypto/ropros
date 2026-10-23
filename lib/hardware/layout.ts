@@ -51,12 +51,29 @@ function parseEnd(end: string): [string, string] {
 }
 
 /** Pins in the component's own (unrotated) frame: evenly spaced at header pitch, centred along their side. */
+/** Drawn size in grid units, grown when a side carries more pins than fit (registry sizes are a minimum). */
+export function drawSize(def: ComponentDef): { w: number; h: number } {
+  const n = (s: Side) => def.pins.filter((p) => p.side === s).length;
+  const pad = def.kind === "passive" ? 0 : 2;
+  let w = Math.max(def.draw.w, n("top") + pad, n("bottom") + pad, 1);
+  let h = Math.max(def.draw.h, n("left") + pad, n("right") + pad, 1);
+  if (def.kind !== "passive") {
+    // Room for rotated pin labels on opposite headers plus the name in between.
+    if (n("top") && n("bottom")) h = Math.max(h, def.kind === "board" ? 14 : 9);
+    else if (n("top") || n("bottom")) h = Math.max(h, 5);
+    if (n("left") && n("right")) w = Math.max(w, def.kind === "board" ? 18 : 12);
+    else if (n("left") || n("right")) w = Math.max(w, 7);
+  }
+  return { w, h };
+}
+
 function localPins(def: ComponentDef): LayoutPin[] {
-  const W = def.draw.w * UNIT, H = def.draw.h * UNIT;
+  const size = drawSize(def);
+  const W = size.w * UNIT, H = size.h * UNIT;
   const out: LayoutPin[] = [];
   for (const side of SIDES) {
     const list = def.pins.filter((p) => p.side === side);
-    const len = side === "top" || side === "bottom" ? def.draw.w : def.draw.h;
+    const len = side === "top" || side === "bottom" ? size.w : size.h;
     const start = Math.max(0, Math.floor((len - list.length) / 2));
     list.forEach((p, k) => {
       const t = (start + k) * UNIT + UNIT / 2;
@@ -216,7 +233,7 @@ export function layoutCircuit(input: CircuitInput, getComponent: (id: string) =>
   conns.forEach((c) => { pinDef(c.from); pinDef(c.to); });
 
   // Board placement at the origin; its pins tell where each module should sit.
-  const bw = boardDef.draw.w * UNIT, bh = boardDef.draw.h * UNIT;
+  const bw = drawSize(boardDef).w * UNIT, bh = drawSize(boardDef).h * UNIT;
   const boardPins = localPins(boardDef);
   const boardPin = (pid: string) => boardPins.find((p) => p.id === pid)!;
 
@@ -274,7 +291,7 @@ export function layoutCircuit(input: CircuitInput, getComponent: (id: string) =>
     const target: Side = axial ? (FACING[group] === "top" || FACING[group] === "bottom" ? "left" : "top") : FACING[group];
     const from: Side = axial ? (sidesUsed.has("left") ? "left" : "top") : main;
     let rot = 0; for (let s = from; s !== target; s = CW[s]) rot++;
-    const r = rotatePins(localPins(def), def.draw.w * UNIT, def.draw.h * UNIT, rot);
+    const r = rotatePins(localPins(def), drawSize(def).w * UNIT, drawSize(def).h * UNIT, rot);
     const horizontal = group === "top" || group === "bottom" || group === "power";
     const a = all.length ? all.reduce((t, p) => t + (horizontal ? p.x : p.y), 0) / all.length : horizontal ? bw / 2 : bh / 2;
     anchor.set(inst.id, a);

@@ -1,9 +1,15 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { layoutCircuit, type Layout } from "../lib/hardware/layout.ts";
-import { FIXTURE_CIRCUITS, getFixtureComponent } from "../app/dev/diagrams/fixtures.ts";
+import { FIXTURE_CIRCUITS, REGISTRY_CIRCUITS, getFixtureComponent } from "../app/dev/diagrams/fixtures.ts";
+import { COMPONENTS } from "../lib/hardware/components.ts";
 
-const layouts: Array<[string, Layout]> = FIXTURE_CIRCUITS.map((f) => [f.slug, layoutCircuit(f.circuit, getFixtureComponent)]);
+const registry = (id: string) => { const d = (COMPONENTS as Record<string, (typeof COMPONENTS)[keyof typeof COMPONENTS]>)[id]; if (!d) throw new Error(id); return d; };
+
+const layouts: Array<[string, Layout]> = [
+  ...FIXTURE_CIRCUITS.map((f): [string, Layout] => [f.slug, layoutCircuit(f.circuit, getFixtureComponent)]),
+  ...REGISTRY_CIRCUITS.map((f): [string, Layout] => [`registry/${f.slug}`, layoutCircuit(f.circuit, registry)]),
+];
 
 for (const [slug, L] of layouts) {
   test(`${slug}: components do not overlap and keep a 3-unit gap`, () => {

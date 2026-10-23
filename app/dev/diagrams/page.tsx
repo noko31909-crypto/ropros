@@ -2,7 +2,14 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { layoutCircuit } from "@/lib/hardware/layout";
 import { AutoDiagram, DiagramLegend } from "@/components/guide/diagrams/auto-diagram";
-import { FIXTURE_CIRCUITS, getFixtureComponent } from "./fixtures";
+import { getComponent } from "@/lib/hardware/components";
+import { isComponentId } from "@/lib/hardware/ids";
+import { REGISTRY_CIRCUITS } from "./fixtures";
+
+const lookup = (id: string) => {
+  if (!isComponentId(id)) throw new Error(`Unknown component "${id}"`);
+  return getComponent(id);
+};
 
 export const metadata: Metadata = { title: "Diagram preview", robots: { index: false } };
 
@@ -12,8 +19,8 @@ export default function DiagramsPreviewPage() {
   return (
     <main className="mx-auto max-w-6xl space-y-12 px-4 py-10">
       <h1 className="text-2xl font-semibold">Auto diagrams (dev)</h1>
-      {FIXTURE_CIRCUITS.map((f) => {
-        const layout = layoutCircuit(f.circuit, getFixtureComponent);
+      {REGISTRY_CIRCUITS.map((f) => {
+        const layout = layoutCircuit(f.circuit, lookup);
         return (
           <section key={f.slug} id={f.slug} className="space-y-4">
             <h2 className="text-lg font-semibold">{f.title}</h2>

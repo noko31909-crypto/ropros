@@ -112,3 +112,55 @@ export const FIXTURE_CIRCUITS: FixtureCircuit[] = [
     },
   },
 ];
+
+/** The same builds written against the real registry (lib/hardware/components.ts) pin ids. */
+export const REGISTRY_CIRCUITS: FixtureCircuit[] = [
+  {
+    slug: "obstacle-robot", title: "Obstacle avoiding robot · Arduino Uno",
+    circuit: {
+      board: "arduino-uno",
+      instances: [
+        { id: "us", component: "hc-sr04" }, { id: "servo", component: "servo-sg90" }, { id: "drv", component: "l298n" },
+        { id: "m1", component: "dc-motor", label: "Left motor" }, { id: "m2", component: "dc-motor", label: "Right motor" },
+        { id: "bat", component: "battery-9v" }, { id: "chassis", component: "robot-chassis-2wd" },
+      ],
+      connections: [
+        { from: "board.5V", to: "us.VCC", color: "red" }, { from: "board.GND", to: "us.GND", color: "black" },
+        { from: "board.D12", to: "us.TRIG", color: "yellow", note: "Trigger pulse" }, { from: "board.D11", to: "us.ECHO", color: "green", note: "Echo return" },
+        { from: "board.D9", to: "servo.SIG", color: "orange", note: "Servo PWM" }, { from: "board.5V", to: "servo.VCC", color: "red" },
+        { from: "board.GND2", to: "servo.GND", color: "brown" },
+        { from: "board.D7", to: "drv.IN1", color: "purple" }, { from: "board.D6", to: "drv.IN2", color: "gray" },
+        { from: "board.D5", to: "drv.IN3", color: "white" }, { from: "board.D4", to: "drv.IN4", color: "blue" },
+        { from: "drv.OUT1", to: "m1.+", color: "red" }, { from: "drv.OUT2", to: "m1.-", color: "black" },
+        { from: "drv.OUT3", to: "m2.+", color: "red" }, { from: "drv.OUT4", to: "m2.-", color: "black" },
+        { from: "bat.+", to: "drv.12V", color: "red", note: "Motor supply" }, { from: "bat.-", to: "drv.GND", color: "black" },
+        { from: "drv.GND", to: "board.GND3", color: "black", note: "Common ground" },
+      ],
+    },
+  },
+  {
+    slug: "weather-station", title: "Weather station · ESP32 + DHT22 + OLED",
+    circuit: {
+      board: "esp32-devkit",
+      instances: [{ id: "dht", component: "dht22" }, { id: "oled", component: "oled-ssd1306" }],
+      connections: [
+        { from: "dht.VCC", to: "board.3V3", color: "red" }, { from: "dht.DATA", to: "board.GPIO4", color: "yellow", note: "One-wire data" },
+        { from: "dht.GND", to: "board.GND", color: "black" },
+        { from: "oled.VCC", to: "board.3V3", color: "red" }, { from: "oled.GND", to: "board.GND2", color: "black" },
+        { from: "oled.SCL", to: "board.GPIO22", color: "blue", note: "I2C clock" }, { from: "oled.SDA", to: "board.GPIO21", color: "green", note: "I2C data" },
+      ],
+    },
+  },
+  {
+    slug: "led-button", title: "LED + resistor + button · Arduino Uno",
+    circuit: {
+      board: "arduino-uno",
+      instances: [{ id: "r1", component: "resistor", label: "220 Ω" }, { id: "led", component: "led", label: "Red LED" }, { id: "btn", component: "push-button" }],
+      connections: [
+        { from: "board.D13", to: "r1.A", color: "orange" }, { from: "r1.B", to: "led.A", color: "orange", note: "Anode (long leg)" },
+        { from: "led.K", to: "board.GND3", color: "black" }, { from: "btn.1", to: "board.D2", color: "yellow", note: "INPUT_PULLUP" },
+        { from: "btn.2", to: "board.GND", color: "black" },
+      ],
+    },
+  },
+];
