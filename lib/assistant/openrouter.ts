@@ -14,7 +14,22 @@ export class OpenRouterError extends Error {
  * The key stays on the server; callers pass only validated messages.
  */
 export async function* streamOpenRouter(messages: ChatMessage[], signal: AbortSignal): AsyncGenerator<string> {
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+  const configured = process.env.OPENROUTER_MODEL?.trim() || OPENROUTER_DEFAULT_MODEL;
+  let res = await request(configured, messages, signal);
+  // Unknown or unavailable model id (400/404): retry once with OpenRouter's automatic model choice.
+  if ((res.status === 400 || res.status === 404) && configured !== "openrouter/auto") {
+    console.error("openrouter model rejected, retrying with openrouter/auto", { model: configured, status: res.status, detail: (await res.text()).slice(0, 300) });
+    res = await request("openrouter/auto", messages, signal);
+  }
+  if (!res.ok || !res.body) {
+    console.error("openrouter request failed", { status: res.status, detail: (await res.text().catch(() => "")).slice(0, 300) });
+    throw new OpenRouterError(res.status);
+  }
+  yield* readStream(res.body);
+}
+
+function request(model: string, messages: ChatMessage[], signal: AbortSignal): Promise<Response> {
+  return fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     signal,
     headers: {
@@ -24,15 +39,16 @@ export async function* streamOpenRouter(messages: ChatMessage[], signal: AbortSi
       ...(process.env.NEXT_PUBLIC_SITE_URL ? { "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL } : {}),
     },
     body: JSON.stringify({
-      model: process.env.OPENROUTER_MODEL?.trim() || OPENROUTER_DEFAULT_MODEL,
+      model,
       messages,
       max_tokens: 4000,
       stream: true,
     }),
   });
-  if (!res.ok || !res.body) throw new OpenRouterError(res.status);
+}
 
-  const reader = res.body.getReader();
+async function* readStream(stream: ReadableStream<Uint8Array>): AsyncGenerator<string> {
+  const reader = stream.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
   for (;;) {
@@ -48,7 +64,7 @@ export async function* streamOpenRouter(messages: ChatMessage[], signal: AbortSi
       if (data === "[DONE]") return;
       try {
         const chunk = JSON.parse(data) as { choices?: { delta?: { content?: string }; finish_reason?: string | null }[]; error?: { message?: string } };
-        if (chunk.error) throw new OpenRouterError(502);
+        if (chunk.error) { console.error("openrouter stream error", { detail: chunk.error.message?.slice(0, 300) }); throw new OpenRouterError(502); }
         const text = chunk.choices?.[0]?.delta?.content;
         if (text) yield text;
         if (chunk.choices?.[0]?.finish_reason === "length") yield "\n\n[truncated]";

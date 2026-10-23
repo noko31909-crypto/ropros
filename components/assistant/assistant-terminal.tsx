@@ -98,7 +98,8 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
     try {
       try {
         for await (const chunk of liveStream({ locale, guideSlug: context?.guideSlug, messages: history }, ctrl.signal)) {
-          append(chunk.replace("[refused]", t.live.refused).replace("[truncated]", t.live.truncated).replace("[error]", t.live.error));
+          append(chunk.replace("[refused]", t.live.refused).replace("[truncated]", t.live.truncated)
+            .replace(/\[error:(\d{3})\]/, (_m, code: string) => t.live.provider(code)).replace("[error]", t.live.error));
         }
       } catch (err) {
         if (ctrl.signal.aborted) { /* stopped by the user */ }

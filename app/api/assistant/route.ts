@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { getGuide } from "@/lib/guides";
 import { LOCALES, LOCALE_NAME, type Locale } from "@/lib/i18n/config";
-import { streamOpenRouter } from "@/lib/assistant/openrouter";
+import { OpenRouterError, streamOpenRouter } from "@/lib/assistant/openrouter";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -78,8 +78,9 @@ export async function POST(req: NextRequest) {
           }
         } catch (err) {
           if (!req.signal.aborted) {
-            console.error("openrouter stream failed", { status: err instanceof Error ? err.message : undefined, userId: user.id });
-            controller.enqueue(encoder.encode("\n\n[error]"));
+            console.error("openrouter stream failed", { status: err instanceof OpenRouterError ? err.status : String(err), userId: user.id });
+            // Status codes only (no provider text) so the UI can say what to fix: 401 key, 402 credits, 429 provider rate limit.
+            controller.enqueue(encoder.encode(err instanceof OpenRouterError ? `\n\n[error:${err.status}]` : "\n\n[error]"));
           }
         } finally {
           controller.close();
