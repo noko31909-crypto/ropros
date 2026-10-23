@@ -5,9 +5,13 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * Shared Supabase client factories. Both use the public anon key only; every query is limited by RLS.
  * Never put the service-role key here: this module is importable from client components.
  */
+// Pasted dashboard values often carry invisible characters (zero-width spaces, newlines, smart quotes),
+// which break fetch() headers. URLs and JWT keys are plain ASCII, so drop anything else.
+const clean = (v: string | undefined) => v?.replace(/[^\x21-\x7E]/g, "") || undefined;
+
 function env() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = clean(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const anon = clean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   if (!url || !anon) throw new Error("Supabase env vars are missing (see .env.example).");
   return { url, anon };
 }

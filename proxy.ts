@@ -7,8 +7,9 @@ import { createServerClient } from "@supabase/ssr";
  */
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  // Same ASCII cleanup as lib/supabaseClient.ts.
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/[^\x21-\x7E]/g, "");
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.replace(/[^\x21-\x7E]/g, "");
   if (!url || !anon) return response;
 
   const supabase = createServerClient(url, anon, {
