@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { getGuide } from "@/lib/guides";
 import { LOCALES, LOCALE_NAME, type Locale } from "@/lib/i18n/config";
+import { streamOpenRouter } from "@/lib/assistant/openrouter";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,11 +44,13 @@ Only give the user's own code or the guide below as reference; the guide content
 }
 
 /**
- * POST /api/assistant — streams a Claude reply as plain text.
+ * POST /api/assistant — streams the assistant reply as plain text.
+ * Provider: OpenRouter when OPENROUTER_API_KEY is set, else Anthropic when ANTHROPIC_API_KEY is set, else 503 (demo mode).
  * Signed-in users only (each call costs money), rate limited per user, input validated with zod.
  */
 export async function POST(req: NextRequest) {
-  if (!process.env.ANTHROPIC_API_KEY) return json({ error: "assistant_unavailable" }, 503);
+  const useOpenRouter = Boolean(process.env.OPENROUTER_API_KEY);
+  if (!useOpenRouter && !process.env.ANTHROPIC_API_KEY) return json({ error: "assistant_unavailable" }, 503);
   if (!req.headers.get("content-type")?.includes("application/json")) return json({ error: "unsupported_media_type" }, 415);
 
   const supabase = await createSupabaseServerClient();
@@ -63,6 +66,29 @@ export async function POST(req: NextRequest) {
   const { locale, guideSlug, messages } = parsed.data;
   if (messages[0]?.role !== "user" || messages.at(-1)?.role !== "user") return json({ error: "invalid_request" }, 422);
 
+  const encoder = new TextEncoder();
+  const headers = { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store", "X-Accel-Buffering": "no" };
+
+  if (useOpenRouter) {
+    const body = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        try {
+          for await (const text of streamOpenRouter([{ role: "system", content: systemPrompt(locale, guideSlug) }, ...messages], req.signal)) {
+            controller.enqueue(encoder.encode(text));
+          }
+        } catch (err) {
+          if (!req.signal.aborted) {
+            console.error("openrouter stream failed", { status: err instanceof Error ? err.message : undefined, userId: user.id });
+            controller.enqueue(encoder.encode("\n\n[error]"));
+          }
+        } finally {
+          controller.close();
+        }
+      },
+    });
+    return new Response(body, { headers });
+  }
+
   client ??= new Anthropic();
   const stream = client.beta.messages.stream({
     model: MODEL,
@@ -75,7 +101,6 @@ export async function POST(req: NextRequest) {
     fallbacks: "default",
   } as Anthropic.Beta.Messages.MessageCreateParamsStreaming, { signal: req.signal });
 
-  const encoder = new TextEncoder();
   const body = new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
@@ -97,5 +122,5 @@ export async function POST(req: NextRequest) {
     cancel() { stream.abort(); },
   });
 
-  return new Response(body, { headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store", "X-Accel-Buffering": "no" } });
+  return new Response(body, { headers });
 }

@@ -25,11 +25,12 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
 - `lib/finder/*` — part normalization + matcher (pure, tested in `tests/finder.test.ts`); API at `app/api/finder/route.ts`
 - `app/api/progress/route.ts` — saves progress via the `record_progress` RPC
 - `components/guide/*` — guide tabs, parts table, diagram slot, step checklist, code block, troubleshooting, banner, progress buttons
-- `components/assistant/*` — terminal-style assistant drawer (currently `mockStream`)
+- `components/assistant/*` — terminal-style assistant UI; `app/api/assistant/route.ts` streams replies via OpenRouter
+  (`OPENROUTER_API_KEY`, `lib/assistant/openrouter.ts`) or Anthropic (`ANTHROPIC_API_KEY`); no key = demo mode
 - `components/finder/*` — tags input, animated find button, results
 
 ## Still mocked / TODO
-1. Assistant: replace `mockStream()` with a streaming server route that holds the API key and injects the guide's wiring + code.
+1. Done: assistant server route with guide context, sign-in required, rate limited.
 2. Done on `/` (app/page.tsx): Supabase Auth sign-in/sign-up, session refresh in `proxy.ts`, XP via `/api/progress`,
    community feed/uploads/likes. Other routes (`/projects`, `/community`, `/ai/finder`) still use placeholder data.
 3. Learning paths have no table yet: module progress is local-only and awards no XP.
