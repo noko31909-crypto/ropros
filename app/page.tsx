@@ -7,6 +7,7 @@ import {
   Square, Terminal, Trophy, Upload, Users, Wrench, X, Zap,
 } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
+import { Logo } from "@/components/brand/logo";
 
 /* ========================================================================
  * Types + guide content (wiring/serial content lives here; ids, progress, XP come from Supabase)
@@ -143,8 +144,8 @@ function Photo({ src, alt, className }: { src: string; alt: string; className?: 
   const [failed, setFailed] = useState(false);
   if (failed || !src) {
     return (
-      <div className={clsx("flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950", className)} role="img" aria-label={alt}>
-        <Bot className="h-10 w-10 text-slate-600" aria-hidden />
+      <div className={clsx("flex items-center justify-center bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950", className)} role="img" aria-label={alt}>
+        <Bot className="h-10 w-10 text-fg-subtle" aria-hidden />
       </div>
     );
   }
@@ -261,67 +262,67 @@ function ProjectHub({ progress, onProgress }: { progress: Record<string, Progres
       <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
         {GUIDES.map((g, i) => (
           <button key={g.id} type="button" onClick={() => setActiveId(g.id)}
-            className={clsx("group mb-6 block w-full break-inside-avoid overflow-hidden rounded-[28px] border bg-slate-900 text-left transition-all",
-              g.id === activeId ? "border-teal-400/70 shadow-[0_0_0_1px_#2ee6c955,0_20px_50px_-20px_#2ee6c966]" : "border-slate-800 hover:border-slate-600")}>
+            className={clsx("group mb-6 block w-full break-inside-avoid overflow-hidden rounded-[28px] border bg-ink-850 text-left transition-all",
+              g.id === activeId ? "border-signal/70 shadow-[0_0_0_1px_#2ee6c955,0_20px_50px_-20px_#2ee6c966]" : "border-line hover:border-ink-700")}>
             <div className="relative overflow-hidden">
               <Photo src={g.image} alt={g.title} className={clsx("w-full transition-transform duration-500 group-hover:scale-105", i === 1 ? "h-80" : "h-60")} />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink-950/90 via-transparent" />
               <Pill className={clsx("absolute left-4 top-4 backdrop-blur", PLATFORM_PILL[g.platform])}>{g.platform}</Pill>
               {(progress[g.id] === "simulated" || progress[g.id] === "completed") && (
-                <Pill className="absolute right-4 top-4 border-teal-400/50 bg-slate-950/70 text-teal-300"><Check className="h-3 w-3" />{progress[g.id]}</Pill>
+                <Pill className="absolute right-4 top-4 border-signal/50 bg-ink-950/70 text-signal"><Check className="h-3 w-3" />{progress[g.id]}</Pill>
               )}
             </div>
             <div className="p-5">
-              <h3 className="text-lg font-semibold tracking-tight text-slate-50">{g.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-slate-400">{g.summary}</p>
-              <div className="mt-4 flex items-center gap-4 font-mono text-xs text-slate-500">
+              <h3 className="text-lg font-semibold tracking-tight text-fg">{g.title}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-fg-muted">{g.summary}</p>
+              <div className="mt-4 flex items-center gap-4 font-mono text-xs text-fg0">
                 <span className={DIFF_TONE[g.difficulty]}>{g.difficulty}</span>
                 <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{g.hours}h</span>
-                <span className="inline-flex items-center gap-1 text-orange-400"><Zap className="h-3.5 w-3.5" />{g.xp} XP</span>
+                <span className="inline-flex items-center gap-1 text-accent"><Zap className="h-3.5 w-3.5" />{g.xp} XP</span>
               </div>
             </div>
           </button>
         ))}
       </div>
 
-      <section className="grid gap-6 rounded-[28px] border border-slate-800 bg-slate-900/60 p-5 sm:p-7 lg:grid-cols-[1.6fr_1fr]" aria-label="Wiring simulator">
+      <section className="grid gap-6 rounded-[28px] border border-line bg-ink-850/60 p-5 sm:p-7 lg:grid-cols-[1.6fr_1fr]" aria-label="Wiring simulator">
         <div>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-teal-400">Circuit · live</p>
-              <h2 className="text-xl font-semibold text-slate-50">{guide.title}</h2>
+              <p className="font-mono text-xs uppercase tracking-widest text-signal">Circuit · live</p>
+              <h2 className="text-xl font-semibold text-fg">{guide.title}</h2>
             </div>
             <div className="flex gap-2">
             <button type="button" disabled={progress[guide.id] === "completed"} onClick={() => onProgress(guide.id, "complete")}
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-700 px-4 text-sm font-semibold text-slate-100 transition-colors hover:border-teal-400/60 disabled:opacity-50">
-              <Trophy className="h-4 w-4 text-orange-400" />{progress[guide.id] === "completed" ? "Completed" : `Mark built · ${guide.xp} XP`}
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-ink-700 px-4 text-sm font-semibold text-fg transition-colors hover:border-signal/60 disabled:opacity-50">
+              <Trophy className="h-4 w-4 text-accent" />{progress[guide.id] === "completed" ? "Completed" : `Mark built · ${guide.xp} XP`}
             </button>
             <button type="button" onClick={toggleRun}
               className={clsx("inline-flex h-10 items-center gap-2 rounded-xl px-4 text-sm font-semibold transition-colors",
-                running ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-orange-500 text-slate-950 hover:bg-orange-400")}>
+                running ? "bg-ink-800 text-fg hover:bg-ink-700" : "bg-accent text-ink-950 hover:bg-accent-hover")}>
               {running ? <><Square className="h-4 w-4" />Stop</> : <><Play className="h-4 w-4" />Run Simulator</>}
             </button>
             </div>
           </div>
-          <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 p-3"><Breadboard guide={guide} running={running} tick={tick} /></div>
+          <div className="overflow-hidden rounded-2xl border border-line bg-ink-950 p-3"><Breadboard guide={guide} running={running} tick={tick} /></div>
           <ul className="mt-4 flex flex-wrap gap-2">
             {guide.wires.map((w) => (
-              <li key={w.label} className="inline-flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950 px-2.5 py-1 font-mono text-[11px] text-slate-300">
+              <li key={w.label} className="inline-flex items-center gap-2 rounded-lg border border-line bg-ink-950 px-2.5 py-1 font-mono text-[11px] text-fg-muted">
                 <span className="h-2 w-2 rounded-full" style={{ background: w.color }} />{w.label}
               </li>
             ))}
           </ul>
         </div>
-        <div className="flex min-h-[320px] flex-col overflow-hidden rounded-2xl border border-slate-800 bg-black">
-          <div className="flex items-center justify-between border-b border-slate-800 px-4 py-2.5">
-            <span className="inline-flex items-center gap-2 font-mono text-xs text-slate-400"><Terminal className="h-3.5 w-3.5" />Serial Monitor · 115200</span>
-            <span className={clsx("h-2 w-2 rounded-full", running ? "animate-pulse bg-teal-400" : "bg-slate-700")} aria-label={running ? "running" : "idle"} />
+        <div className="flex min-h-[320px] flex-col overflow-hidden rounded-2xl border border-line bg-black">
+          <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
+            <span className="inline-flex items-center gap-2 font-mono text-xs text-fg-muted"><Terminal className="h-3.5 w-3.5" />Serial Monitor · 115200</span>
+            <span className={clsx("h-2 w-2 rounded-full", running ? "animate-pulse bg-signal" : "bg-ink-700")} aria-label={running ? "running" : "idle"} />
           </div>
           <div ref={logRef} className="h-72 flex-1 overflow-y-auto p-4 font-mono text-xs leading-relaxed" aria-live="polite">
             {logs.length === 0
-              ? <p className="text-slate-600">Press “Run Simulator” to flash the sketch…</p>
-              : logs.map((l, i) => <p key={i} className={clsx(l.includes("⚠") ? "text-orange-400" : "text-teal-300/90")}>{l}</p>)}
-            {running && <span className="inline-block h-3.5 w-2 animate-pulse bg-teal-400" />}
+              ? <p className="text-fg-subtle">Press “Run Simulator” to flash the sketch…</p>
+              : logs.map((l, i) => <p key={i} className={clsx(l.includes("⚠") ? "text-accent" : "text-signal/90")}>{l}</p>)}
+            {running && <span className="inline-block h-3.5 w-2 animate-pulse bg-signal" />}
           </div>
         </div>
       </section>
@@ -343,21 +344,21 @@ function ProjectFinder() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_1.3fr]">
-      <div className="space-y-6 rounded-[28px] border border-slate-800 bg-slate-900/60 p-6">
+      <div className="space-y-6 rounded-[28px] border border-line bg-ink-850/60 p-6">
         <div className="flex items-center justify-between">
-          <h2 className="inline-flex items-center gap-2 text-lg font-semibold text-slate-50"><Sparkles className="h-5 w-5 text-teal-400" />What&apos;s on your bench?</h2>
-          <button type="button" onClick={() => setSelected(new Set())} className="text-xs text-slate-500 hover:text-slate-300">Clear</button>
+          <h2 className="inline-flex items-center gap-2 text-lg font-semibold text-fg"><Sparkles className="h-5 w-5 text-signal" />What&apos;s on your bench?</h2>
+          <button type="button" onClick={() => setSelected(new Set())} className="text-xs text-fg0 hover:text-fg-muted">Clear</button>
         </div>
         {(Object.keys(HARDWARE) as Category[]).map((cat) => (
           <fieldset key={cat}>
-            <legend className="mb-2 font-mono text-xs uppercase tracking-widest text-slate-500">{cat}</legend>
+            <legend className="mb-2 font-mono text-xs uppercase tracking-widest text-fg0">{cat}</legend>
             <div className="flex flex-wrap gap-2">
               {HARDWARE[cat].map((part) => {
                 const on = selected.has(part);
                 return (
                   <button key={part} type="button" aria-pressed={on} onClick={() => toggle(part)}
                     className={clsx("inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-all",
-                      on ? "border-teal-400/60 bg-teal-400/10 text-teal-200 shadow-[0_0_16px_-4px_#2ee6c9]" : "border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-200")}>
+                      on ? "border-signal/60 bg-signal/10 text-signal shadow-[0_0_16px_-4px_#2ee6c9]" : "border-ink-700 text-fg-muted hover:border-ink-700 hover:text-fg")}>
                     {on && <Check className="h-3.5 w-3.5" />}{part}
                   </button>
                 );
@@ -367,20 +368,20 @@ function ProjectFinder() {
         ))}
       </div>
       <div>
-        <p className="mb-4 font-mono text-xs text-slate-500">{results.length} match{results.length === 1 ? "" : "es"} for {selected.size} part{selected.size === 1 ? "" : "s"}</p>
+        <p className="mb-4 font-mono text-xs text-fg0">{results.length} match{results.length === 1 ? "" : "es"} for {selected.size} part{selected.size === 1 ? "" : "s"}</p>
         <ul className="space-y-3">
-          {results.length === 0 && <li className="rounded-2xl border border-dashed border-slate-800 p-10 text-center text-sm text-slate-500">Select components to see builds you can start today.</li>}
+          {results.length === 0 && <li className="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-fg0">Select components to see builds you can start today.</li>}
           {results.map((r) => (
-            <li key={r.title} className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 transition-colors hover:border-slate-600">
+            <li key={r.title} className="rounded-2xl border border-line bg-ink-850/60 p-5 transition-colors hover:border-ink-700">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="font-semibold text-slate-50">{r.title}</h3>
+                <h3 className="font-semibold text-fg">{r.title}</h3>
                 <div className="flex items-center gap-2"><Pill className={PLATFORM_PILL[r.platform]}>{r.platform}</Pill><span className={clsx("font-mono text-xs", DIFF_TONE[r.difficulty])}>{r.difficulty}</span></div>
               </div>
-              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-800">
-                <div className="h-full rounded-full bg-gradient-to-r from-teal-400 to-orange-500 transition-all duration-500" style={{ width: `${Math.round(r.score * 100)}%` }} />
+              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-ink-800">
+                <div className="h-full rounded-full bg-gradient-to-r from-signal to-accent transition-all duration-500" style={{ width: `${Math.round(r.score * 100)}%` }} />
               </div>
-              <p className="mt-2 font-mono text-xs text-slate-400">
-                {r.have}/{r.parts.length} parts on hand{r.missing.length > 0 && <> · <span className="text-orange-400">need {r.missing.join(", ")}</span></>}
+              <p className="mt-2 font-mono text-xs text-fg-muted">
+                {r.have}/{r.parts.length} parts on hand{r.missing.length > 0 && <> · <span className="text-accent">need {r.missing.join(", ")}</span></>}
               </p>
             </li>
           ))}
@@ -404,22 +405,22 @@ function LearningPaths() {
         const done = progress[p.id] ?? 0;
         const pct = Math.round((done / p.modules) * 100);
         return (
-          <article key={p.id} className={clsx("relative flex flex-col rounded-[28px] border bg-slate-900/60 p-6", p.locked ? "border-slate-800 opacity-60" : "border-slate-800 hover:border-slate-600")}>
+          <article key={p.id} className={clsx("relative flex flex-col rounded-[28px] border bg-ink-850/60 p-6", p.locked ? "border-line opacity-60" : "border-line hover:border-ink-700")}>
             <div className="flex items-center justify-between">
               <span className={clsx("font-mono text-xs", DIFF_TONE[p.level])}>{p.level}</span>
-              {p.locked ? <Lock className="h-4 w-4 text-slate-500" aria-label="Locked" /> : pct === 100 ? <Trophy className="h-4 w-4 text-orange-400" aria-label="Complete" /> : <GraduationCap className="h-4 w-4 text-teal-400" aria-hidden />}
+              {p.locked ? <Lock className="h-4 w-4 text-fg0" aria-label="Locked" /> : pct === 100 ? <Trophy className="h-4 w-4 text-accent" aria-label="Complete" /> : <GraduationCap className="h-4 w-4 text-signal" aria-hidden />}
             </div>
-            <h3 className="mt-3 text-lg font-semibold text-slate-50">{p.title}</h3>
-            <p className="mt-1.5 flex-1 text-sm leading-relaxed text-slate-400">{p.blurb}</p>
-            <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-slate-800">
-              <div className="h-full rounded-full bg-teal-400 transition-all duration-500" style={{ width: `${pct}%` }} />
+            <h3 className="mt-3 text-lg font-semibold text-fg">{p.title}</h3>
+            <p className="mt-1.5 flex-1 text-sm leading-relaxed text-fg-muted">{p.blurb}</p>
+            <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-ink-800">
+              <div className="h-full rounded-full bg-signal transition-all duration-500" style={{ width: `${pct}%` }} />
             </div>
-            <div className="mt-3 flex items-center justify-between font-mono text-xs text-slate-500">
+            <div className="mt-3 flex items-center justify-between font-mono text-xs text-fg0">
               <span>{done}/{p.modules} modules · {pct}%</span>
-              <span className="text-orange-400">{p.xp} XP</span>
+              <span className="text-accent">{p.xp} XP</span>
             </div>
             <button type="button" disabled={p.locked || done >= p.modules} onClick={() => advance(p)}
-              className="mt-4 h-10 rounded-xl border border-slate-700 text-sm font-semibold text-slate-100 transition-colors hover:border-teal-400/60 hover:text-teal-200 disabled:cursor-not-allowed disabled:opacity-50">
+              className="mt-4 h-10 rounded-xl border border-ink-700 text-sm font-semibold text-fg transition-colors hover:border-signal/60 hover:text-signal disabled:cursor-not-allowed disabled:opacity-50">
               {p.locked ? "Reach Level 5 to unlock" : done >= p.modules ? "Completed" : done === 0 ? "Start path" : "Continue next module"}
             </button>
           </article>
@@ -480,36 +481,36 @@ function Community({ userId, onNeedAuth, onPosted }: { userId: string | null; on
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="font-mono text-xs text-slate-500">{posts ? `${posts.length} builds shared` : "Loading…"}</p>
+        <p className="font-mono text-xs text-fg0">{posts ? `${posts.length} builds shared` : "Loading…"}</p>
         <button type="button" onClick={() => (userId ? setComposerOpen(true) : onNeedAuth())}
-          className="inline-flex h-10 items-center gap-2 rounded-xl bg-orange-500 px-4 text-sm font-semibold text-slate-950 hover:bg-orange-400">
+          className="inline-flex h-10 items-center gap-2 rounded-xl bg-accent px-4 text-sm font-semibold text-ink-950 hover:bg-accent-hover">
           <Camera className="h-4 w-4" />Share your build
         </button>
       </div>
-      {error && <p className="text-sm text-orange-400">{error}</p>}
+      {error && <p className="text-sm text-accent">{error}</p>}
       {posts && posts.length === 0 && !error && (
-        <div className="rounded-[28px] border border-dashed border-slate-800 p-14 text-center text-sm text-slate-500">No builds yet. Be the first to share one.</div>
+        <div className="rounded-[28px] border border-dashed border-line p-14 text-center text-sm text-fg0">No builds yet. Be the first to share one.</div>
       )}
       <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
         {posts?.map((p) => {
           const isLiked = liked.has(p.id);
           return (
-            <article key={p.id} className="mb-5 break-inside-avoid overflow-hidden rounded-[28px] border border-slate-800 bg-slate-900">
+            <article key={p.id} className="mb-5 break-inside-avoid overflow-hidden rounded-[28px] border border-line bg-ink-850">
               <div className="relative">
                 <Photo src={p.signedUrl ?? ""} alt={p.title} className="h-auto min-h-40 w-full" />
                 <Pill className={clsx("absolute left-4 top-4 backdrop-blur",
-                  p.status === "working" ? "border-teal-400/50 bg-slate-950/70 text-teal-300" : "border-orange-400/50 bg-slate-950/70 text-orange-300")}>
+                  p.status === "working" ? "border-signal/50 bg-ink-950/70 text-signal" : "border-accent/50 bg-ink-950/70 text-accent")}>
                   {p.status === "working" ? <Check className="h-3 w-3" /> : <Wrench className="h-3 w-3" />}{p.status}
                 </Pill>
               </div>
               <div className="flex items-center justify-between gap-3 p-4">
                 <div className="min-w-0">
-                  <h3 className="truncate font-semibold text-slate-50">{p.title}</h3>
-                  <p className="font-mono text-xs text-slate-500">@{p.author}</p>
+                  <h3 className="truncate font-semibold text-fg">{p.title}</h3>
+                  <p className="font-mono text-xs text-fg0">@{p.author}</p>
                 </div>
                 <button type="button" aria-pressed={isLiked} aria-label={isLiked ? "Unlike" : "Like"} onClick={() => void toggleLike(p)}
                   className={clsx("inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 font-mono text-xs transition-all active:scale-90",
-                    isLiked ? "border-orange-500/60 bg-orange-500/15 text-orange-300" : "border-slate-700 text-slate-400 hover:text-slate-200")}>
+                    isLiked ? "border-accent/60 bg-accent/15 text-accent" : "border-ink-700 text-fg-muted hover:text-fg")}>
                   <Heart className={clsx("h-4 w-4", isLiked && "fill-current")} />{p.likes_count}
                 </button>
               </div>
@@ -550,26 +551,26 @@ function Composer({ userId, onClose, onDone }: { userId: string; onClose: () => 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/80 p-4 backdrop-blur-sm" onClick={onClose}>
       <form role="dialog" aria-modal="true" aria-label="Share your build" onClick={(e) => e.stopPropagation()} onSubmit={(e) => void submit(e)}
-        className="w-full max-w-sm space-y-3 rounded-[28px] border border-slate-800 bg-slate-900 p-7 shadow-2xl">
+        className="w-full max-w-sm space-y-3 rounded-[28px] border border-line bg-ink-850 p-7 shadow-2xl">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-slate-50">Share your build</h2>
-          <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-1 text-slate-500 hover:text-slate-200"><X className="h-5 w-5" /></button>
+          <h2 className="text-xl font-semibold text-fg">Share your build</h2>
+          <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-1 text-fg0 hover:text-fg"><X className="h-5 w-5" /></button>
         </div>
         <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} required placeholder="What did you build?"
-          className="h-11 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 text-sm text-slate-100 placeholder:text-slate-600 focus:border-teal-400 focus:outline-none" />
-        <div className="grid grid-cols-2 rounded-xl bg-slate-950 p-1 text-sm">
+          className="h-11 w-full rounded-xl border border-ink-700 bg-ink-950 px-4 text-sm text-fg placeholder:text-fg-subtle focus:border-signal focus:outline-none" />
+        <div className="grid grid-cols-2 rounded-xl bg-ink-950 p-1 text-sm">
           {(["working", "debugging"] as const).map((s) => (
-            <button key={s} type="button" onClick={() => setStatus(s)} className={clsx("h-9 rounded-lg font-medium capitalize", status === s ? "bg-slate-800 text-slate-50" : "text-slate-500")}>{s}</button>
+            <button key={s} type="button" onClick={() => setStatus(s)} className={clsx("h-9 rounded-lg font-medium capitalize", status === s ? "bg-ink-800 text-fg" : "text-fg0")}>{s}</button>
           ))}
         </div>
-        <label className="flex h-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-slate-700 text-sm text-slate-400 hover:border-teal-400/60">
+        <label className="flex h-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-ink-700 text-sm text-fg-muted hover:border-signal/60">
           <Upload className="h-5 w-5" />{file ? file.name : "JPEG, PNG or WebP · max 10 MB"}
           <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
         </label>
-        {error && <p className="text-sm text-orange-400">{error}</p>}
-        <button type="submit" disabled={busy} className="h-11 w-full rounded-xl bg-orange-500 text-sm font-semibold text-slate-950 hover:bg-orange-400 disabled:opacity-60">
+        {error && <p className="text-sm text-accent">{error}</p>}
+        <button type="submit" disabled={busy} className="h-11 w-full rounded-xl bg-accent text-sm font-semibold text-ink-950 hover:bg-accent-hover disabled:opacity-60">
           {busy ? "Publishing…" : "Publish · +100 XP"}
         </button>
       </form>
@@ -621,18 +622,18 @@ function AuthModal({ onClose }: { onClose: () => void }) {
     else onClose();
   };
 
-  const field = "h-11 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 text-sm text-slate-100 placeholder:text-slate-600 focus:border-teal-400 focus:outline-none";
+  const field = "h-11 w-full rounded-xl border border-ink-700 bg-ink-950 px-4 text-sm text-fg placeholder:text-fg-subtle focus:border-signal focus:outline-none";
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/80 p-4 backdrop-blur-sm" onClick={onClose}>
       <div role="dialog" aria-modal="true" aria-labelledby="auth-title" onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-sm rounded-[28px] border border-slate-800 bg-slate-900 p-7 shadow-2xl">
+        className="w-full max-w-sm rounded-[28px] border border-line bg-ink-850 p-7 shadow-2xl">
         <div className="flex items-center justify-between">
-          <h2 id="auth-title" className="text-xl font-semibold text-slate-50">{mode === "signin" ? "Welcome back" : "Join ropros"}</h2>
-          <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-1 text-slate-500 hover:text-slate-200"><X className="h-5 w-5" /></button>
+          <h2 id="auth-title" className="text-xl font-semibold text-fg">{mode === "signin" ? "Welcome back" : "Join ropros"}</h2>
+          <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-1 text-fg0 hover:text-fg"><X className="h-5 w-5" /></button>
         </div>
-        <div className="mt-5 grid grid-cols-2 rounded-xl bg-slate-950 p-1 text-sm">
+        <div className="mt-5 grid grid-cols-2 rounded-xl bg-ink-950 p-1 text-sm">
           {(["signin", "register"] as const).map((m) => (
-            <button key={m} type="button" onClick={() => { setMode(m); setMessage(null); }} className={clsx("h-9 rounded-lg font-medium", mode === m ? "bg-slate-800 text-slate-50" : "text-slate-500")}>
+            <button key={m} type="button" onClick={() => { setMode(m); setMessage(null); }} className={clsx("h-9 rounded-lg font-medium", mode === m ? "bg-ink-800 text-fg" : "text-fg0")}>
               {m === "signin" ? "Sign In" : "Register"}
             </button>
           ))}
@@ -644,8 +645,8 @@ function AuthModal({ onClose }: { onClose: () => void }) {
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@lab.dev" autoComplete="email" className={field} />
           <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password (8+ chars)"
             autoComplete={mode === "signin" ? "current-password" : "new-password"} className={field} />
-          {message && <p className={clsx("text-sm", message.tone === "error" ? "text-orange-400" : "text-teal-300")}>{message.text}</p>}
-          <button type="submit" disabled={busy} className="h-11 w-full rounded-xl bg-orange-500 text-sm font-semibold text-slate-950 hover:bg-orange-400 disabled:opacity-60">
+          {message && <p className={clsx("text-sm", message.tone === "error" ? "text-accent" : "text-signal")}>{message.text}</p>}
+          <button type="submit" disabled={busy} className="h-11 w-full rounded-xl bg-accent text-sm font-semibold text-ink-950 hover:bg-accent-hover disabled:opacity-60">
             {busy ? "Please wait…" : mode === "signin" ? "Sign In" : "Create account"}
           </button>
         </form>
@@ -662,19 +663,19 @@ function XpBadge({ profile, onSignOut }: { profile: Profile; onSignOut: () => vo
   return (
     <div className="flex items-center gap-3">
       <div className="hidden text-right sm:block">
-        <p className="text-xs font-semibold text-slate-100">Level {profile.level} • {band.title}</p>
+        <p className="text-xs font-semibold text-fg">Level {profile.level} • {band.title}</p>
         <div className="mt-1 flex items-center gap-2">
-          <div className="h-1.5 w-28 overflow-hidden rounded-full bg-slate-800">
-            <div className="h-full rounded-full bg-gradient-to-r from-teal-400 to-orange-500 transition-all duration-700" style={{ width: `${pct}%` }} />
+          <div className="h-1.5 w-28 overflow-hidden rounded-full bg-ink-800">
+            <div className="h-full rounded-full bg-gradient-to-r from-signal to-accent transition-all duration-700" style={{ width: `${pct}%` }} />
           </div>
-          <span className="font-mono text-[10px] text-slate-500">{profile.xp}{next ? `/${next.floor}` : ""} XP</span>
+          <span className="font-mono text-[10px] text-fg0">{profile.xp}{next ? `/${next.floor}` : ""} XP</span>
         </div>
       </div>
-      <span className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-orange-500 font-semibold text-slate-950 ring-2 ring-slate-950" title={`@${profile.name}`}>
+      <span className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-signal to-accent font-semibold text-ink-950 ring-2 ring-ink-950" title={`@${profile.name}`}>
         {profile.name.slice(0, 2).toUpperCase()}
-        <span className="absolute -bottom-1 -right-1 rounded-full bg-slate-950 px-1 font-mono text-[9px] text-orange-400">{profile.level}</span>
+        <span className="absolute -bottom-1 -right-1 rounded-full bg-ink-950 px-1 font-mono text-[9px] text-accent">{profile.level}</span>
       </span>
-      <button type="button" onClick={onSignOut} aria-label="Sign out" className="rounded-lg p-2 text-slate-500 hover:bg-slate-800 hover:text-slate-200"><LogOut className="h-4 w-4" /></button>
+      <button type="button" onClick={onSignOut} aria-label="Sign out" className="rounded-lg p-2 text-fg0 hover:bg-ink-800 hover:text-fg"><LogOut className="h-4 w-4" /></button>
     </div>
   );
 }
@@ -742,15 +743,13 @@ export default function HomePage() {
   const signOut = async () => { await getSupabaseBrowserClient().auth.signOut(); setToast("Signed out"); };
 
   return (
-    <div className="min-h-dvh bg-slate-950 text-slate-200">
-      <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl">
+    <div className="min-h-dvh bg-ink-950 text-fg">
+      <header className="sticky top-0 z-40 border-b border-line/80 bg-ink-950/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6">
-          <span className="inline-flex items-center gap-2 text-lg font-semibold tracking-tight text-slate-50">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500 text-slate-950"><Bot className="h-5 w-5" /></span>ropros
-          </span>
+          <Logo />
           <div className="ml-auto">
             {profile ? <XpBadge profile={profile} onSignOut={() => void signOut()} /> : (
-              <button type="button" onClick={() => setAuthOpen(true)} className="inline-flex h-10 items-center gap-2 rounded-xl bg-orange-500 px-4 text-sm font-semibold text-slate-950 transition-colors hover:bg-orange-400">
+              <button type="button" onClick={() => setAuthOpen(true)} className="inline-flex h-10 items-center gap-2 rounded-xl bg-accent px-4 text-sm font-semibold text-ink-950 transition-colors hover:bg-accent-hover">
                 <Flame className="h-4 w-4" />Sign In / Register
               </button>
             )}
@@ -758,26 +757,26 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section className="relative overflow-hidden border-b border-slate-800/80">
-        <div className="pointer-events-none absolute -top-40 left-1/2 h-[420px] w-[900px] -translate-x-1/2 rounded-full bg-teal-500/10 blur-3xl" />
+      <section className="relative overflow-hidden border-b border-line/80">
+        <div className="pointer-events-none absolute -top-40 left-1/2 h-[420px] w-[900px] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl" />
         <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-          <p className="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900 px-3 py-1 font-mono text-xs text-slate-400">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-teal-400" />166 builds · 40 robotics guides
+          <p className="inline-flex items-center gap-2 rounded-full border border-line bg-ink-850 px-3 py-1 font-mono text-xs text-fg-muted">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-signal" />166 builds · 40 robotics guides
           </p>
-          <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-slate-50 sm:text-6xl">
-            Wire it. Simulate it. <span className="bg-gradient-to-r from-teal-300 to-orange-400 bg-clip-text text-transparent">Ship the robot.</span>
+          <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-fg sm:text-6xl">
+            Wire it. Simulate it. <span className="font-display font-normal tracking-normal text-brand-gradient">Ship the robot.</span>
           </h1>
-          <p className="mt-5 max-w-xl text-lg text-slate-400">Guides with live breadboard simulation, an AI finder for the parts on your bench, and a community that actually builds.</p>
+          <p className="mt-5 max-w-xl text-lg text-fg-muted">Guides with live breadboard simulation, an AI finder for the parts on your bench, and a community that actually builds.</p>
         </div>
       </section>
 
-      <nav aria-label="Sections" className="sticky top-16 z-30 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur">
+      <nav aria-label="Sections" className="sticky top-16 z-30 border-b border-line/80 bg-ink-950/90 backdrop-blur">
         <div role="tablist" className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 sm:px-6">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button key={id} role="tab" type="button" aria-selected={tab === id} aria-controls={`panel-${id}`} onClick={() => setTab(id)}
               className={clsx("relative inline-flex h-12 shrink-0 items-center gap-2 px-4 text-sm font-medium transition-colors",
-                tab === id ? "text-slate-50 after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-orange-500" : "text-slate-500 hover:text-slate-200")}>
-              <Icon className={clsx("h-4 w-4", tab === id && (id === "finder" ? "text-teal-400" : "text-orange-400"))} />{label}
+                tab === id ? "text-fg after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-accent" : "text-fg0 hover:text-fg")}>
+              <Icon className={clsx("h-4 w-4", tab === id && (id === "finder" ? "text-signal" : "text-accent"))} />{label}
             </button>
           ))}
         </div>
@@ -792,7 +791,7 @@ export default function HomePage() {
 
       {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
       {toast && (
-        <div role="status" className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-teal-400/40 bg-slate-900 px-4 py-2 font-mono text-sm text-teal-200 shadow-xl">{toast}</div>
+        <div role="status" className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-signal/40 bg-ink-850 px-4 py-2 font-mono text-sm text-signal shadow-xl">{toast}</div>
       )}
     </div>
   );
