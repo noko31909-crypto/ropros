@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { supabasePublicConfig } from "@/lib/supabase/public-config";
 
 /**
  * Refreshes the Supabase auth session on every request so server code (e.g. /api/progress)
@@ -7,10 +8,7 @@ import { createServerClient } from "@supabase/ssr";
  */
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
-  // Same ASCII cleanup as lib/supabaseClient.ts.
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/[^\x21-\x7E]/g, "");
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.replace(/[^\x21-\x7E]/g, "");
-  if (!url || !anon) return response;
+  const { url, anon } = supabasePublicConfig();
 
   const supabase = createServerClient(url, anon, {
     cookies: {
