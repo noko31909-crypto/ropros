@@ -26,10 +26,11 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
 
 ## Still mocked / TODO
 1. Assistant: replace `mockStream()` with a streaming server route that holds the API key and injects the guide's wiring + code.
-2. Auth UI: build sign-in/sign-up with Supabase Auth (@supabase/ssr); add session refresh in proxy/middleware.
-3. Community: real uploads to the private `community` bucket (path `<uid>/...`), feed from `community_posts`, likes via `post_likes`.
+2. Done on `/` (app/page.tsx): Supabase Auth sign-in/sign-up, session refresh in `proxy.ts`, XP via `/api/progress`,
+   community feed/uploads/likes. Other routes (`/projects`, `/community`, `/ai/finder`) still use placeholder data.
+3. Learning paths have no table yet: module progress is local-only and awards no XP.
 4. Replace placeholder data in `lib/projects.ts`, `lib/guides.ts`, `lib/finder/projects-data.ts` with Supabase queries.
-5. Add a daily cap on XP for posts (delete/re-post farming).
+5. Done: daily cap of 3 rewarded posts per user (`reward_post()`).
 6. Rate limiter in `lib/rate-limit.ts` is in-memory; move to a shared store before multi-instance deploys.
 
 ## Rules
