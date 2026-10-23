@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { rateLimit } from "@/lib/rate-limit";
-import { getGuide } from "@/lib/guides";
+import { endpointName, getGuide } from "@/lib/guides";
 import { LOCALES, LOCALE_NAME, type Locale } from "@/lib/i18n/config";
 import { OpenRouterError, streamOpenRouter } from "@/lib/assistant/openrouter";
 
@@ -31,7 +31,7 @@ function guideContext(slug: string | undefined): string {
   const g = slug ? getGuide(slug) : undefined;
   if (!g) return "";
   const parts = g.parts.map((p) => `- ${p.qty}× ${p.name}: ${p.spec.en} (${p.role.en})`).join("\n");
-  const wires = g.wires.map((w) => `- ${w.from} → ${w.to} (${w.color} wire)${w.note ? `: ${w.note.en}` : ""}`).join("\n");
+  const wires = g.connections.map((w) => `- ${endpointName(g, w.from)} → ${endpointName(g, w.to)} (${w.color} wire)${w.note ? `: ${w.note.en}` : ""}`).join("\n");
   const code = g.code.map((f) => `--- ${f.filename} ---\n${f.source}`).join("\n\n");
   return `\n\n<guide slug="${g.slug}" title="${g.title.en}" board="${g.board}">\nParts:\n${parts}\n\nWiring:\n${wires}\n\nCode:\n${code}\n</guide>`;
 }

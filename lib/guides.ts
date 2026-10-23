@@ -43,11 +43,11 @@ const OBSTACLE: Guide = {
     ru: "Едет вперёд, пока впереди свободно, затем сервопривод поворачивает датчик влево и вправо, и робот уезжает в сторону, где больше места.",
     kk: "Алдыңғы жол бос болғанша алға жүреді, содан кейін серво датчикті солға және оңға бұрады, ал робот бос орны көп жаққа бұрылады.",
   },
-  board: "Arduino Uno", boardComponent: "arduino-uno", platform: "arduino", cover: "obstacle", difficulty: "intermediate", hours: 5, costUsd: 38, xpReward: 250,
+  board: "Arduino Uno", boardComponent: "arduino-uno", platform: "arduino", cover: "obstacle", difficulty: "intermediate", hours: 5, costUsd: 40, xpReward: 250,
   verification: {
-    en: "Wiring checked against the L298N, HC-SR04 and SG90 datasheets. Not yet bench-tested on real hardware.",
-    ru: "Проводка сверена с даташитами L298N, HC-SR04 и SG90. На реальном железе ещё не тестировалась.",
-    kk: "Сымдар L298N, HC-SR04 және SG90 даташиттерімен салыстырылды. Нақты құрылғыда әлі тексерілмеген.",
+    en: "Wiring checked against the L298N, HC-SR04, SG90 and LM2596 datasheets and by the automatic circuit checker. Not yet bench-tested on real hardware.",
+    ru: "Проводка сверена с даташитами L298N, HC-SR04, SG90 и LM2596 и автоматической проверкой схемы. На реальном железе ещё не тестировалась.",
+    kk: "Сымдар L298N, HC-SR04, SG90 және LM2596 даташиттерімен әрі автоматты схема тексерісімен салыстырылды. Нақты құрылғыда әлі тексерілмеген.",
   },
   parts: [
     { name: "Arduino Uno R3", component: "arduino-uno", qty: 1, spec: { en: "5 V logic", ru: "логика 5 В", kk: "5 В логика" }, role: { en: "Controller", ru: "Контроллер", kk: "Контроллер" } },
@@ -57,6 +57,7 @@ const OBSTACLE: Guide = {
     { name: "TT gear motor", component: "dc-motor", qty: 2, spec: { en: "3–6 V", ru: "3–6 В", kk: "3–6 В" }, role: { en: "Wheels", ru: "Колёса", kk: "Дөңгелектер" } },
     { name: "2WD chassis", component: "robot-chassis-2wd", qty: 1, spec: { en: "frame, wheels, caster", ru: "рама, колёса, опора", kk: "рама, дөңгелектер, тірек" }, role: { en: "Body", ru: "Корпус", kk: "Корпус" } },
     { name: "2× 18650 battery pack", component: "battery-2s-lipo", qty: 1, spec: { en: "7.4 V", ru: "7,4 В", kk: "7,4 В" }, role: { en: "Power", ru: "Питание", kk: "Қуат" } },
+    { name: "LM2596 buck converter", component: "buck-converter-lm2596", qty: 1, spec: { en: "set to 5.0 V, 2 A", ru: "настроить на 5,0 В, 2 А", kk: "5,0 В-қа баптау, 2 А" }, role: { en: "Separate servo supply", ru: "Отдельное питание серво", kk: "Сервоның бөлек қуаты" } },
     { name: "Breadboard + jumper wires", component: "breadboard", qty: 1, spec: { en: "half size, M-M / M-F", ru: "половинка, папа-папа / папа-мама", kk: "жартылай, M-M / M-F" }, role: { en: "Connections", ru: "Соединения", kk: "Қосылыстар" } },
     { name: "TB6612FNG driver", component: "tb6612fng", qty: 1, optional: true, spec: { en: "1.2 A, 3.3–5 V logic", ru: "1,2 А, логика 3,3–5 В", kk: "1,2 А, 3,3–5 В логика" }, role: { en: "More efficient driver", ru: "Более эффективный драйвер", kk: "Тиімдірек драйвер" } },
   ],
@@ -75,14 +76,14 @@ const OBSTACLE: Guide = {
     },
     {
       title: { en: "Wire the motor driver", ru: "Подключите драйвер моторов", kk: "Мотор драйверін қосыңыз" },
-      body: { en: "Remove the ENA/ENB jumpers. ENA→D5, IN1→D7, IN2→D8, IN3→D4, IN4→D2, ENB→D6. Join L298N GND to Arduino GND.", ru: "Снимите перемычки ENA/ENB. ENA→D5, IN1→D7, IN2→D8, IN3→D4, IN4→D2, ENB→D6. Соедините GND драйвера с GND Arduino.", kk: "ENA/ENB секіргіштерін алыңыз. ENA→D5, IN1→D7, IN2→D8, IN3→D4, IN4→D2, ENB→D6. L298N GND-ін Arduino GND-імен қосыңыз." },
+      body: { en: "Remove the ENA/ENB jumpers. ENA→D5, IN1→D7, IN2→D8, IN3→D4, IN4→D2, ENB→D6. Battery + → L298N 12V and Arduino VIN; battery − → L298N GND. Join L298N GND to Arduino GND.", ru: "Снимите перемычки ENA/ENB. ENA→D5, IN1→D7, IN2→D8, IN3→D4, IN4→D2, ENB→D6. Плюс аккумулятора — на 12V драйвера и VIN Arduino, минус — на GND драйвера. Соедините GND драйвера с GND Arduino.", kk: "ENA/ENB секіргіштерін алыңыз. ENA→D5, IN1→D7, IN2→D8, IN3→D4, IN4→D2, ENB→D6. Аккумулятор плюсі — драйвердің 12V-ына және Arduino VIN-іне, минусы — драйвер GND-іне. L298N GND-ін Arduino GND-імен қосыңыз." },
       expect: { en: "Driver ready for PWM speed control.", ru: "Драйвер готов к ШИМ-управлению скоростью.", kk: "Драйвер ШИМ арқылы жылдамдықты басқаруға дайын." },
       mistake: { en: "Without a common ground the motors behave randomly.", ru: "Без общей земли моторы ведут себя хаотично.", kk: "Ортақ жерсіз моторлар ретсіз жұмыс істейді." },
     },
     {
       title: { en: "Wire the sensor and servo", ru: "Подключите датчик и серво", kk: "Датчик пен сервоны қосыңыз" },
-      body: { en: "HC-SR04: TRIG→A0, ECHO→A1, VCC→5V, GND→GND. Servo signal→D3, servo power to the 5V and GND rails.", ru: "HC-SR04: TRIG→A0, ECHO→A1, VCC→5V, GND→GND. Сигнал серво→D3, питание серво — на шины 5V и GND.", kk: "HC-SR04: TRIG→A0, ECHO→A1, VCC→5V, GND→GND. Серво сигналы→D3, серво қуаты 5V және GND шиналарына." },
-      expect: { en: "All signal wires connected.", ru: "Все сигнальные провода подключены.", kk: "Барлық сигнал сымдары қосылды." },
+      body: { en: "HC-SR04: TRIG→A0, ECHO→A1, VCC→5V, GND→GND. Servo signal→D3. The servo can draw ~650 mA, more than the Arduino 5V pin gives, so it gets its own supply: feed the LM2596 from the battery (IN+/IN−), turn its screw until OUT reads 5.0 V on a multimeter, then connect servo VCC→OUT+ and GND→OUT−.", ru: "HC-SR04: TRIG→A0, ECHO→A1, VCC→5V, GND→GND. Сигнал серво→D3. Серво потребляет до ~650 мА — больше, чем даёт пин 5V Arduino, поэтому у него своё питание: подайте на LM2596 аккумулятор (IN+/IN−), подстроечником выставьте на OUT 5,0 В по мультиметру, затем подключите VCC серво→OUT+, GND→OUT−.", kk: "HC-SR04: TRIG→A0, ECHO→A1, VCC→5V, GND→GND. Серво сигналы→D3. Серво ~650 мА-ге дейін тұтынады — бұл Arduino 5V пинінің беретінінен көп, сондықтан оның өз қуаты бар: LM2596-ға аккумуляторды қосыңыз (IN+/IN−), бұрағышпен OUT-та мультиметр бойынша 5,0 В қойыңыз, содан кейін серво VCC→OUT+, GND→OUT− қосыңыз." },
+      expect: { en: "All signal wires connected; the LM2596 shows 5.0 V before the servo is plugged in.", ru: "Все сигнальные провода подключены; LM2596 выдаёт 5,0 В ещё до подключения серво.", kk: "Барлық сигнал сымдары қосылды; серво қосылмай тұрып LM2596 5,0 В береді." },
       mistake: { en: "Swapped TRIG/ECHO gives a constant 400 cm.", ru: "Перепутанные TRIG/ECHO дают постоянные 400 см.", kk: "TRIG/ECHO ауысып кетсе, үнемі 400 см көрсетеді." },
     },
     {
@@ -139,7 +140,7 @@ void loop() {
   }],
   troubleshooting: [
     { symptom: { en: "Robot spins in circles", ru: "Робот крутится на месте", kk: "Робот бір орнында айналады" }, cause: { en: "One motor is wired backwards.", ru: "Один мотор подключён наоборот.", kk: "Бір мотор кері қосылған." }, fix: { en: "Swap that motor’s two wires at the L298N output.", ru: "Поменяйте местами два провода этого мотора на выходе L298N.", kk: "Сол мотордың екі сымын L298N шығысында ауыстырыңыз." } },
-    { symptom: { en: "Board resets when the motors start", ru: "Плата перезагружается при старте моторов", kk: "Моторлар іске қосылғанда плата қайта жүктеледі" }, cause: { en: "Battery voltage sags under load.", ru: "Напряжение аккумулятора проседает под нагрузкой.", kk: "Жүктеме кезінде аккумулятор кернеуі төмендейді." }, fix: { en: "Charge the pack, power the servo separately and add a 470 µF capacitor.", ru: "Зарядите аккумулятор, запитайте серво отдельно и добавьте конденсатор 470 мкФ.", kk: "Аккумуляторды зарядтаңыз, сервоны бөлек қуаттаңыз және 470 мкФ конденсатор қосыңыз." } },
+    { symptom: { en: "Board resets when the motors start", ru: "Плата перезагружается при старте моторов", kk: "Моторлар іске қосылғанда плата қайта жүктеледі" }, cause: { en: "Battery voltage sags under load.", ru: "Напряжение аккумулятора проседает под нагрузкой.", kk: "Жүктеме кезінде аккумулятор кернеуі төмендейді." }, fix: { en: "Charge the pack, make sure the servo runs from the LM2596 (not the Arduino 5V) and add a 470 µF capacitor across the servo supply.", ru: "Зарядите аккумулятор, убедитесь, что серво питается от LM2596 (а не от 5V Arduino), и добавьте конденсатор 470 мкФ на питание серво.", kk: "Аккумуляторды зарядтаңыз, серво LM2596-дан (Arduino 5V-тан емес) қуатталатынын тексеріңіз және серво қуатына 470 мкФ конденсатор қосыңыз." } },
     { symptom: { en: "Distance is always 400 cm", ru: "Расстояние всегда 400 см", kk: "Қашықтық үнемі 400 см" }, cause: { en: "TRIG/ECHO swapped or the sensor gets no 5 V.", ru: "Перепутаны TRIG/ECHO или на датчик не приходит 5 В.", kk: "TRIG/ECHO ауысқан немесе датчикке 5 В келмейді." }, fix: { en: "Check the two signal wires and the sensor VCC.", ru: "Проверьте два сигнальных провода и питание VCC датчика.", kk: "Екі сигнал сымын және датчиктің VCC қуатын тексеріңіз." } },
     { symptom: { en: "Motors don’t turn at all", ru: "Моторы вообще не крутятся", kk: "Моторлар мүлдем айналмайды" }, cause: { en: "ENA/ENB jumpers removed but the enable wires aren’t connected.", ru: "Перемычки ENA/ENB сняты, а провода включения не подключены.", kk: "ENA/ENB секіргіштері алынған, бірақ қосу сымдары жалғанбаған." }, fix: { en: "Connect ENA→D5 and ENB→D6 and check the common ground.", ru: "Подключите ENA→D5 и ENB→D6 и проверьте общую землю.", kk: "ENA→D5 және ENB→D6 қосып, ортақ жерді тексеріңіз." } },
   ],
@@ -149,8 +150,8 @@ void loop() {
   ],
   instances: [
     { id: "us", component: "hc-sr04" }, { id: "servo", component: "servo-sg90" }, { id: "drv", component: "l298n" },
-    { id: "m1", component: "dc-motor", label: "Left motor" }, { id: "m2", component: "dc-motor", label: "Right motor" },
-    { id: "bat", component: "battery-2s-lipo", label: "Battery 2S" },
+    { id: "m1", component: "dc-motor", label: "M1" }, { id: "m2", component: "dc-motor", label: "M2" },
+    { id: "bat", component: "battery-2s-lipo", label: "Battery 2S" }, { id: "buck", component: "buck-converter-lm2596" },
   ],
   connections: [
     { from: "board.A0", to: "us.TRIG", color: "yellow" },
@@ -158,20 +159,22 @@ void loop() {
     { from: "board.5V", to: "us.VCC", color: "red", note: { en: "sensor power", ru: "питание датчика", kk: "датчик қуаты" } },
     { from: "board.GND", to: "us.GND", color: "black" },
     { from: "board.D3", to: "servo.SIG", color: "purple" },
-    { from: "board.5V", to: "servo.VCC", color: "red" },
-    { from: "board.GND", to: "servo.GND", color: "brown" },
+    { from: "buck.OUT+", to: "servo.VCC", color: "red", note: { en: "servo 5 V from the LM2596, not the Arduino", ru: "5 В для серво от LM2596, а не от Arduino", kk: "серво 5 В-ы LM2596-дан, Arduino-дан емес" } },
+    { from: "buck.OUT-", to: "servo.GND", color: "brown" },
     { from: "board.D5", to: "drv.ENA", color: "cyan", note: { en: "PWM, left speed", ru: "ШИМ, скорость левого", kk: "ШИМ, сол жақ жылдамдығы" } },
     { from: "board.D7", to: "drv.IN1", color: "pink" },
     { from: "board.D8", to: "drv.IN2", color: "green" },
     { from: "board.D4", to: "drv.IN3", color: "brown" },
     { from: "board.D2", to: "drv.IN4", color: "gray" },
     { from: "board.D6", to: "drv.ENB", color: "blue", note: { en: "PWM, right speed", ru: "ШИМ, скорость правого", kk: "ШИМ, оң жақ жылдамдығы" } },
-    { from: "drv.OUT1", to: "m1.+", color: "red" }, { from: "drv.OUT2", to: "m1.-", color: "black" },
-    { from: "drv.OUT3", to: "m2.+", color: "red" }, { from: "drv.OUT4", to: "m2.-", color: "black" },
+    { from: "drv.OUT1", to: "m1.+", color: "red", note: { en: "left motor", ru: "левый мотор", kk: "сол мотор" } }, { from: "drv.OUT2", to: "m1.-", color: "black" },
+    { from: "drv.OUT3", to: "m2.+", color: "red", note: { en: "right motor", ru: "правый мотор", kk: "оң мотор" } }, { from: "drv.OUT4", to: "m2.-", color: "black" },
     { from: "bat.+", to: "drv.12V", color: "red", note: { en: "motor supply 7.4 V", ru: "питание моторов 7,4 В", kk: "мотор қуаты 7,4 В" } },
     { from: "bat.-", to: "drv.GND", color: "black" },
     { from: "bat.+", to: "board.VIN", color: "red", note: { en: "Arduino supply (VIN 7–12 V)", ru: "питание Arduino (VIN 7–12 В)", kk: "Arduino қуаты (VIN 7–12 В)" } },
-    { from: "drv.GND", to: "board.GND2", color: "black", note: { en: "common ground with L298N", ru: "общая земля с L298N", kk: "L298N-мен ортақ жер" } },
+    { from: "bat.+", to: "buck.IN+", color: "red", note: { en: "set OUT to 5.0 V before connecting the servo", ru: "выставьте OUT на 5,0 В до подключения серво", kk: "серво қоспас бұрын OUT-ты 5,0 В-қа қойыңыз" } },
+    { from: "bat.-", to: "buck.IN-", color: "black" },
+    { from: "drv.GND", to: "board.GND2", color: "black", note: { en: "common ground: Arduino, L298N, LM2596, battery −", ru: "общая земля: Arduino, L298N, LM2596, минус аккумулятора", kk: "ортақ жер: Arduino, L298N, LM2596, аккумулятор минусы" } },
   ],
   simulation: {
     baud: 9600,
@@ -219,7 +222,7 @@ const LINE: Guide = {
     },
     {
       title: { en: "Wire the motor driver", ru: "Подключите драйвер моторов", kk: "Мотор драйверін қосыңыз" },
-      body: { en: "Remove ENA/ENB jumpers. ENA→D5, IN1→D7, IN2→D8, IN3→D9, IN4→D10, ENB→D6. Battery + to L298N 12V, battery − to GND, L298N 5V → Nano VIN is NOT used: power the Nano from 5V out.", ru: "Снимите перемычки ENA/ENB. ENA→D5, IN1→D7, IN2→D8, IN3→D9, IN4→D10, ENB→D6. Плюс аккумулятора — на 12V драйвера, минус — на GND; Nano питайте от выхода 5V драйвера.", kk: "ENA/ENB секіргіштерін алыңыз. ENA→D5, IN1→D7, IN2→D8, IN3→D9, IN4→D10, ENB→D6. Аккумулятор плюсі — драйвердің 12V-ына, минусы — GND-ге; Nano-ны драйвердің 5V шығысынан қуаттаңыз." },
+      body: { en: "Remove ENA/ENB jumpers. ENA→D5, IN1→D7, IN2→D8, IN3→D9, IN4→D10, ENB→D6. Battery + to L298N 12V, battery − to L298N GND. Keep the 5V-EN jumper on and wire L298N 5V to the Nano 5V pin (not VIN); join L298N GND to Nano GND.", ru: "Снимите перемычки ENA/ENB. ENA→D5, IN1→D7, IN2→D8, IN3→D9, IN4→D10, ENB→D6. Плюс аккумулятора — на 12V драйвера, минус — на GND драйвера. Перемычку 5V-EN оставьте, выход 5V драйвера соедините с пином 5V Nano (не VIN), GND драйвера — с GND Nano.", kk: "ENA/ENB секіргіштерін алыңыз. ENA→D5, IN1→D7, IN2→D8, IN3→D9, IN4→D10, ENB→D6. Аккумулятор плюсі — драйвердің 12V-ына, минусы — драйвер GND-іне. 5V-EN секіргішін қалдырып, драйвердің 5V шығысын Nano-ның 5V пиніне (VIN емес) қосыңыз, драйвер GND-ін Nano GND-імен жалғаңыз." },
       expect: { en: "Nano power LED lights when the battery switch is on.", ru: "При включении аккумулятора загорается светодиод питания Nano.", kk: "Аккумулятор қосылғанда Nano қуат жарықдиоды жанады." },
       mistake: { en: "Feeding 7.4 V into the Nano’s 5V pin can destroy it.", ru: "7,4 В на пин 5V у Nano могут её сжечь.", kk: "Nano-ның 5V пиніне 7,4 В берсеңіз, ол күйіп кетуі мүмкін." },
     },
@@ -239,7 +242,7 @@ const LINE: Guide = {
   code: [{
     filename: "line_follower_pid.ino", language: "cpp", libraries: ["—"],
     source: `// 4-sensor PID line follower for Arduino Nano + L298N
-const int SENS[4] = {A0, A1, A2, A3};
+const int SENSOR_PINS[4] = {A0, A1, A2, A3};   // left to right
 const int ENA = 5, IN1 = 7, IN2 = 8, ENB = 6, IN3 = 9, IN4 = 10;
 const int BASE = 150;
 float Kp = 0.09, Ki = 0.0, Kd = 0.6;
@@ -257,7 +260,7 @@ void drive(int l, int r) {
 long readPosition() {
   long num = 0, den = 0;
   for (int i = 0; i < 4; i++) {
-    int v = map(analogRead(SENS[i]), minV[i], maxV[i], 0, 1000);
+    int v = map(analogRead(SENSOR_PINS[i]), minV[i], maxV[i], 0, 1000);
     v = constrain(v, 0, 1000);
     num += (long)v * (i * 1000 - 1500);
     den += v;
@@ -270,7 +273,7 @@ void calibrate() {
   unsigned long t0 = millis();
   while (millis() - t0 < 3000) {
     for (int i = 0; i < 4; i++) {
-      int v = analogRead(SENS[i]);
+      int v = analogRead(SENSOR_PINS[i]);
       minV[i] = min(minV[i], v); maxV[i] = max(maxV[i], v);
     }
   }
@@ -309,7 +312,7 @@ void loop() {
     { id: "ir1", component: "tcrt5000", label: "IR1" }, { id: "ir2", component: "tcrt5000", label: "IR2" },
     { id: "ir3", component: "tcrt5000", label: "IR3" }, { id: "ir4", component: "tcrt5000", label: "IR4" },
     { id: "drv", component: "l298n" },
-    { id: "m1", component: "dc-motor", label: "Left motor" }, { id: "m2", component: "dc-motor", label: "Right motor" },
+    { id: "m1", component: "dc-motor", label: "M1" }, { id: "m2", component: "dc-motor", label: "M2" },
     { id: "bat", component: "battery-2s-lipo", label: "Battery 2S" },
   ],
   connections: [
@@ -325,11 +328,11 @@ void loop() {
     { from: "board.D6", to: "drv.ENB", color: "blue", note: { en: "PWM", ru: "ШИМ", kk: "ШИМ" } },
     { from: "board.D7", to: "drv.IN1", color: "purple" }, { from: "board.D8", to: "drv.IN2", color: "purple" },
     { from: "board.D9", to: "drv.IN3", color: "brown" }, { from: "board.D10", to: "drv.IN4", color: "brown" },
-    { from: "drv.OUT1", to: "m1.+", color: "red" }, { from: "drv.OUT2", to: "m1.-", color: "black" },
-    { from: "drv.OUT3", to: "m2.+", color: "red" }, { from: "drv.OUT4", to: "m2.-", color: "black" },
+    { from: "drv.OUT1", to: "m1.+", color: "red", note: { en: "left motor", ru: "левый мотор", kk: "сол мотор" } }, { from: "drv.OUT2", to: "m1.-", color: "black" },
+    { from: "drv.OUT3", to: "m2.+", color: "red", note: { en: "right motor", ru: "правый мотор", kk: "оң мотор" } }, { from: "drv.OUT4", to: "m2.-", color: "black" },
     { from: "bat.+", to: "drv.12V", color: "red", note: { en: "motor supply 7.4 V", ru: "питание моторов 7,4 В", kk: "мотор қуаты 7,4 В" } },
     { from: "bat.-", to: "drv.GND", color: "black" },
-    { from: "drv.5V", to: "board.5V", color: "red", note: { en: "powers the Nano and sensors (5V-EN jumper on)", ru: "питает Nano и датчики (перемычка 5V-EN на месте)", kk: "Nano мен датчиктерді қуаттайды (5V-EN секіргіші орнында)" } },
+    { from: "drv.5V", to: "board.5V", color: "red", note: { en: "powers the Nano and sensors (5V-EN jumper on); battery off while USB is plugged in", ru: "питает Nano и датчики (перемычка 5V-EN на месте); при подключённом USB выключайте аккумулятор", kk: "Nano мен датчиктерді қуаттайды (5V-EN секіргіші орнында); USB қосулы кезде аккумуляторды өшіріңіз" } },
     { from: "drv.GND", to: "board.GND2", color: "black", note: { en: "common ground", ru: "общая земля", kk: "ортақ жер" } },
   ],
   simulation: {

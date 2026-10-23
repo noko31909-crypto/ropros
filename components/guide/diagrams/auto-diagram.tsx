@@ -188,11 +188,11 @@ function Wire({ w }: { w: LayoutWire }) {
   );
 }
 
-export function AutoDiagram({ layout, title, captions }: { layout: Layout; title: string; captions?: AutoDiagramCaptions }) {
+export function AutoDiagram({ layout, title, captions, className = "block h-auto w-full max-w-full" }: { layout: Layout; title: string; captions?: AutoDiagramCaptions; className?: string }) {
   const { width, height } = layout;
   const railLabel = (r: LayoutRail) => (r.kind === "gnd" ? captions?.railGnd ?? "GND rail" : r.volts === 3.3 ? captions?.rail3v3 ?? "3V3 rail" : captions?.rail5v ?? "5V rail");
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${width} ${height}`} width={width} height={height} role="img" aria-label={title} className="block h-auto w-full max-w-full">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${width} ${height}`} width={width} height={height} role="img" aria-label={title} className={className}>
       <title>{title}</title>
       <defs>
         <pattern id="ad-mesh" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".9" fill="#3E444A" /></pattern>
