@@ -1,16 +1,24 @@
 import type { Locale } from "@/lib/i18n/config";
+import type { ComponentId } from "./hardware/ids.ts";
+import type { CheckInput } from "./hardware/check.ts";
+import type { WIRE_COLORS } from "./content/schema.ts";
+import { getComponent } from "./hardware/components.ts";
 
 /**
  * Guide content model. Human-language text is stored per locale; part names, pins and code stay untranslated.
  * TODO: move to Supabase once guide content has a table (see CLAUDE.md, item 4).
  */
 export type L = Record<Locale, string>;
-export type Part = { name: string; qty: number; spec: L; role: L; optional?: boolean };
+/** `component` is the registry id (lib/hardware/components.ts); omitted only for consumables with no registry entry (e.g. tape). */
+export type Part = { name: string; component?: ComponentId; qty: number; spec: L; role: L; optional?: boolean };
 export type Step = { title: L; body: L; expect: L; mistake: L };
 export type CodeFile = { filename: string; language: "cpp" | "python" | "bash"; source: string; libraries: string[] };
 export type Issue = { symptom: L; cause: L; fix: L };
-/** One coloured jumper in the wiring diagram legend. */
-export type Wire = { color: string; from: string; to: string; note?: L };
+export type WireColor = (typeof WIRE_COLORS)[number];
+/** An electrical part on the diagram (same shape as GuideSchema.instances). The board is implicit as instance "board". */
+export type Instance = { id: string; component: ComponentId; label?: string };
+/** One wire, "instance.PIN" → "instance.PIN" with registry pin ids (same shape as GuideSchema.connections). */
+export type Connection = { from: string; to: string; color: WireColor; note?: L };
 /** Simulator panel: serial log lines (device output, untranslated) and the LEDs that blink while it runs. */
 export type Simulation = { baud: number; lines: string[]; leds: { label: string; color: string }[] };
 
@@ -19,10 +27,10 @@ export type Difficulty = "beginner" | "intermediate" | "advanced";
 export type CoverId = "obstacle" | "line" | "plant";
 
 export type Guide = {
-  slug: string; title: L; summary: L; board: string; platform: Platform; cover: CoverId;
+  slug: string; title: L; summary: L; board: string; boardComponent: ComponentId; platform: Platform; cover: CoverId;
   difficulty: Difficulty; hours: number; costUsd: number; xpReward: number;
   verification: L; parts: Part[]; steps: Step[]; code: CodeFile[]; troubleshooting: Issue[]; safety: L[];
-  wires: Wire[]; simulation: Simulation;
+  instances: Instance[]; connections: Connection[]; simulation: Simulation;
 };
 
 const same = (s: string): L => ({ en: s, ru: s, kk: s });
@@ -35,22 +43,22 @@ const OBSTACLE: Guide = {
     ru: "Едет вперёд, пока впереди свободно, затем сервопривод поворачивает датчик влево и вправо, и робот уезжает в сторону, где больше места.",
     kk: "Алдыңғы жол бос болғанша алға жүреді, содан кейін серво датчикті солға және оңға бұрады, ал робот бос орны көп жаққа бұрылады.",
   },
-  board: "Arduino Uno", platform: "arduino", cover: "obstacle", difficulty: "intermediate", hours: 5, costUsd: 38, xpReward: 250,
+  board: "Arduino Uno", boardComponent: "arduino-uno", platform: "arduino", cover: "obstacle", difficulty: "intermediate", hours: 5, costUsd: 38, xpReward: 250,
   verification: {
     en: "Wiring checked against the L298N, HC-SR04 and SG90 datasheets. Not yet bench-tested on real hardware.",
     ru: "Проводка сверена с даташитами L298N, HC-SR04 и SG90. На реальном железе ещё не тестировалась.",
     kk: "Сымдар L298N, HC-SR04 және SG90 даташиттерімен салыстырылды. Нақты құрылғыда әлі тексерілмеген.",
   },
   parts: [
-    { name: "Arduino Uno R3", qty: 1, spec: { en: "5 V logic", ru: "логика 5 В", kk: "5 В логика" }, role: { en: "Controller", ru: "Контроллер", kk: "Контроллер" } },
-    { name: "HC-SR04 ultrasonic sensor", qty: 1, spec: { en: "5 V, 2–400 cm", ru: "5 В, 2–400 см", kk: "5 В, 2–400 см" }, role: { en: "Distance sensing", ru: "Измерение расстояния", kk: "Қашықтықты өлшеу" } },
-    { name: "SG90 micro servo", qty: 1, spec: { en: "4.8–6 V", ru: "4,8–6 В", kk: "4,8–6 В" }, role: { en: "Sensor scanning", ru: "Поворот датчика", kk: "Датчикті бұру" } },
-    { name: "L298N motor driver", qty: 1, spec: { en: "2 A per channel", ru: "2 А на канал", kk: "арнаға 2 А" }, role: { en: "Drives both motors", ru: "Управление моторами", kk: "Моторларды басқару" } },
-    { name: "TT gear motor", qty: 2, spec: { en: "3–6 V", ru: "3–6 В", kk: "3–6 В" }, role: { en: "Wheels", ru: "Колёса", kk: "Дөңгелектер" } },
-    { name: "2WD chassis", qty: 1, spec: { en: "frame, wheels, caster", ru: "рама, колёса, опора", kk: "рама, дөңгелектер, тірек" }, role: { en: "Body", ru: "Корпус", kk: "Корпус" } },
-    { name: "2× 18650 battery pack", qty: 1, spec: { en: "7.4 V", ru: "7,4 В", kk: "7,4 В" }, role: { en: "Power", ru: "Питание", kk: "Қуат" } },
-    { name: "Breadboard + jumper wires", qty: 1, spec: { en: "half size, M-M / M-F", ru: "половинка, папа-папа / папа-мама", kk: "жартылай, M-M / M-F" }, role: { en: "Connections", ru: "Соединения", kk: "Қосылыстар" } },
-    { name: "TB6612FNG driver", qty: 1, optional: true, spec: { en: "1.2 A, 3.3–5 V logic", ru: "1,2 А, логика 3,3–5 В", kk: "1,2 А, 3,3–5 В логика" }, role: { en: "More efficient driver", ru: "Более эффективный драйвер", kk: "Тиімдірек драйвер" } },
+    { name: "Arduino Uno R3", component: "arduino-uno", qty: 1, spec: { en: "5 V logic", ru: "логика 5 В", kk: "5 В логика" }, role: { en: "Controller", ru: "Контроллер", kk: "Контроллер" } },
+    { name: "HC-SR04 ultrasonic sensor", component: "hc-sr04", qty: 1, spec: { en: "5 V, 2–400 cm", ru: "5 В, 2–400 см", kk: "5 В, 2–400 см" }, role: { en: "Distance sensing", ru: "Измерение расстояния", kk: "Қашықтықты өлшеу" } },
+    { name: "SG90 micro servo", component: "servo-sg90", qty: 1, spec: { en: "4.8–6 V", ru: "4,8–6 В", kk: "4,8–6 В" }, role: { en: "Sensor scanning", ru: "Поворот датчика", kk: "Датчикті бұру" } },
+    { name: "L298N motor driver", component: "l298n", qty: 1, spec: { en: "2 A per channel", ru: "2 А на канал", kk: "арнаға 2 А" }, role: { en: "Drives both motors", ru: "Управление моторами", kk: "Моторларды басқару" } },
+    { name: "TT gear motor", component: "dc-motor", qty: 2, spec: { en: "3–6 V", ru: "3–6 В", kk: "3–6 В" }, role: { en: "Wheels", ru: "Колёса", kk: "Дөңгелектер" } },
+    { name: "2WD chassis", component: "robot-chassis-2wd", qty: 1, spec: { en: "frame, wheels, caster", ru: "рама, колёса, опора", kk: "рама, дөңгелектер, тірек" }, role: { en: "Body", ru: "Корпус", kk: "Корпус" } },
+    { name: "2× 18650 battery pack", component: "battery-2s-lipo", qty: 1, spec: { en: "7.4 V", ru: "7,4 В", kk: "7,4 В" }, role: { en: "Power", ru: "Питание", kk: "Қуат" } },
+    { name: "Breadboard + jumper wires", component: "breadboard", qty: 1, spec: { en: "half size, M-M / M-F", ru: "половинка, папа-папа / папа-мама", kk: "жартылай, M-M / M-F" }, role: { en: "Connections", ru: "Соединения", kk: "Қосылыстар" } },
+    { name: "TB6612FNG driver", component: "tb6612fng", qty: 1, optional: true, spec: { en: "1.2 A, 3.3–5 V logic", ru: "1,2 А, логика 3,3–5 В", kk: "1,2 А, 3,3–5 В логика" }, role: { en: "More efficient driver", ru: "Более эффективный драйвер", kk: "Тиімдірек драйвер" } },
   ],
   steps: [
     {
@@ -139,18 +147,31 @@ void loop() {
     { en: "Insulate battery connections and never short its terminals.", ru: "Изолируйте соединения аккумулятора и никогда не замыкайте его выводы.", kk: "Аккумулятор қосылыстарын оқшаулаңыз және оның шықпаларын ешқашан тұйықтамаңыз." },
     { en: "Charge Li-ion cells only with a matching charger.", ru: "Заряжайте Li-ion только подходящим зарядным устройством.", kk: "Li-ion элементтерін тек сәйкес зарядтағышпен зарядтаңыз." },
   ],
-  wires: [
-    { color: "#F2C200", from: "HC-SR04 TRIG", to: "A0" },
-    { color: "#F57C00", from: "HC-SR04 ECHO", to: "A1" },
-    { color: "#8E24AA", from: "SG90 signal", to: "D3" },
-    { color: "#00ACC1", from: "L298N ENA", to: "D5", note: { en: "PWM, left speed", ru: "ШИМ, скорость левого", kk: "ШИМ, сол жақ жылдамдығы" } },
-    { color: "#E91E63", from: "L298N IN1", to: "D7" },
-    { color: "#7CB342", from: "L298N IN2", to: "D8" },
-    { color: "#795548", from: "L298N IN3", to: "D4" },
-    { color: "#9E9E9E", from: "L298N IN4", to: "D2" },
-    { color: "#3949AB", from: "L298N ENB", to: "D6", note: { en: "PWM, right speed", ru: "ШИМ, скорость правого", kk: "ШИМ, оң жақ жылдамдығы" } },
-    { color: "#E53935", from: "5V", to: "+ rail", note: { en: "sensor + servo power", ru: "питание датчика и серво", kk: "датчик пен серво қуаты" } },
-    { color: "#1F1F1F", from: "GND", to: "− rail", note: { en: "common ground with L298N", ru: "общая земля с L298N", kk: "L298N-мен ортақ жер" } },
+  instances: [
+    { id: "us", component: "hc-sr04" }, { id: "servo", component: "servo-sg90" }, { id: "drv", component: "l298n" },
+    { id: "m1", component: "dc-motor", label: "Left motor" }, { id: "m2", component: "dc-motor", label: "Right motor" },
+    { id: "bat", component: "battery-2s-lipo", label: "Battery 2S" },
+  ],
+  connections: [
+    { from: "board.A0", to: "us.TRIG", color: "yellow" },
+    { from: "board.A1", to: "us.ECHO", color: "orange" },
+    { from: "board.5V", to: "us.VCC", color: "red", note: { en: "sensor power", ru: "питание датчика", kk: "датчик қуаты" } },
+    { from: "board.GND", to: "us.GND", color: "black" },
+    { from: "board.D3", to: "servo.SIG", color: "purple" },
+    { from: "board.5V", to: "servo.VCC", color: "red" },
+    { from: "board.GND", to: "servo.GND", color: "brown" },
+    { from: "board.D5", to: "drv.ENA", color: "cyan", note: { en: "PWM, left speed", ru: "ШИМ, скорость левого", kk: "ШИМ, сол жақ жылдамдығы" } },
+    { from: "board.D7", to: "drv.IN1", color: "pink" },
+    { from: "board.D8", to: "drv.IN2", color: "green" },
+    { from: "board.D4", to: "drv.IN3", color: "brown" },
+    { from: "board.D2", to: "drv.IN4", color: "gray" },
+    { from: "board.D6", to: "drv.ENB", color: "blue", note: { en: "PWM, right speed", ru: "ШИМ, скорость правого", kk: "ШИМ, оң жақ жылдамдығы" } },
+    { from: "drv.OUT1", to: "m1.+", color: "red" }, { from: "drv.OUT2", to: "m1.-", color: "black" },
+    { from: "drv.OUT3", to: "m2.+", color: "red" }, { from: "drv.OUT4", to: "m2.-", color: "black" },
+    { from: "bat.+", to: "drv.12V", color: "red", note: { en: "motor supply 7.4 V", ru: "питание моторов 7,4 В", kk: "мотор қуаты 7,4 В" } },
+    { from: "bat.-", to: "drv.GND", color: "black" },
+    { from: "bat.+", to: "board.VIN", color: "red", note: { en: "Arduino supply (VIN 7–12 V)", ru: "питание Arduino (VIN 7–12 В)", kk: "Arduino қуаты (VIN 7–12 В)" } },
+    { from: "drv.GND", to: "board.GND2", color: "black", note: { en: "common ground with L298N", ru: "общая земля с L298N", kk: "L298N-мен ортақ жер" } },
   ],
   simulation: {
     baud: 9600,
@@ -167,20 +188,20 @@ const LINE: Guide = {
     ru: "Четыре ИК-датчика TCRT5000 видят чёрную линию, а PID-регулятор на Arduino Nano плавно ведёт по ней два мотора.",
     kk: "Төрт TCRT5000 ИҚ датчигі қара сызықты оқиды, ал Arduino Nano-дағы PID реттегіш екі моторды сызық бойымен бірқалыпты басқарады.",
   },
-  board: "Arduino Nano", platform: "arduino", cover: "line", difficulty: "intermediate", hours: 4, costUsd: 29, xpReward: 200,
+  board: "Arduino Nano", boardComponent: "arduino-nano", platform: "arduino", cover: "line", difficulty: "intermediate", hours: 4, costUsd: 29, xpReward: 200,
   verification: {
     en: "Pinout checked against the Nano, L298N and TCRT5000 module datasheets. PID gains are starting values: tune them on your track.",
     ru: "Распиновка сверена с даташитами Nano, L298N и модуля TCRT5000. Коэффициенты PID — стартовые, подберите их на своей трассе.",
     kk: "Пиндер Nano, L298N және TCRT5000 модулінің даташиттерімен тексерілді. PID коэффициенттері — бастапқы мәндер, оларды өз трассаңызда баптаңыз.",
   },
   parts: [
-    { name: "Arduino Nano", qty: 1, spec: { en: "ATmega328P, 5 V", ru: "ATmega328P, 5 В", kk: "ATmega328P, 5 В" }, role: { en: "Controller", ru: "Контроллер", kk: "Контроллер" } },
-    { name: "TCRT5000 IR sensor module", qty: 4, spec: { en: "analog out, 3–5 V", ru: "аналоговый выход, 3–5 В", kk: "аналогтық шығыс, 3–5 В" }, role: { en: "Line detection", ru: "Обнаружение линии", kk: "Сызықты анықтау" } },
-    { name: "L298N motor driver", qty: 1, spec: { en: "2 A per channel", ru: "2 А на канал", kk: "арнаға 2 А" }, role: { en: "Drives both motors", ru: "Управление моторами", kk: "Моторларды басқару" } },
-    { name: "N20 / TT DC gear motor", qty: 2, spec: { en: "6 V, 300 rpm", ru: "6 В, 300 об/мин", kk: "6 В, 300 айн/мин" }, role: { en: "Wheels", ru: "Колёса", kk: "Дөңгелектер" } },
-    { name: "2WD chassis", qty: 1, spec: { en: "frame, wheels, ball caster", ru: "рама, колёса, шаровая опора", kk: "рама, дөңгелектер, шар тірек" }, role: { en: "Body", ru: "Корпус", kk: "Корпус" } },
-    { name: "2× 18650 battery pack", qty: 1, spec: { en: "7.4 V", ru: "7,4 В", kk: "7,4 В" }, role: { en: "Power", ru: "Питание", kk: "Қуат" } },
-    { name: "Breadboard + jumper wires", qty: 1, spec: { en: "mini, M-F", ru: "мини, папа-мама", kk: "шағын, M-F" }, role: { en: "Connections", ru: "Соединения", kk: "Қосылыстар" } },
+    { name: "Arduino Nano", component: "arduino-nano", qty: 1, spec: { en: "ATmega328P, 5 V", ru: "ATmega328P, 5 В", kk: "ATmega328P, 5 В" }, role: { en: "Controller", ru: "Контроллер", kk: "Контроллер" } },
+    { name: "TCRT5000 IR sensor module", component: "tcrt5000", qty: 4, spec: { en: "analog out, 3–5 V", ru: "аналоговый выход, 3–5 В", kk: "аналогтық шығыс, 3–5 В" }, role: { en: "Line detection", ru: "Обнаружение линии", kk: "Сызықты анықтау" } },
+    { name: "L298N motor driver", component: "l298n", qty: 1, spec: { en: "2 A per channel", ru: "2 А на канал", kk: "арнаға 2 А" }, role: { en: "Drives both motors", ru: "Управление моторами", kk: "Моторларды басқару" } },
+    { name: "N20 / TT DC gear motor", component: "dc-motor", qty: 2, spec: { en: "6 V, 300 rpm", ru: "6 В, 300 об/мин", kk: "6 В, 300 айн/мин" }, role: { en: "Wheels", ru: "Колёса", kk: "Дөңгелектер" } },
+    { name: "2WD chassis", component: "robot-chassis-2wd", qty: 1, spec: { en: "frame, wheels, ball caster", ru: "рама, колёса, шаровая опора", kk: "рама, дөңгелектер, шар тірек" }, role: { en: "Body", ru: "Корпус", kk: "Корпус" } },
+    { name: "2× 18650 battery pack", component: "battery-2s-lipo", qty: 1, spec: { en: "7.4 V", ru: "7,4 В", kk: "7,4 В" }, role: { en: "Power", ru: "Питание", kk: "Қуат" } },
+    { name: "Breadboard + jumper wires", component: "breadboard", qty: 1, spec: { en: "mini, M-F", ru: "мини, папа-мама", kk: "шағын, M-F" }, role: { en: "Connections", ru: "Соединения", kk: "Қосылыстар" } },
     { name: "Black electrical tape (19 mm)", qty: 1, spec: { en: "matte, on white floor", ru: "матовая, на белом полу", kk: "күңгірт, ақ еденде" }, role: { en: "Test track", ru: "Тестовая трасса", kk: "Сынақ трассасы" } },
   ],
   steps: [
@@ -284,17 +305,32 @@ void loop() {
     { en: "Insulate battery connections and never short its terminals.", ru: "Изолируйте соединения аккумулятора и никогда не замыкайте его выводы.", kk: "Аккумулятор қосылыстарын оқшаулаңыз және оның шықпаларын ешқашан тұйықтамаңыз." },
     { en: "Lift the wheels off the ground while uploading new code.", ru: "Поднимайте колёса над полом, когда загружаете новый код.", kk: "Жаңа код жүктегенде дөңгелектерді еденнен көтеріңіз." },
   ],
-  wires: [
-    { color: "#F2C200", from: "IR 1 (left) AO", to: "A0" },
-    { color: "#F57C00", from: "IR 2 AO", to: "A1" },
-    { color: "#7CB342", from: "IR 3 AO", to: "A2" },
-    { color: "#00ACC1", from: "IR 4 (right) AO", to: "A3" },
-    { color: "#E91E63", from: "L298N ENA", to: "D5", note: { en: "PWM", ru: "ШИМ", kk: "ШИМ" } },
-    { color: "#3949AB", from: "L298N ENB", to: "D6", note: { en: "PWM", ru: "ШИМ", kk: "ШИМ" } },
-    { color: "#8E24AA", from: "L298N IN1 / IN2", to: "D7 / D8" },
-    { color: "#795548", from: "L298N IN3 / IN4", to: "D9 / D10" },
-    { color: "#E53935", from: "L298N 5V", to: "Nano 5V · + rail" },
-    { color: "#1F1F1F", from: "GND", to: "− rail", note: { en: "common ground", ru: "общая земля", kk: "ортақ жер" } },
+  instances: [
+    { id: "ir1", component: "tcrt5000", label: "IR1" }, { id: "ir2", component: "tcrt5000", label: "IR2" },
+    { id: "ir3", component: "tcrt5000", label: "IR3" }, { id: "ir4", component: "tcrt5000", label: "IR4" },
+    { id: "drv", component: "l298n" },
+    { id: "m1", component: "dc-motor", label: "Left motor" }, { id: "m2", component: "dc-motor", label: "Right motor" },
+    { id: "bat", component: "battery-2s-lipo", label: "Battery 2S" },
+  ],
+  connections: [
+    { from: "ir1.AO", to: "board.A0", color: "yellow", note: { en: "leftmost sensor", ru: "крайний левый датчик", kk: "ең сол жақ датчик" } },
+    { from: "ir2.AO", to: "board.A1", color: "orange" },
+    { from: "ir3.AO", to: "board.A2", color: "green" },
+    { from: "ir4.AO", to: "board.A3", color: "cyan", note: { en: "rightmost sensor", ru: "крайний правый датчик", kk: "ең оң жақ датчик" } },
+    { from: "ir1.VCC", to: "board.5V", color: "red" }, { from: "ir1.GND", to: "board.GND", color: "black" },
+    { from: "ir2.VCC", to: "board.5V", color: "red" }, { from: "ir2.GND", to: "board.GND", color: "black" },
+    { from: "ir3.VCC", to: "board.5V", color: "red" }, { from: "ir3.GND", to: "board.GND", color: "black" },
+    { from: "ir4.VCC", to: "board.5V", color: "red" }, { from: "ir4.GND", to: "board.GND", color: "black" },
+    { from: "board.D5", to: "drv.ENA", color: "pink", note: { en: "PWM", ru: "ШИМ", kk: "ШИМ" } },
+    { from: "board.D6", to: "drv.ENB", color: "blue", note: { en: "PWM", ru: "ШИМ", kk: "ШИМ" } },
+    { from: "board.D7", to: "drv.IN1", color: "purple" }, { from: "board.D8", to: "drv.IN2", color: "purple" },
+    { from: "board.D9", to: "drv.IN3", color: "brown" }, { from: "board.D10", to: "drv.IN4", color: "brown" },
+    { from: "drv.OUT1", to: "m1.+", color: "red" }, { from: "drv.OUT2", to: "m1.-", color: "black" },
+    { from: "drv.OUT3", to: "m2.+", color: "red" }, { from: "drv.OUT4", to: "m2.-", color: "black" },
+    { from: "bat.+", to: "drv.12V", color: "red", note: { en: "motor supply 7.4 V", ru: "питание моторов 7,4 В", kk: "мотор қуаты 7,4 В" } },
+    { from: "bat.-", to: "drv.GND", color: "black" },
+    { from: "drv.5V", to: "board.5V", color: "red", note: { en: "powers the Nano and sensors (5V-EN jumper on)", ru: "питает Nano и датчики (перемычка 5V-EN на месте)", kk: "Nano мен датчиктерді қуаттайды (5V-EN секіргіші орнында)" } },
+    { from: "drv.GND", to: "board.GND2", color: "black", note: { en: "common ground", ru: "общая земля", kk: "ортақ жер" } },
   ],
   simulation: {
     baud: 115200,
@@ -311,22 +347,22 @@ const PLANT: Guide = {
     ru: "ESP32 измеряет влажность почвы, температуру и влажность воздуха, выводит их на OLED, поливает растение через насос на реле и показывает живую страницу в вашей Wi-Fi-сети.",
     kk: "ESP32 топырақ ылғалдылығын, температура мен ауа ылғалдылығын өлшеп, OLED-ке шығарады, реле арқылы сорғымен өсімдікті суарады және Wi-Fi желісінде тірі бет көрсетеді.",
   },
-  board: "ESP32 DevKit V1", platform: "esp32", cover: "plant", difficulty: "beginner", hours: 3, costUsd: 24, xpReward: 180,
+  board: "ESP32 DevKit V1", boardComponent: "esp32-devkit", platform: "esp32", cover: "plant", difficulty: "beginner", hours: 3, costUsd: 24, xpReward: 180,
   verification: {
     en: "Pins checked against the ESP32-WROOM-32, DHT22 and SSD1306 datasheets. Calibrate the soil sensor in your own pot.",
     ru: "Пины сверены с даташитами ESP32-WROOM-32, DHT22 и SSD1306. Датчик почвы откалибруйте в своём горшке.",
     kk: "Пиндер ESP32-WROOM-32, DHT22 және SSD1306 даташиттерімен тексерілді. Топырақ датчигін өз құмыраңызда калибрлеңіз.",
   },
   parts: [
-    { name: "ESP32 DevKit V1", qty: 1, spec: { en: "3.3 V logic, Wi-Fi", ru: "логика 3,3 В, Wi-Fi", kk: "3,3 В логика, Wi-Fi" }, role: { en: "Controller + web server", ru: "Контроллер и веб-сервер", kk: "Контроллер және веб-сервер" } },
-    { name: "Capacitive soil moisture sensor v1.2", qty: 1, spec: { en: "3.3–5 V, analog", ru: "3,3–5 В, аналоговый", kk: "3,3–5 В, аналогтық" }, role: { en: "Soil moisture", ru: "Влажность почвы", kk: "Топырақ ылғалдылығы" } },
-    { name: "DHT22 (AM2302)", qty: 1, spec: { en: "3.3 V, ±0.5 °C", ru: "3,3 В, ±0,5 °C", kk: "3,3 В, ±0,5 °C" }, role: { en: "Air temperature + humidity", ru: "Температура и влажность воздуха", kk: "Ауа температурасы мен ылғалдылығы" } },
-    { name: "SSD1306 OLED 0.96″ I²C", qty: 1, spec: { en: "128×64, 3.3 V", ru: "128×64, 3,3 В", kk: "128×64, 3,3 В" }, role: { en: "Local display", ru: "Локальный дисплей", kk: "Жергілікті дисплей" } },
-    { name: "1-channel 5 V relay module", qty: 1, spec: { en: "opto-isolated, 3.3 V trigger", ru: "с оптронной развязкой, управление 3,3 В", kk: "оптронды, 3,3 В басқару" }, role: { en: "Switches the pump", ru: "Включает насос", kk: "Сорғыны қосады" } },
-    { name: "5 V submersible pump + tubing", qty: 1, spec: { en: "≈ 120 l/h", ru: "≈ 120 л/ч", kk: "≈ 120 л/сағ" }, role: { en: "Watering", ru: "Полив", kk: "Суару" } },
-    { name: "10 kΩ resistor", qty: 1, spec: same("1/4 W"), role: { en: "DHT22 data pull-up", ru: "Подтяжка линии DHT22", kk: "DHT22 деректер желісін тарту" } },
-    { name: "5 V 2 A USB supply", qty: 1, spec: { en: "USB-C or micro-USB", ru: "USB-C или micro-USB", kk: "USB-C немесе micro-USB" }, role: { en: "Power", ru: "Питание", kk: "Қуат" } },
-    { name: "Breadboard + jumper wires", qty: 1, spec: { en: "full size", ru: "полноразмерная", kk: "толық өлшемді" }, role: { en: "Connections", ru: "Соединения", kk: "Қосылыстар" } },
+    { name: "ESP32 DevKit V1", component: "esp32-devkit", qty: 1, spec: { en: "3.3 V logic, Wi-Fi", ru: "логика 3,3 В, Wi-Fi", kk: "3,3 В логика, Wi-Fi" }, role: { en: "Controller + web server", ru: "Контроллер и веб-сервер", kk: "Контроллер және веб-сервер" } },
+    { name: "Capacitive soil moisture sensor v1.2", component: "soil-moisture-capacitive", qty: 1, spec: { en: "3.3–5 V, analog", ru: "3,3–5 В, аналоговый", kk: "3,3–5 В, аналогтық" }, role: { en: "Soil moisture", ru: "Влажность почвы", kk: "Топырақ ылғалдылығы" } },
+    { name: "DHT22 (AM2302)", component: "dht22", qty: 1, spec: { en: "3.3 V, ±0.5 °C", ru: "3,3 В, ±0,5 °C", kk: "3,3 В, ±0,5 °C" }, role: { en: "Air temperature + humidity", ru: "Температура и влажность воздуха", kk: "Ауа температурасы мен ылғалдылығы" } },
+    { name: "SSD1306 OLED 0.96″ I²C", component: "oled-ssd1306", qty: 1, spec: { en: "128×64, 3.3 V", ru: "128×64, 3,3 В", kk: "128×64, 3,3 В" }, role: { en: "Local display", ru: "Локальный дисплей", kk: "Жергілікті дисплей" } },
+    { name: "1-channel 5 V relay module", component: "relay-module", qty: 1, spec: { en: "opto-isolated, 3.3 V trigger", ru: "с оптронной развязкой, управление 3,3 В", kk: "оптронды, 3,3 В басқару" }, role: { en: "Switches the pump", ru: "Включает насос", kk: "Сорғыны қосады" } },
+    { name: "5 V submersible pump + tubing", component: "water-pump", qty: 1, spec: { en: "≈ 120 l/h", ru: "≈ 120 л/ч", kk: "≈ 120 л/сағ" }, role: { en: "Watering", ru: "Полив", kk: "Суару" } },
+    { name: "10 kΩ resistor", component: "resistor", qty: 1, spec: same("1/4 W"), role: { en: "DHT22 data pull-up", ru: "Подтяжка линии DHT22", kk: "DHT22 деректер желісін тарту" } },
+    { name: "5 V 2 A USB supply", component: "usb-5v", qty: 1, spec: { en: "USB-C or micro-USB", ru: "USB-C или micro-USB", kk: "USB-C немесе micro-USB" }, role: { en: "Power", ru: "Питание", kk: "Қуат" } },
+    { name: "Breadboard + jumper wires", component: "breadboard", qty: 1, spec: { en: "full size", ru: "полноразмерная", kk: "толық өлшемді" }, role: { en: "Connections", ru: "Соединения", kk: "Қосылыстар" } },
   ],
   steps: [
     {
@@ -450,15 +486,27 @@ void loop() {
     { en: "Keep water and the pump away from the ESP32 and the USB supply; mount electronics above the pot.", ru: "Держите воду и насос подальше от ESP32 и блока питания; электронику размещайте выше горшка.", kk: "Су мен сорғыны ESP32 мен қуат блогынан алыс ұстаңыз; электрониканы құмырадан жоғары орнатыңыз." },
     { en: "Use only low-voltage (5 V) pumps with this relay setup; never switch mains.", ru: "С этой схемой используйте только низковольтные (5 В) насосы; никогда не коммутируйте сеть 220 В.", kk: "Бұл схемада тек төмен кернеулі (5 В) сорғыларды қолданыңыз; 220 В желіні ешқашан коммутацияламаңыз." },
   ],
-  wires: [
-    { color: "#00ACC1", from: "Soil AOUT", to: "GPIO34", note: { en: "ADC1 (works with Wi-Fi)", ru: "ADC1 (работает с Wi-Fi)", kk: "ADC1 (Wi-Fi-мен жұмыс істейді)" } },
-    { color: "#F2C200", from: "DHT22 DATA", to: "GPIO4", note: { en: "+10 kΩ pull-up to 3V3", ru: "+ подтяжка 10 кОм к 3V3", kk: "+ 3V3-ке 10 кОм тарту" } },
-    { color: "#3949AB", from: "OLED SDA", to: "GPIO21" },
-    { color: "#7CB342", from: "OLED SCL", to: "GPIO22" },
-    { color: "#8E24AA", from: "Relay IN", to: "GPIO26" },
-    { color: "#F57C00", from: "3V3", to: "3.3 V rail", note: { en: "sensors + OLED", ru: "датчики и OLED", kk: "датчиктер мен OLED" } },
-    { color: "#E53935", from: "VIN (5 V)", to: "5 V rail", note: { en: "relay + pump", ru: "реле и насос", kk: "реле мен сорғы" } },
-    { color: "#1F1F1F", from: "GND", to: "− rails" },
+  instances: [
+    { id: "soil", component: "soil-moisture-capacitive", label: "Soil sensor" }, { id: "dht", component: "dht22" },
+    { id: "r1", component: "resistor", label: "10 kΩ" }, { id: "oled", component: "oled-ssd1306" },
+    { id: "relay", component: "relay-module", label: "Relay" }, { id: "pump", component: "water-pump", label: "Pump" },
+  ],
+  connections: [
+    { from: "soil.AOUT", to: "board.GPIO34", color: "cyan", note: { en: "ADC1 (works with Wi-Fi)", ru: "ADC1 (работает с Wi-Fi)", kk: "ADC1 (Wi-Fi-мен жұмыс істейді)" } },
+    { from: "soil.VCC", to: "board.3V3", color: "orange" }, { from: "soil.GND", to: "board.GND", color: "black" },
+    { from: "dht.DATA", to: "board.GPIO4", color: "yellow" },
+    { from: "dht.VCC", to: "board.3V3", color: "orange" }, { from: "dht.GND", to: "board.GND", color: "black" },
+    { from: "r1.A", to: "dht.DATA", color: "yellow", note: { en: "10 kΩ pull-up to 3V3", ru: "подтяжка 10 кОм к 3V3", kk: "3V3-ке 10 кОм тарту" } },
+    { from: "r1.B", to: "board.3V3", color: "orange" },
+    { from: "oled.SDA", to: "board.GPIO21", color: "blue", note: { en: "I²C data", ru: "данные I²C", kk: "I²C деректері" } },
+    { from: "oled.SCL", to: "board.GPIO22", color: "green", note: { en: "I²C clock", ru: "тактирование I²C", kk: "I²C тактісі" } },
+    { from: "oled.VCC", to: "board.3V3", color: "orange" }, { from: "oled.GND", to: "board.GND2", color: "black" },
+    { from: "relay.IN", to: "board.GPIO26", color: "purple" },
+    { from: "relay.VCC", to: "board.5V", color: "red", note: { en: "5 V from USB", ru: "5 В от USB", kk: "USB-ден 5 В" } },
+    { from: "relay.GND", to: "board.GND3", color: "black" },
+    { from: "board.5V", to: "relay.COM", color: "red", note: { en: "pump supply, switched by the relay", ru: "питание насоса через контакт реле", kk: "сорғы қуаты реле арқылы" } },
+    { from: "relay.NO", to: "pump.+", color: "red" },
+    { from: "pump.-", to: "board.GND", color: "black" },
   ],
   simulation: {
     baud: 115200,
@@ -486,9 +534,29 @@ export type LocalizedGuide = {
   code: CodeFile[];
   troubleshooting: { symptom: string; cause: string; fix: string }[];
   safety: string[];
-  wires: { color: string; from: string; to: string; note?: string }[];
+  /** Wire legend built from the checked connections: part names and pins untranslated, notes localized. */
+  wiring: { color: WireColor; from: string; to: string; note?: string }[];
   simulation: Simulation;
 };
+
+/** The circuit-checker / layout input for a guide. Parts without a registry id (consumables) are left out. */
+export function guideCircuit(g: Guide): CheckInput {
+  return {
+    board: g.boardComponent, platform: g.platform, instances: g.instances, connections: g.connections, code: g.code,
+    parts: g.parts.flatMap((p) => (p.component ? [{ component: p.component, qty: p.qty, spec: p.spec, role: p.role, ...(p.optional ? { optional: true } : {}) }] : [])),
+  };
+}
+
+/** "drv.ENA" → "L298N ENA", "board.D5" → "Arduino Uno D5": instance label, else the first word of the registry name. */
+export function endpointName(g: Guide, end: string): string {
+  const dot = end.indexOf(".");
+  const inst = end.slice(0, dot);
+  const pin = end.slice(dot + 1);
+  if (inst === "board") return `${g.board} ${pin}`;
+  const i = g.instances.find((x) => x.id === inst);
+  const name = i?.label ?? (i ? getComponent(i.component).name.split(" ")[0] : inst);
+  return `${name} ${pin}`;
+}
 
 export function localizeGuide(g: Guide, locale: Locale): LocalizedGuide {
   return {
@@ -499,7 +567,7 @@ export function localizeGuide(g: Guide, locale: Locale): LocalizedGuide {
     code: g.code,
     troubleshooting: g.troubleshooting.map((t) => ({ symptom: t.symptom[locale], cause: t.cause[locale], fix: t.fix[locale] })),
     safety: g.safety.map((s) => s[locale]),
-    wires: g.wires.map((w) => ({ color: w.color, from: w.from, to: w.to, note: w.note?.[locale] })),
+    wiring: g.connections.map((c) => ({ color: c.color, from: endpointName(g, c.from), to: endpointName(g, c.to), ...(c.note ? { note: c.note[locale] } : {}) })),
     simulation: g.simulation,
   };
 }
