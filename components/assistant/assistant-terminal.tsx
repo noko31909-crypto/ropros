@@ -98,8 +98,7 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
     try {
       try {
         for await (const chunk of liveStream({ locale, guideSlug: context?.guideSlug, messages: history }, ctrl.signal)) {
-          append(chunk.replace("[refused]", t.live.refused).replace("[truncated]", t.live.truncated)
-            .replace(/\[error:(\d{3})\]/, (_m, code: string) => t.live.provider(code)).replace("[error]", t.live.error));
+          append(chunk);
         }
       } catch (err) {
         if (ctrl.signal.aborted) { /* stopped by the user */ }
@@ -109,6 +108,10 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
         } else if (err instanceof LiveError && err.reason === "signIn") { append(t.live.signIn); openAuth(t.live.signIn); }
         else append(err instanceof LiveError && err.reason === "rateLimited" ? t.live.rateLimited : t.live.error);
       }
+      // Server status markers can arrive split across chunks, so translate them on the finished text.
+      setMessages((m) => m.map((msg) => (msg.id === assistantId ? { ...msg, text: msg.text
+        .replace("[refused]", t.live.refused).replace("[truncated]", t.live.truncated)
+        .replace(/\[error:(\d{3})\]/, (_m, code: string) => t.live.provider(code)).replace("[error]", t.live.error) } : msg)));
       if (ctrl.signal.aborted) setMessages((m) => m.map((msg) => (msg.id === assistantId ? { ...msg, stopped: true } : msg)));
     } finally { setStreaming(false); abortRef.current = null; }
   }, [attachment, streaming, t, messages, locale, context?.guideSlug, openAuth]);
