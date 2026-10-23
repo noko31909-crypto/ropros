@@ -1,15 +1,31 @@
 import "server-only";
 
+type ModelInfo = { id: string; pricing?: { prompt?: string; completion?: string }; architecture?: { output_modalities?: string[] } };
+let cached: { at: number; ids: string[] } | undefined;
+
 /**
- * Default: free OpenRouter models (":free" ids cost nothing and work without credits, with daily limits).
- * Tried in order when an id is unknown or retired. Override with OPENROUTER_MODEL (any id from openrouter.ai/models).
+ * Cheapest usable models from OpenRouter's live catalogue (free ":free" models first, then lowest price),
+ * cached for an hour, so retired model ids never break the assistant. OPENROUTER_MODEL overrides this.
  */
-export const OPENROUTER_FREE_MODELS = [
-  "meta-llama/llama-3.3-70b-instruct:free",
-  "google/gemma-3-27b-it:free",
-  "deepseek/deepseek-chat-v3-0324:free",
-  "mistralai/mistral-small-3.1-24b-instruct:free",
-] as const;
+export async function cheapestModels(limit = 4): Promise<string[]> {
+  if (cached && Date.now() - cached.at < 3_600_000) return cached.ids;
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/models", { headers: { Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}` } });
+    if (!res.ok) throw new Error(String(res.status));
+    const { data } = (await res.json()) as { data: ModelInfo[] };
+    const price = (m: ModelInfo) => Number(m.pricing?.prompt ?? NaN) + Number(m.pricing?.completion ?? NaN);
+    const ids = data
+      .filter((m) => Number.isFinite(price(m)) && price(m) >= 0 && !m.id.startsWith("openrouter/")
+        && (m.architecture?.output_modalities ?? ["text"]).includes("text"))
+      .sort((x, y) => price(x) - price(y) || Number(y.id.endsWith(":free")) - Number(x.id.endsWith(":free")))
+      .slice(0, limit)
+      .map((m) => m.id);
+    if (ids.length) { cached = { at: Date.now(), ids }; return ids; }
+  } catch (err) {
+    console.error("openrouter model list failed", { detail: String(err) });
+  }
+  return ["openrouter/auto"];
+}
 
 type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 
@@ -23,12 +39,13 @@ export class OpenRouterError extends Error {
  */
 export async function* streamOpenRouter(messages: ChatMessage[], signal: AbortSignal): AsyncGenerator<string> {
   const configured = process.env.OPENROUTER_MODEL?.trim();
-  const candidates = configured ? [configured] : [...OPENROUTER_FREE_MODELS];
+  const candidates = configured ? [configured] : await cheapestModels();
   let res!: Response;
   for (const model of candidates) {
     res = await request(model, messages, signal);
-    // Unknown, retired or overloaded free model: try the next one.
+    // Unknown, retired or overloaded model: drop the cached list and try the next one.
     if (![400, 404, 429, 503].includes(res.status)) break;
+    if (res.status === 404) cached = undefined;
     console.error("openrouter model unavailable, trying next", { model, status: res.status, detail: (await res.text()).slice(0, 200) });
   }
   if (!res.ok || !res.body) {
