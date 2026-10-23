@@ -1,0 +1,2148 @@
+[
+  {
+    "slug": "obstacle-avoiding-robot",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "Obstacle Avoiding Robot",
+      "ru": "Робот, объезжающий препятствия",
+      "kk": "Кедергіден айналып өтетін робот"
+    },
+    "summary": {
+      "en": "Scans ahead with a servo-mounted HC-SR04 and steers the 2WD chassis toward open space through an L298N driver.",
+      "ru": "Сканирует пространство датчиком HC-SR04 на сервоприводе и уводит 2WD-шасси в свободную сторону через драйвер моторов L298N.",
+      "kk": "Серводағы HC-SR04 датчигімен алдын тексеріп, L298N қозғалтқыш драйвері арқылы 2WD шассиді бос жаққа бұрады."
+    },
+    "components": [
+      "arduino-uno",
+      "hc-sr04",
+      "servo-sg90",
+      "l298n",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "line-follower",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 4,
+    "title": {
+      "en": "Precision Line Following Bot",
+      "ru": "Точный робот для езды по линии",
+      "kk": "Сызық бойымен жүретін дәл робот"
+    },
+    "summary": {
+      "en": "A five-channel IR sensor array and a PID loop keep the 2WD bot locked on a black line, even through tight corners.",
+      "ru": "Пятиканальная ИК-линейка и PID-регулятор держат 2WD-робота на чёрной линии даже на крутых поворотах.",
+      "kk": "Бес арналы ИҚ датчик сызғышы мен PID реттегіші 2WD роботты қатты бұрылыстарда да қара сызықта ұстайды."
+    },
+    "components": [
+      "arduino-uno",
+      "line-sensor-array",
+      "l298n",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "self-balancing-robot",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 12,
+    "title": {
+      "en": "Self-Balancing Stepper Robot",
+      "ru": "Самобалансирующий робот на шаговиках",
+      "kk": "Өзін теңестіретін қадамдық робот"
+    },
+    "summary": {
+      "en": "Two NEMA17 steppers on A4988 drivers hold an inverted pendulum upright using MPU6050 angle data and a tuned PID loop.",
+      "ru": "Два шаговых двигателя NEMA17 с драйверами A4988 удерживают робота в равновесии по данным MPU6050 и настроенному PID.",
+      "kk": "A4988 драйверлі екі NEMA17 қадамдық қозғалтқышы MPU6050 деректері мен PID арқылы роботты тік ұстап тұрады."
+    },
+    "components": [
+      "arduino-uno",
+      "mpu6050",
+      "a4988",
+      "stepper-nema17",
+      "battery-2s-lipo",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "mecanum-rover",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 10,
+    "title": {
+      "en": "Mecanum Omnidirectional Rover",
+      "ru": "Всенаправленный ровер на меканум-колёсах",
+      "kk": "Меканум дөңгелекті көпбағытты ровер"
+    },
+    "summary": {
+      "en": "Four mecanum wheels on two TB6612FNG drivers let the ESP32 rover strafe and drive diagonally from a phone joystick over Wi-Fi.",
+      "ru": "Четыре меканум-колеса и два драйвера TB6612FNG позволяют роверу на ESP32 ехать боком и по диагонали с джойстика в телефоне по Wi-Fi.",
+      "kk": "Төрт меканум дөңгелегі мен екі TB6612FNG драйвері ESP32 роверіне Wi-Fi арқылы телефон джойстигінен бүйірлеп және қиғаш жүруге мүмкіндік береді."
+    },
+    "components": [
+      "esp32-devkit",
+      "mecanum-wheels",
+      "robot-chassis-4wd",
+      "tb6612fng",
+      "dc-motor",
+      "battery-2s-lipo",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "quadruped-walker",
+    "platform": "arduino",
+    "board": "arduino-mega",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 14,
+    "title": {
+      "en": "Four-Legged Walking Robot",
+      "ru": "Четвероногий шагающий робот",
+      "kk": "Төрт аяқты жүретін робот"
+    },
+    "summary": {
+      "en": "Eight servos driven by an Arduino Mega walk a stable creep gait, with an MPU6050 correcting body tilt on slopes.",
+      "ru": "Восемь сервоприводов на Arduino Mega шагают устойчивой походкой, а MPU6050 выравнивает корпус на наклонах.",
+      "kk": "Arduino Mega басқаратын сегіз серво тұрақты қадаммен жүреді, ал MPU6050 еңісте корпусты түзейді."
+    },
+    "components": [
+      "arduino-mega",
+      "servo-mg996r",
+      "servo-sg90",
+      "battery-2s-lipo",
+      "buck-converter-lm2596",
+      "mpu6050"
+    ]
+  },
+  {
+    "slug": "esp32-cam-fpv-rover",
+    "platform": "esp32",
+    "board": "esp32-cam",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 8,
+    "title": {
+      "en": "ESP32-CAM FPV Rover",
+      "ru": "FPV-ровер на ESP32-CAM",
+      "kk": "ESP32-CAM FPV роверы"
+    },
+    "summary": {
+      "en": "Streams live video to a browser page and drives a 2WD chassis through a DRV8833 driver from an on-screen joystick.",
+      "ru": "Передаёт живое видео в браузер и управляет 2WD-шасси через драйвер DRV8833 с экранного джойстика.",
+      "kk": "Браузерге тікелей бейне жібереді және экрандағы джойстикпен DRV8833 драйвері арқылы 2WD шассиді басқарады."
+    },
+    "components": [
+      "esp32-cam",
+      "robot-chassis-2wd",
+      "drv8833",
+      "dc-motor",
+      "battery-18650",
+      "tp4056-charger"
+    ]
+  },
+  {
+    "slug": "robot-arm",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 6,
+    "title": {
+      "en": "4-DOF Desktop Robot Arm",
+      "ru": "Настольный манипулятор на 4 оси",
+      "kk": "4 осьті үстел робот-қолы"
+    },
+    "summary": {
+      "en": "Four servos follow two joysticks and a potentiometer to pick and sort small blocks, powered from a separate 5 V rail.",
+      "ru": "Четыре сервопривода повторяют движения двух джойстиков и потенциометра, чтобы брать и сортировать кубики.",
+      "kk": "Төрт серво екі джойстик пен потенциометрге еріп, кішкентай текшелерді алып, сұрыптайды."
+    },
+    "components": [
+      "arduino-uno",
+      "servo-sg90",
+      "servo-mg996r",
+      "potentiometer",
+      "joystick",
+      "breadboard-power-module"
+    ]
+  },
+  {
+    "slug": "arduino-sumo-robot",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 6,
+    "title": {
+      "en": "Mini Sumo Robot",
+      "ru": "Мини-сумо робот",
+      "kk": "Мини сумо робот"
+    },
+    "summary": {
+      "en": "A compact Nano sumo bot finds opponents with IR obstacle sensors and stays inside the ring using TCRT5000 edge detectors.",
+      "ru": "Компактный сумо-робот на Nano ищет соперника ИК-датчиками препятствий и не выезжает за ринг благодаря TCRT5000.",
+      "kk": "Nano негізіндегі шағын сумо-робот қарсыласын ИҚ датчиктерімен табады, ал TCRT5000 арқасында рингтен шықпайды."
+    },
+    "components": [
+      "arduino-nano",
+      "ir-obstacle",
+      "tcrt5000",
+      "tb6612fng",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "bluetooth-rc-car-hc05",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 3,
+    "title": {
+      "en": "Bluetooth Phone-Controlled Car",
+      "ru": "Машинка с управлением по Bluetooth",
+      "kk": "Bluetooth арқылы басқарылатын машина"
+    },
+    "summary": {
+      "en": "Drive a 2WD chassis from a phone app over an HC-05 Bluetooth link with an L298N motor driver.",
+      "ru": "Управляйте 2WD-шасси с телефона через Bluetooth-модуль HC-05 и драйвер моторов L298N.",
+      "kk": "HC-05 Bluetooth модулі мен L298N драйвері арқылы 2WD шассиді телефоннан басқарыңыз."
+    },
+    "components": [
+      "arduino-uno",
+      "hc-05",
+      "l298n",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "light-seeking-robot",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 3,
+    "title": {
+      "en": "Light-Seeking Robot",
+      "ru": "Робот, ищущий свет",
+      "kk": "Жарыққа ұмтылатын робот"
+    },
+    "summary": {
+      "en": "Two LDRs compare brightness left and right so a little 2WD bot turns and drives toward a torch beam.",
+      "ru": "Два фоторезистора сравнивают освещённость слева и справа, и робот поворачивает к лучу фонарика.",
+      "kk": "Екі фоторезистор сол және оң жақтағы жарықты салыстырып, робот фонарь сәулесіне қарай бұрылады."
+    },
+    "components": [
+      "arduino-nano",
+      "ldr",
+      "resistor",
+      "l9110s",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "pan-tilt-face-tracker",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-4",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 10,
+    "title": {
+      "en": "Pan-Tilt Face Tracking Camera",
+      "ru": "Камера с поворотом для слежения за лицом",
+      "kk": "Бетті бақылайтын бұрылмалы камера"
+    },
+    "summary": {
+      "en": "A Raspberry Pi 4 runs OpenCV face detection on a USB camera and steers two SG90 servos to keep a face centred.",
+      "ru": "Raspberry Pi 4 распознаёт лица через OpenCV на USB-камере и двумя сервоприводами SG90 держит лицо в центре кадра.",
+      "kk": "Raspberry Pi 4 USB-камерадан OpenCV арқылы бетті табады да, екі SG90 сервосымен оны кадр ортасында ұстайды."
+    },
+    "components": [
+      "raspberry-pi-4",
+      "servo-sg90",
+      "breadboard-power-module",
+      "jumper-wires"
+    ]
+  },
+  {
+    "slug": "servo-gripper-claw",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 2,
+    "title": {
+      "en": "Potentiometer Servo Gripper",
+      "ru": "Захват на сервоприводе с потенциометром",
+      "kk": "Потенциометрмен басқарылатын серво қармауыш"
+    },
+    "summary": {
+      "en": "Turn a knob to open and close a 3D-printed claw driven by an SG90 servo — the first step toward a full robot arm.",
+      "ru": "Вращайте ручку потенциометра, чтобы открывать и закрывать клешню на сервоприводе SG90 — первый шаг к манипулятору.",
+      "kk": "Потенциометр тұтқасын бұрап, SG90 сервосындағы қысқышты ашып-жабыңыз — робот-қолға алғашқы қадам."
+    },
+    "components": [
+      "arduino-uno",
+      "servo-sg90",
+      "potentiometer"
+    ]
+  },
+  {
+    "slug": "wall-following-robot",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "Wall-Following Maze Robot",
+      "ru": "Робот, едущий вдоль стены",
+      "kk": "Қабырға бойымен жүретін робот"
+    },
+    "summary": {
+      "en": "Keeps a fixed distance to the wall with a VL53L0X side sensor and an HC-SR04 front sensor to solve simple mazes.",
+      "ru": "Держит заданное расстояние до стены по боковому VL53L0X и переднему HC-SR04, проходя простые лабиринты.",
+      "kk": "Бүйірдегі VL53L0X пен алдыңғы HC-SR04 арқылы қабырғадан тұрақты қашықтық сақтап, қарапайым лабиринттерден өтеді."
+    },
+    "components": [
+      "arduino-nano",
+      "vl53l0x",
+      "hc-sr04",
+      "drv8833",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "drawing-robot-turtle",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 7,
+    "title": {
+      "en": "Turtle Drawing Robot",
+      "ru": "Рисующий робот-черепашка",
+      "kk": "Сурет салатын тасбақа-робот"
+    },
+    "summary": {
+      "en": "Two 28BYJ-48 steppers drive precise lines while an SG90 lifts the pen, drawing shapes from simple turtle commands.",
+      "ru": "Два шаговика 28BYJ-48 рисуют точные линии, а SG90 поднимает маркер — робот чертит фигуры по командам «черепашки».",
+      "kk": "Екі 28BYJ-48 қадамдық қозғалтқышы дәл сызық жүргізеді, SG90 қаламды көтереді — робот пішіндерді командамен салады."
+    },
+    "components": [
+      "arduino-uno",
+      "stepper-28byj48",
+      "uln2003",
+      "servo-sg90",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "esp32-web-controlled-rover",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "Wi-Fi Web-Controlled 4WD Rover",
+      "ru": "4WD-ровер с управлением через веб",
+      "kk": "Веб арқылы басқарылатын 4WD ровер"
+    },
+    "summary": {
+      "en": "The ESP32 serves a touch-friendly control page and drives four motors through an L298N, no app install needed.",
+      "ru": "ESP32 раздаёт страницу управления для телефона и крутит четыре мотора через L298N — приложение не нужно.",
+      "kk": "ESP32 телефонға арналған басқару бетін таратады және L298N арқылы төрт қозғалтқышты айналдырады."
+    },
+    "components": [
+      "esp32-devkit",
+      "robot-chassis-4wd",
+      "l298n",
+      "dc-motor",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "pico-line-follower-pid",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-pico",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "Pico Three-Sensor Line Follower",
+      "ru": "Робот по линии на Pico с тремя датчиками",
+      "kk": "Үш датчикті Pico сызық роботы"
+    },
+    "summary": {
+      "en": "Three TCRT5000 sensors and MicroPython PID on a Raspberry Pi Pico steer a DRV8833-driven 2WD chassis.",
+      "ru": "Три датчика TCRT5000 и PID на MicroPython в Raspberry Pi Pico ведут 2WD-шасси с драйвером DRV8833.",
+      "kk": "Үш TCRT5000 датчигі мен Raspberry Pi Pico-дағы MicroPython PID DRV8833 драйверлі 2WD шассиді басқарады."
+    },
+    "components": [
+      "raspberry-pi-pico",
+      "tcrt5000",
+      "drv8833",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "hexapod-walker",
+    "platform": "arduino",
+    "board": "arduino-mega",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 30,
+    "title": {
+      "en": "Six-Legged Hexapod Walker",
+      "ru": "Шестиногий робот-гексапод",
+      "kk": "Алты аяқты гексапод робот"
+    },
+    "summary": {
+      "en": "An Arduino Mega coordinates 18 servos for a tripod gait, steered from a phone over HC-05 Bluetooth.",
+      "ru": "Arduino Mega согласует 18 сервоприводов для треножной походки, управление с телефона по Bluetooth HC-05.",
+      "kk": "Arduino Mega 18 сервоны үшаяқты жүріс үшін үйлестіреді, телефоннан HC-05 Bluetooth арқылы басқарылады."
+    },
+    "components": [
+      "arduino-mega",
+      "servo-mg996r",
+      "servo-sg90",
+      "battery-2s-lipo",
+      "buck-converter-lm2596",
+      "hc-05"
+    ]
+  },
+  {
+    "slug": "biped-humanoid-walker",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 16,
+    "title": {
+      "en": "Six-Servo Biped Walker",
+      "ru": "Двуногий шагающий робот",
+      "kk": "Екі аяқты жүретін робот"
+    },
+    "summary": {
+      "en": "A small two-legged robot shifts its weight with six SG90 servos and keeps balance using MPU6050 feedback.",
+      "ru": "Маленький двуногий робот переносит вес шестью сервоприводами SG90 и держит равновесие по данным MPU6050.",
+      "kk": "Кішкентай екі аяқты робот алты SG90 сервосымен салмағын ауыстырып, MPU6050 арқылы тепе-теңдік сақтайды."
+    },
+    "components": [
+      "arduino-nano",
+      "servo-sg90",
+      "mpu6050",
+      "battery-18650",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "ir-remote-tank",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 3,
+    "title": {
+      "en": "IR Remote-Controlled Tank",
+      "ru": "Танк на ИК-пульте",
+      "kk": "ИҚ пультпен басқарылатын танк"
+    },
+    "summary": {
+      "en": "Drive a tracked or wheeled chassis with any TV-style IR remote decoded by a VS1838B receiver.",
+      "ru": "Управляйте гусеничным или колёсным шасси обычным ИК-пультом через приёмник VS1838B.",
+      "kk": "VS1838B қабылдағышы арқылы кез келген ИҚ пультпен шынжыр табанды не дөңгелекті шассиді басқарыңыз."
+    },
+    "components": [
+      "arduino-uno",
+      "ir-receiver-vs1838b",
+      "ir-remote",
+      "l9110s",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "pi-autonomous-camera-rover",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-4",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 20,
+    "title": {
+      "en": "Pi Autonomous Camera Rover",
+      "ru": "Автономный ровер на Raspberry Pi с камерой",
+      "kk": "Камералы автономды Raspberry Pi роверы"
+    },
+    "summary": {
+      "en": "A Raspberry Pi 4 follows coloured markers with OpenCV and brakes for obstacles seen by a level-shifted HC-SR04.",
+      "ru": "Raspberry Pi 4 едет за цветными метками с помощью OpenCV и тормозит перед препятствиями по HC-SR04 через преобразователь уровней.",
+      "kk": "Raspberry Pi 4 OpenCV арқылы түсті белгілерге ереді және деңгей түрлендіргіші бар HC-SR04 кедергіні көргенде тоқтайды."
+    },
+    "components": [
+      "raspberry-pi-4",
+      "robot-chassis-4wd",
+      "l298n",
+      "dc-motor",
+      "hc-sr04",
+      "level-shifter",
+      "battery-2s-lipo",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "nrf24-joystick-rc-robot",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 7,
+    "title": {
+      "en": "NRF24 Joystick-Controlled Robot",
+      "ru": "Робот на радиоуправлении NRF24 с джойстиком",
+      "kk": "NRF24 радиобасқарылатын джойстикті робот"
+    },
+    "summary": {
+      "en": "A Nano handset with a joystick sends commands over NRF24L01 radio to a TB6612FNG-driven robot up to 100 m away.",
+      "ru": "Пульт на Nano с джойстиком передаёт команды по NRF24L01 роботу с драйвером TB6612FNG на расстояние до 100 м.",
+      "kk": "Джойстикті Nano пульті NRF24L01 арқылы TB6612FNG драйверлі роботқа 100 м-ге дейін команда жібереді."
+    },
+    "components": [
+      "arduino-nano",
+      "nrf24l01",
+      "joystick",
+      "tb6612fng",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-2s-lipo",
+      "capacitor"
+    ]
+  },
+  {
+    "slug": "edge-avoiding-table-bot",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 3,
+    "title": {
+      "en": "Table-Edge Avoiding Bot",
+      "ru": "Робот, который не падает со стола",
+      "kk": "Үстелден құламайтын робот"
+    },
+    "summary": {
+      "en": "Downward IR sensors spot the edge of a desk so this little robot reverses and turns instead of falling off.",
+      "ru": "Направленные вниз ИК-датчики замечают край стола, и робот отъезжает назад и разворачивается.",
+      "kk": "Төмен қараған ИҚ датчиктер үстел шетін байқап, робот артқа шегініп, бұрылады."
+    },
+    "components": [
+      "arduino-nano",
+      "ir-obstacle",
+      "l9110s",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "esp32-robot-arm-web",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 8,
+    "title": {
+      "en": "Wi-Fi Robot Arm with Pose Memory",
+      "ru": "Wi-Fi манипулятор с памятью поз",
+      "kk": "Қалып жадысы бар Wi-Fi робот-қол"
+    },
+    "summary": {
+      "en": "Control a 5-servo arm from browser sliders, save poses and replay pick-and-place sequences from the ESP32.",
+      "ru": "Управляйте рукой из пяти сервоприводов ползунками в браузере, сохраняйте позы и повторяйте последовательности на ESP32.",
+      "kk": "Бес серволы қолды браузердегі жүгірткілермен басқарып, қалыптарды сақтап, ESP32-де қайталаңыз."
+    },
+    "components": [
+      "esp32-devkit",
+      "servo-mg996r",
+      "servo-sg90",
+      "buck-converter-lm2596",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "stepper-scara-plotter",
+    "platform": "arduino",
+    "board": "arduino-mega",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 18,
+    "title": {
+      "en": "SCARA Arm Pen Plotter",
+      "ru": "SCARA-манипулятор плоттер",
+      "kk": "SCARA қол-плоттер"
+    },
+    "summary": {
+      "en": "Two NEMA17 steppers move a SCARA arm with inverse kinematics on a Mega, plotting G-code drawings with a servo pen lift.",
+      "ru": "Два шаговика NEMA17 двигают SCARA-руку по обратной кинематике на Mega и рисуют G-код, сервопривод поднимает перо.",
+      "kk": "Mega-дағы кері кинематикамен екі NEMA17 SCARA қолды жылжытып, G-код суреттерін салады, серво қаламды көтереді."
+    },
+    "components": [
+      "arduino-mega",
+      "a4988",
+      "stepper-nema17",
+      "servo-sg90",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "pico-servo-spider",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-pico",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 14,
+    "title": {
+      "en": "Pico Eight-Servo Spider",
+      "ru": "Паук на Pico с восемью сервоприводами",
+      "kk": "Сегіз серволы Pico өрмекші"
+    },
+    "summary": {
+      "en": "A Raspberry Pi Pico uses its PIO-driven PWM to walk an eight-servo spider and stop for objects seen by an HC-SR04.",
+      "ru": "Raspberry Pi Pico с ШИМ на PIO ведёт паука на восьми сервоприводах и останавливается перед препятствиями по HC-SR04.",
+      "kk": "Raspberry Pi Pico PIO ШИМ-і арқылы сегіз серволы өрмекшіні жүргізеді, HC-SR04 кедергі көрсе тоқтайды."
+    },
+    "components": [
+      "raspberry-pi-pico",
+      "servo-sg90",
+      "battery-18650",
+      "buck-converter-lm2596",
+      "hc-sr04",
+      "resistor"
+    ]
+  },
+  {
+    "slug": "esp32-ps-style-ble-rover",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 6,
+    "title": {
+      "en": "BLE Gamepad-Controlled Rover",
+      "ru": "Ровер с управлением от BLE-геймпада",
+      "kk": "BLE геймпадпен басқарылатын ровер"
+    },
+    "summary": {
+      "en": "Pair a Bluetooth gamepad directly with the ESP32 and drive a TB6612FNG rover with analog sticks and turbo button.",
+      "ru": "Подключите Bluetooth-геймпад прямо к ESP32 и управляйте ровером с драйвером TB6612FNG аналоговыми стиками.",
+      "kk": "Bluetooth геймпадты тікелей ESP32-ге қосып, TB6612FNG драйверлі роверді аналогтық таяқшалармен басқарыңыз."
+    },
+    "components": [
+      "esp32-devkit",
+      "robot-chassis-2wd",
+      "tb6612fng",
+      "dc-motor",
+      "battery-18650",
+      "tp4056-charger"
+    ]
+  },
+  {
+    "slug": "pi-voice-command-robot",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-4",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 14,
+    "title": {
+      "en": "Offline Voice-Command Robot",
+      "ru": "Робот с голосовыми командами офлайн",
+      "kk": "Офлайн дауыстық командалы робот"
+    },
+    "summary": {
+      "en": "A Raspberry Pi 4 runs offline speech recognition on a USB mic and obeys commands like “forward” and “turn left”.",
+      "ru": "Raspberry Pi 4 распознаёт речь без интернета и выполняет команды «вперёд», «налево» и т. п.",
+      "kk": "Raspberry Pi 4 сөзді интернетсіз таниды да, «алға», «солға» сияқты командаларды орындайды."
+    },
+    "components": [
+      "raspberry-pi-4",
+      "robot-chassis-2wd",
+      "tb6612fng",
+      "dc-motor",
+      "microphone-max9814",
+      "battery-2s-lipo",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "maze-solving-micromouse",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 20,
+    "title": {
+      "en": "Micromouse Maze Solver",
+      "ru": "Микромышь для лабиринта",
+      "kk": "Лабиринт шешетін микротышқан"
+    },
+    "summary": {
+      "en": "Three VL53L0X time-of-flight sensors map walls while encoders track distance, letting a Nano flood-fill its way to the maze centre.",
+      "ru": "Три лазерных датчика VL53L0X видят стены, энкодеры считают путь, и Nano находит центр лабиринта алгоритмом flood-fill.",
+      "kk": "Үш VL53L0X датчигі қабырғаларды, энкодерлер қашықтықты өлшейді, ал Nano flood-fill алгоритмімен лабиринт ортасын табады."
+    },
+    "components": [
+      "arduino-nano",
+      "vl53l0x",
+      "drv8833",
+      "dc-motor",
+      "rotary-encoder",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "cable-cam-slider",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 8,
+    "title": {
+      "en": "Motorized Camera Slider",
+      "ru": "Моторизованный слайдер для камеры",
+      "kk": "Моторлы камера слайдері"
+    },
+    "summary": {
+      "en": "A NEMA17 stepper glides a camera along a rail for smooth time-lapses, with speed and distance set on an LCD menu.",
+      "ru": "Шаговик NEMA17 плавно ведёт камеру по рельсу для таймлапсов, скорость и путь задаются в меню на LCD.",
+      "kk": "NEMA17 қадамдық қозғалтқышы камераны рельс бойымен тайм-лапсқа баяу жылжытады, жылдамдық LCD мәзірінде орнатылады."
+    },
+    "components": [
+      "arduino-uno",
+      "a4988",
+      "stepper-nema17",
+      "push-button",
+      "lcd-1602-i2c",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "dog-tail-wagging-bot",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 1.5,
+    "title": {
+      "en": "Wagging Tail Desk Pet",
+      "ru": "Настольный питомец с хвостом",
+      "kk": "Құйрық бұлғайтын үстел жануары"
+    },
+    "summary": {
+      "en": "Touch the TTP223 pad and an SG90 servo wags a tail faster the longer you pet it — a playful first servo build.",
+      "ru": "Коснитесь сенсора TTP223, и сервопривод SG90 виляет хвостом тем быстрее, чем дольше гладите.",
+      "kk": "TTP223 сенсорына тиіп тұрсаңыз, SG90 сервосы құйрықты одан сайын жылдам бұлғайды."
+    },
+    "components": [
+      "arduino-nano",
+      "servo-sg90",
+      "touch-ttp223"
+    ]
+  },
+  {
+    "slug": "pi-pico-balancing-bot",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-pico",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 12,
+    "title": {
+      "en": "Pico Two-Wheel Balancing Bot",
+      "ru": "Двухколёсный балансирующий робот на Pico",
+      "kk": "Pico екі дөңгелекті теңгерімді роботы"
+    },
+    "summary": {
+      "en": "Geared DC motors with encoders and an MPU6050 keep a lightweight Pico robot upright using a cascaded PID controller.",
+      "ru": "Мотор-редукторы с энкодерами и MPU6050 удерживают лёгкого робота на Pico в равновесии каскадным PID.",
+      "kk": "Энкодерлі моторлар мен MPU6050 жеңіл Pico роботын каскадты PID арқылы тік ұстайды."
+    },
+    "components": [
+      "raspberry-pi-pico",
+      "mpu6050",
+      "drv8833",
+      "dc-motor",
+      "rotary-encoder",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "esp8266-telepresence-bot",
+    "platform": "esp32",
+    "board": "esp8266-nodemcu",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 6,
+    "title": {
+      "en": "Phone-Holder Telepresence Bot",
+      "ru": "Робот телеприсутствия с держателем телефона",
+      "kk": "Телефон ұстағышты телеқатысу роботы"
+    },
+    "summary": {
+      "en": "Clip a phone on top for video calls while the NodeMCU drives the base and tilts the phone over Wi-Fi.",
+      "ru": "Закрепите телефон для видеозвонка, а NodeMCU по Wi-Fi двигает базу и наклоняет телефон сервоприводом.",
+      "kk": "Бейнеқоңырау үшін телефонды бекітіңіз, NodeMCU Wi-Fi арқылы базаны жүргізіп, сервомен телефонды еңкейтеді."
+    },
+    "components": [
+      "esp8266-nodemcu",
+      "robot-chassis-2wd",
+      "l9110s",
+      "dc-motor",
+      "servo-sg90",
+      "battery-18650",
+      "tp4056-charger"
+    ]
+  },
+  {
+    "slug": "color-sorting-arm",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 7,
+    "title": {
+      "en": "Colour-Sorting Servo Machine",
+      "ru": "Сортировщик по цвету на сервоприводах",
+      "kk": "Түс бойынша сұрыптайтын серво машина"
+    },
+    "summary": {
+      "en": "An RGB LED and light sensor read each sweet's colour, then two servos drop it into the matching cup.",
+      "ru": "RGB-светодиод и датчик света определяют цвет конфеты, а два сервопривода отправляют её в нужный стакан.",
+      "kk": "RGB жарықдиоды мен жарық датчигі кәмпиттің түсін анықтайды, екі серво оны тиісті ыдысқа түсіреді."
+    },
+    "components": [
+      "arduino-uno",
+      "servo-sg90",
+      "ldr-module",
+      "rgb-led",
+      "resistor"
+    ]
+  },
+  {
+    "slug": "pi-mecanum-ros-rover",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-4",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 30,
+    "title": {
+      "en": "ROS 2 Mecanum Research Rover",
+      "ru": "Исследовательский ровер ROS 2 на меканум-колёсах",
+      "kk": "ROS 2 меканум зерттеу роверi"
+    },
+    "summary": {
+      "en": "A Raspberry Pi 4 runs ROS 2 with wheel odometry from encoders and MPU6050 fusion on a holonomic mecanum base.",
+      "ru": "Raspberry Pi 4 запускает ROS 2 с одометрией по энкодерам и фьюжном MPU6050 на голономной меканум-платформе.",
+      "kk": "Raspberry Pi 4 голономды меканум платформада энкодер одометриясы мен MPU6050 біріктіруімен ROS 2 іске қосады."
+    },
+    "components": [
+      "raspberry-pi-4",
+      "mecanum-wheels",
+      "robot-chassis-4wd",
+      "tb6612fng",
+      "dc-motor",
+      "rotary-encoder",
+      "mpu6050",
+      "battery-2s-lipo",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "fire-fighting-robot",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 8,
+    "title": {
+      "en": "Fire-Fighting Robot",
+      "ru": "Робот-пожарный",
+      "kk": "Өрт сөндіруші робот"
+    },
+    "summary": {
+      "en": "Flame sensors guide the robot toward a candle, then a servo-aimed pump sprays water to put it out.",
+      "ru": "Датчики пламени ведут робота к свече, затем помпа, наведённая сервоприводом, гасит её водой.",
+      "kk": "Жалын датчиктері роботты шамға бағыттайды, сосын сервомен бағытталған сорғы оны сумен сөндіреді."
+    },
+    "components": [
+      "arduino-uno",
+      "flame-sensor",
+      "water-pump",
+      "relay-module",
+      "servo-sg90",
+      "l298n",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "sound-following-robot",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 4,
+    "title": {
+      "en": "Clap-Following Robot",
+      "ru": "Робот, едущий на хлопок",
+      "kk": "Шапалаққа келетін робот"
+    },
+    "summary": {
+      "en": "Two sound sensors compare loudness so the robot turns toward a clap and rolls a short distance to you.",
+      "ru": "Два датчика звука сравнивают громкость, и робот поворачивается к хлопку и подъезжает к вам.",
+      "kk": "Екі дыбыс датчигі қаттылықты салыстырып, робот шапалақ жаққа бұрылып, сізге қарай жүреді."
+    },
+    "components": [
+      "arduino-nano",
+      "sound-sensor",
+      "l9110s",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "esp32-swarm-robots-espnow",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 16,
+    "title": {
+      "en": "ESP-NOW Swarm Robots",
+      "ru": "Рой роботов на ESP-NOW",
+      "kk": "ESP-NOW робот үйірі"
+    },
+    "summary": {
+      "en": "Several ESP32 bots share positions over ESP-NOW and move in formation, showing their role on a WS2812B ring.",
+      "ru": "Несколько роботов на ESP32 обмениваются координатами по ESP-NOW и едут строем, показывая роль на кольце WS2812B.",
+      "kk": "Бірнеше ESP32 роботы ESP-NOW арқылы орнын бөлісіп, сапта жүреді, рөлін WS2812B сақинасында көрсетеді."
+    },
+    "components": [
+      "esp32-devkit",
+      "robot-chassis-2wd",
+      "drv8833",
+      "dc-motor",
+      "ws2812b-ring",
+      "ir-obstacle",
+      "battery-18650",
+      "tp4056-charger"
+    ]
+  },
+  {
+    "slug": "gesture-controlled-robot",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 6,
+    "title": {
+      "en": "Hand-Gesture Controlled Robot",
+      "ru": "Робот, управляемый жестами",
+      "kk": "Қол қимылымен басқарылатын робот"
+    },
+    "summary": {
+      "en": "Tilt a glove-mounted MPU6050 and the NRF24L01 link turns your hand gestures into robot motion.",
+      "ru": "Наклоняйте перчатку с MPU6050 — радиоканал NRF24L01 превращает жесты руки в движение робота.",
+      "kk": "Қолғаптағы MPU6050-ді еңкейтіңіз — NRF24L01 арнасы қимылды робот қозғалысына айналдырады."
+    },
+    "components": [
+      "arduino-nano",
+      "mpu6050",
+      "nrf24l01",
+      "l298n",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "pico-robot-eyes",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-pico",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 2,
+    "title": {
+      "en": "Animated Robot Eyes",
+      "ru": "Анимированные глаза робота",
+      "kk": "Анимациялы робот көздері"
+    },
+    "summary": {
+      "en": "Two OLED eyes on a Pico blink, look around and widen in surprise when the HC-SR04 sees you approach.",
+      "ru": "Глаза на OLED-экране Pico моргают, оглядываются и удивляются, когда HC-SR04 замечает ваше приближение.",
+      "kk": "Pico-дағы OLED көздер жыпылықтап, жан-жаққа қарайды, HC-SR04 жақындағаныңызды байқаса таң қалады."
+    },
+    "components": [
+      "raspberry-pi-pico",
+      "oled-ssd1306",
+      "hc-sr04",
+      "resistor"
+    ]
+  },
+  {
+    "slug": "conveyor-belt-sorter",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 9,
+    "title": {
+      "en": "Mini Conveyor Belt Sorter",
+      "ru": "Мини-конвейер с сортировкой",
+      "kk": "Сұрыптайтын шағын конвейер"
+    },
+    "summary": {
+      "en": "A stepper-driven belt carries parts past an IR sensor and a servo flipper diverts them, with counts on an LCD.",
+      "ru": "Лента на шаговике везёт детали мимо ИК-датчика, сервопривод отбрасывает их в сторону, счёт выводится на LCD.",
+      "kk": "Қадамдық қозғалтқышты таспа бөлшектерді ИҚ датчиктен өткізеді, серво оларды бұрады, саны LCD-де көрсетіледі."
+    },
+    "components": [
+      "arduino-uno",
+      "stepper-28byj48",
+      "uln2003",
+      "ir-obstacle",
+      "servo-sg90",
+      "lcd-1602-i2c"
+    ]
+  },
+  {
+    "slug": "servo-desk-lamp-robot",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 6,
+    "title": {
+      "en": "Robotic Desk Lamp",
+      "ru": "Роботизированная настольная лампа",
+      "kk": "Роботтандырылған үстел шамы"
+    },
+    "summary": {
+      "en": "Three servos aim a bright LED head toward your work area, following the darkest spot reported by a light sensor.",
+      "ru": "Три сервопривода наводят яркую светодиодную головку на рабочую зону, ориентируясь на датчик света.",
+      "kk": "Үш серво жарық датчигіне сүйеніп, жарқын жарықдиодты басты жұмыс аймағына бағыттайды."
+    },
+    "components": [
+      "arduino-nano",
+      "servo-sg90",
+      "ldr-module",
+      "led",
+      "mosfet-n",
+      "resistor",
+      "usb-5v"
+    ]
+  },
+  {
+    "slug": "esp32-pan-tilt-webcam",
+    "platform": "esp32",
+    "board": "esp32-cam",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 4,
+    "title": {
+      "en": "ESP32-CAM Pan-Tilt Webcam",
+      "ru": "Поворотная веб-камера на ESP32-CAM",
+      "kk": "ESP32-CAM бұрылмалы веб-камерасы"
+    },
+    "summary": {
+      "en": "Two SG90 servos let you look around a room from a browser page streaming live from the ESP32-CAM.",
+      "ru": "Два сервопривода SG90 позволяют осматривать комнату из браузера, пока ESP32-CAM транслирует видео.",
+      "kk": "Екі SG90 сервосы ESP32-CAM тікелей таратқан бейнені браузерден көріп, бөлмені шолуға мүмкіндік береді."
+    },
+    "components": [
+      "esp32-cam",
+      "servo-sg90",
+      "usb-5v"
+    ]
+  },
+  {
+    "slug": "arduino-animatronic-eye",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "Animatronic Eye Mechanism",
+      "ru": "Аниматронный глаз",
+      "kk": "Аниматроникалық көз"
+    },
+    "summary": {
+      "en": "Four micro servos move an eyeball and eyelids that follow a joystick or run a lifelike idle animation.",
+      "ru": "Четыре микросервопривода двигают глазное яблоко и веки по джойстику или в живой фоновой анимации.",
+      "kk": "Төрт микро серво көз алмасы мен қабақтарды джойстикке ілестіріп немесе табиғи анимацияда қозғайды."
+    },
+    "components": [
+      "arduino-nano",
+      "servo-sg90",
+      "joystick",
+      "breadboard-power-module"
+    ]
+  },
+  {
+    "slug": "stepper-turntable-scanner",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "Photo Turntable for 3D Scanning",
+      "ru": "Поворотный стол для 3D-сканирования",
+      "kk": "3D сканерлеуге арналған айналмалы үстел"
+    },
+    "summary": {
+      "en": "A NEMA17 turntable rotates objects in exact steps and triggers shots for photogrammetry scans.",
+      "ru": "Столик на NEMA17 поворачивает предмет точными шагами для съёмки фотограмметрии.",
+      "kk": "NEMA17 үстелі затты нақты қадаммен айналдырып, фотограмметрия үшін түсірілімге көмектеседі."
+    },
+    "components": [
+      "arduino-uno",
+      "a4988",
+      "stepper-nema17",
+      "push-button",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "pico-robot-car-ultrasonic",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-pico",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 4,
+    "title": {
+      "en": "Pico Bump-Free Robot Car",
+      "ru": "Машинка на Pico, которая не врезается",
+      "kk": "Соқтығыспайтын Pico машинасы"
+    },
+    "summary": {
+      "en": "A Pico robot car slows and turns when its HC-SR04 sees a wall — a friendly first MicroPython robot.",
+      "ru": "Робот-машинка на Pico сбавляет ход и поворачивает, когда HC-SR04 видит стену — первый робот на MicroPython.",
+      "kk": "Pico машинасы HC-SR04 қабырғаны көргенде баяулап, бұрылады — MicroPython-дағы алғашқы робот."
+    },
+    "components": [
+      "raspberry-pi-pico",
+      "hc-sr04",
+      "resistor",
+      "drv8833",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "esp32-robot-dog-servo",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 22,
+    "title": {
+      "en": "Twelve-Servo Robot Dog",
+      "ru": "Робот-собака на двенадцати сервоприводах",
+      "kk": "Он екі серволы робот ит"
+    },
+    "summary": {
+      "en": "Twelve MG996R servos give an ESP32 quadruped trot and stand poses, steered from a web joystick with IMU stabilisation.",
+      "ru": "Двенадцать сервоприводов MG996R дают четвероногому роботу на ESP32 рысь и стойку, IMU стабилизирует корпус.",
+      "kk": "Он екі MG996R сервосы ESP32 төрт аяқтыға желіс пен тұру қалпын береді, IMU денені тұрақтандырады."
+    },
+    "components": [
+      "esp32-devkit",
+      "servo-mg996r",
+      "mpu6050",
+      "battery-2s-lipo",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "arduino-tic-tac-toe-arm",
+    "platform": "arduino",
+    "board": "arduino-mega",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 15,
+    "title": {
+      "en": "Tic-Tac-Toe Playing Robot Arm",
+      "ru": "Робот-рука, играющая в крестики-нолики",
+      "kk": "Дойбы-нөлдік ойнайтын робот-қол"
+    },
+    "summary": {
+      "en": "Enter your move on a keypad and a three-servo arm draws its unbeatable minimax reply on paper.",
+      "ru": "Введите ход на клавиатуре, и рука на трёх сервоприводах рисует на бумаге ответ по алгоритму минимакс.",
+      "kk": "Пернетақтада жүрісіңізді енгізіңіз, үш серволы қол минимакс жауабын қағазға салады."
+    },
+    "components": [
+      "arduino-mega",
+      "servo-mg996r",
+      "servo-sg90",
+      "keypad-4x4",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "pi-robot-arm-vision",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-4",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 20,
+    "title": {
+      "en": "Vision-Guided Pick-and-Place Arm",
+      "ru": "Манипулятор с компьютерным зрением",
+      "kk": "Көру жүйесі бар алу-қою қолы"
+    },
+    "summary": {
+      "en": "A Pi 4 camera finds coloured blocks and computes inverse kinematics to pick them with a five-servo arm.",
+      "ru": "Камера Raspberry Pi 4 находит цветные кубики, а обратная кинематика позволяет руке из пяти сервоприводов их взять.",
+      "kk": "Pi 4 камерасы түрлі түсті текшелерді табады, бес серволы қол кері кинематикамен оларды алады."
+    },
+    "components": [
+      "raspberry-pi-4",
+      "servo-mg996r",
+      "servo-sg90",
+      "buck-converter-lm2596",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "nano-crawling-inchworm",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 2,
+    "title": {
+      "en": "Inchworm Crawler Robot",
+      "ru": "Робот-гусеница",
+      "kk": "Құрт тәрізді жорғалаушы робот"
+    },
+    "summary": {
+      "en": "Two servos bend and stretch a 3D-printed body so it inches forward like a caterpillar.",
+      "ru": "Два сервопривода сгибают и вытягивают корпус, и робот ползёт вперёд как гусеница.",
+      "kk": "Екі серво денені иіп, созып, робот жұлдызқұрт сияқты алға жорғалайды."
+    },
+    "components": [
+      "arduino-nano",
+      "servo-sg90",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "esp32-line-maze-solver",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 12,
+    "title": {
+      "en": "Line Maze Solving Robot",
+      "ru": "Робот, решающий линейный лабиринт",
+      "kk": "Сызықты лабиринт шешетін робот"
+    },
+    "summary": {
+      "en": "Explores a black-line maze, records every junction and then runs the shortest path, showing its route on an OLED.",
+      "ru": "Исследует лабиринт из чёрных линий, запоминает развилки и затем проходит кратчайший путь, показывая маршрут на OLED.",
+      "kk": "Қара сызықты лабиринтті зерттеп, қиылыстарды есте сақтайды да, ең қысқа жолмен өтеді, бағытын OLED-те көрсетеді."
+    },
+    "components": [
+      "esp32-devkit",
+      "line-sensor-array",
+      "tb6612fng",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-2s-lipo",
+      "oled-ssd1306"
+    ]
+  },
+  {
+    "slug": "arduino-pan-tilt-laser-cat-toy",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 2,
+    "title": {
+      "en": "Laser Cat Toy Turret",
+      "ru": "Лазерная игрушка для кошки",
+      "kk": "Мысыққа арналған лазер ойыншық"
+    },
+    "summary": {
+      "en": "Two servos sweep a low-power laser dot in random patterns at the press of a button to keep a cat busy.",
+      "ru": "Два сервопривода водят точку маломощного лазера по случайной траектории по нажатию кнопки.",
+      "kk": "Түйме басылғанда екі серво әлсіз лазер нүктесін кездейсоқ бағытпен жүргізеді."
+    },
+    "components": [
+      "arduino-nano",
+      "servo-sg90",
+      "led",
+      "push-button",
+      "resistor"
+    ]
+  },
+  {
+    "slug": "pico-robotic-hand-flex",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-pico",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 15,
+    "title": {
+      "en": "Glove-Mirroring Robotic Hand",
+      "ru": "Роботизированная кисть, повторяющая перчатку",
+      "kk": "Қолғапты қайталайтын робот-қол"
+    },
+    "summary": {
+      "en": "Potentiometers on each finger of a glove are mirrored by five servos pulling the tendons of a printed hand.",
+      "ru": "Потенциометры на пальцах перчатки передают движение пяти сервоприводам, тянущим «сухожилия» печатной кисти.",
+      "kk": "Қолғап саусақтарындағы потенциометрлер қозғалысты басылған қолдың сіңірлерін тартатын бес сервоға береді."
+    },
+    "components": [
+      "raspberry-pi-pico",
+      "servo-sg90",
+      "potentiometer",
+      "breadboard-power-module"
+    ]
+  },
+  {
+    "slug": "esp8266-alexa-style-pet-feeder-bot",
+    "platform": "esp32",
+    "board": "esp8266-nodemcu",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "Scheduled Pet Feeder Auger",
+      "ru": "Кормушка для питомца по расписанию",
+      "kk": "Кесте бойынша жануар жемсауыты"
+    },
+    "summary": {
+      "en": "An MG996R servo turns a feed auger at scheduled times kept by a DS3231 clock, with extra portions from a web page.",
+      "ru": "Сервопривод MG996R вращает шнек корма по расписанию часов DS3231, доп. порция — со страницы в браузере.",
+      "kk": "MG996R сервосы DS3231 сағатының кестесімен жем шнегін айналдырады, қосымша үлесті веб-беттен беруге болады."
+    },
+    "components": [
+      "esp8266-nodemcu",
+      "servo-mg996r",
+      "rtc-ds3231",
+      "push-button",
+      "usb-5v"
+    ]
+  },
+  {
+    "slug": "stepper-camera-pan-timelapse",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 3,
+    "title": {
+      "en": "Panning Time-Lapse Head",
+      "ru": "Поворотная головка для таймлапса",
+      "kk": "Тайм-лапсқа арналған бұрылмалы бас"
+    },
+    "summary": {
+      "en": "A 28BYJ-48 stepper slowly turns your phone or camera across a scene, with the pan speed set by a knob.",
+      "ru": "Шаговик 28BYJ-48 медленно поворачивает телефон или камеру, скорость задаётся потенциометром.",
+      "kk": "28BYJ-48 қадамдық қозғалтқышы телефонды немесе камераны баяу бұрады, жылдамдығы потенциометрмен орнатылады."
+    },
+    "components": [
+      "arduino-nano",
+      "stepper-28byj48",
+      "uln2003",
+      "potentiometer",
+      "usb-5v"
+    ]
+  },
+  {
+    "slug": "arduino-solar-tracker",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 3,
+    "title": {
+      "en": "Dual-Axis Solar Tracker",
+      "ru": "Двухосевой солнечный трекер",
+      "kk": "Екі осьті күн трекері"
+    },
+    "summary": {
+      "en": "Four LDRs compare light and two servos tilt a small panel to face the sun throughout the day.",
+      "ru": "Четыре фоторезистора сравнивают освещённость, а два сервопривода поворачивают панель к солнцу.",
+      "kk": "Төрт фоторезистор жарықты салыстырады, екі серво шағын панельді күнге бұрады."
+    },
+    "components": [
+      "arduino-uno",
+      "ldr",
+      "resistor",
+      "servo-sg90"
+    ]
+  },
+  {
+    "slug": "esp32-cam-object-follower",
+    "platform": "esp32",
+    "board": "esp32-cam",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 12,
+    "title": {
+      "en": "ESP32-CAM Colour-Blob Follower",
+      "ru": "Робот на ESP32-CAM, следующий за цветом",
+      "kk": "Түсті нысанға еретін ESP32-CAM"
+    },
+    "summary": {
+      "en": "The ESP32-CAM detects a bright coloured ball on-board and steers its 2WD chassis to chase it.",
+      "ru": "ESP32-CAM прямо на плате находит яркий цветной мяч и ведёт за ним 2WD-шасси.",
+      "kk": "ESP32-CAM тақтаның өзінде жарқын түсті допты тауып, 2WD шассиді соның артынан жүргізеді."
+    },
+    "components": [
+      "esp32-cam",
+      "robot-chassis-2wd",
+      "drv8833",
+      "dc-motor",
+      "battery-18650",
+      "tp4056-charger"
+    ]
+  },
+  {
+    "slug": "arduino-xy-plotter-28byj",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 10,
+    "title": {
+      "en": "Mini XY Pen Plotter",
+      "ru": "Мини XY-плоттер",
+      "kk": "Шағын XY плоттер"
+    },
+    "summary": {
+      "en": "Two 28BYJ-48 steppers move a pen on an XY gantry made of drawer slides to draw SVG art from G-code.",
+      "ru": "Два шаговика 28BYJ-48 двигают перо на XY-портале из мебельных направляющих и рисуют SVG по G-коду.",
+      "kk": "Екі 28BYJ-48 қадамдық қозғалтқышы жиһаз бағыттауыштарынан жасалған порталда қаламды жүргізіп, G-кодпен сурет салады."
+    },
+    "components": [
+      "arduino-uno",
+      "stepper-28byj48",
+      "uln2003",
+      "servo-sg90",
+      "usb-5v"
+    ]
+  },
+  {
+    "slug": "pi-pico-robot-arm-recorder",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-pico",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 7,
+    "title": {
+      "en": "Record-and-Replay Robot Arm",
+      "ru": "Манипулятор с записью движений",
+      "kk": "Қозғалысты жазып қайталайтын робот-қол"
+    },
+    "summary": {
+      "en": "Move four potentiometers to teach the arm, press record, and the Pico replays the motion on loop.",
+      "ru": "Двигайте четыре потенциометра, нажмите запись — и Pico повторяет движение руки по кругу.",
+      "kk": "Төрт потенциометрді бұрап үйретіңіз, жазуды басыңыз — Pico қозғалысты қайта-қайта орындайды."
+    },
+    "components": [
+      "raspberry-pi-pico",
+      "servo-sg90",
+      "potentiometer",
+      "push-button",
+      "breadboard-power-module"
+    ]
+  },
+  {
+    "slug": "esp32-two-wheel-ble-bot",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 3,
+    "title": {
+      "en": "First ESP32 Bluetooth Robot",
+      "ru": "Первый робот на ESP32 с Bluetooth",
+      "kk": "Bluetooth-ты алғашқы ESP32 роботы"
+    },
+    "summary": {
+      "en": "Drive a simple 2WD robot from a free BLE phone app — the gentlest intro to ESP32 motor control.",
+      "ru": "Управляйте простым 2WD-роботом из бесплатного BLE-приложения — мягкое знакомство с моторами на ESP32.",
+      "kk": "Тегін BLE қосымшасынан қарапайым 2WD роботты басқарыңыз — ESP32 мотор басқаруына жеңіл кіріспе."
+    },
+    "components": [
+      "esp32-devkit",
+      "drv8833",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "mega-delta-robot",
+    "platform": "arduino",
+    "board": "arduino-mega",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 24,
+    "title": {
+      "en": "Delta Parallel Robot",
+      "ru": "Дельта-робот с параллельной кинематикой",
+      "kk": "Параллель дельта-робот"
+    },
+    "summary": {
+      "en": "Three MG996R servos drive a parallel delta mechanism for fast pick-and-place, solved with delta kinematics on a Mega.",
+      "ru": "Три MG996R двигают дельта-механизм для быстрого перемещения деталей, кинематика считается на Mega.",
+      "kk": "Үш MG996R жылдам алу-қою үшін дельта механизмін қозғайды, кинематика Mega-да есептеледі."
+    },
+    "components": [
+      "arduino-mega",
+      "servo-mg996r",
+      "servo-sg90",
+      "buck-converter-lm2596",
+      "joystick"
+    ]
+  },
+  {
+    "slug": "arduino-robot-head-tracker",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "robotics",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "Motion-Tracking Robot Head",
+      "ru": "Голова робота, следящая за движением",
+      "kk": "Қозғалысқа бұрылатын робот басы"
+    },
+    "summary": {
+      "en": "Three PIR sensors locate movement and the HC-SR04 head turns on a servo to face whoever enters the room.",
+      "ru": "Три PIR-датчика определяют направление движения, и голова с HC-SR04 поворачивается к вошедшему.",
+      "kk": "Үш PIR датчигі қозғалыс бағытын анықтайды, HC-SR04 бар бас бөлмеге кірген адамға бұрылады."
+    },
+    "components": [
+      "arduino-uno",
+      "servo-sg90",
+      "pir-hc-sr501",
+      "hc-sr04"
+    ]
+  },
+  {
+    "slug": "rc-car-esp32-nrf24",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 6,
+    "title": {
+      "en": "Long-Range 4WD RC Car",
+      "ru": "Радиоуправляемая 4WD-машина дальнего действия",
+      "kk": "Алыс қашықтықты 4WD радиомашина"
+    },
+    "summary": {
+      "en": "An NRF24L01 handset and receiver link drive a 4WD chassis with proportional speed and failsafe stop.",
+      "ru": "Пульт и приёмник на NRF24L01 управляют 4WD-шасси с плавной скоростью и аварийной остановкой при потере связи.",
+      "kk": "NRF24L01 пульті мен қабылдағышы 4WD шассиді біркелкі жылдамдықпен және байланыс үзілсе тоқтатумен басқарады."
+    },
+    "components": [
+      "esp32-devkit",
+      "nrf24l01",
+      "joystick",
+      "l298n",
+      "dc-motor",
+      "robot-chassis-4wd",
+      "battery-2s-lipo",
+      "capacitor"
+    ]
+  },
+  {
+    "slug": "fan-hovercraft",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 8,
+    "title": {
+      "en": "Bluetooth Mini Hovercraft",
+      "ru": "Мини-судно на воздушной подушке",
+      "kk": "Шағын ауа жастықшалы кеме"
+    },
+    "summary": {
+      "en": "A lift fan, a thrust fan with MOSFET speed control and a servo rudder make a phone-steered hovercraft.",
+      "ru": "Подъёмный вентилятор, маршевый вентилятор с MOSFET и сервопривод-руль — ховеркрафт с управлением с телефона.",
+      "kk": "Көтергіш желдеткіш, MOSFET-пен басқарылатын тарту желдеткіші және серво рулі — телефоннан басқарылатын ховеркрафт."
+    },
+    "components": [
+      "arduino-nano",
+      "fan-5v",
+      "mosfet-n",
+      "diode",
+      "servo-sg90",
+      "hc-05",
+      "battery-2s-lipo",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "rc-boat-esp8266",
+    "platform": "esp32",
+    "board": "esp8266-nodemcu",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 7,
+    "title": {
+      "en": "Wi-Fi RC Boat",
+      "ru": "Радиоуправляемый катер по Wi-Fi",
+      "kk": "Wi-Fi басқарылатын қайық"
+    },
+    "summary": {
+      "en": "A sealed NodeMCU drives a propeller motor and servo rudder from a phone browser for pond cruising.",
+      "ru": "NodeMCU в герметичном корпусе крутит гребной мотор и руль-сервопривод по командам из браузера телефона.",
+      "kk": "Герметикалық қораптағы NodeMCU телефон браузерінен винт қозғалтқышы мен серво рульді басқарады."
+    },
+    "components": [
+      "esp8266-nodemcu",
+      "dc-motor",
+      "l9110s",
+      "servo-sg90",
+      "battery-18650",
+      "tp4056-charger",
+      "enclosure"
+    ]
+  },
+  {
+    "slug": "gps-waypoint-rover",
+    "platform": "arduino",
+    "board": "arduino-mega",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 18,
+    "title": {
+      "en": "GPS Waypoint Navigation Rover",
+      "ru": "Ровер с навигацией по GPS-точкам",
+      "kk": "GPS нүктелері бойынша навигация роверi"
+    },
+    "summary": {
+      "en": "A Mega reads NEO-6M GPS and a compass to drive a 4WD rover autonomously through a list of outdoor waypoints.",
+      "ru": "Mega читает GPS NEO-6M и компас и самостоятельно ведёт 4WD-ровер по списку точек на улице.",
+      "kk": "Mega NEO-6M GPS пен компасты оқып, 4WD роверді далада нүктелер тізімімен өз бетімен жүргізеді."
+    },
+    "components": [
+      "arduino-mega",
+      "neo-6m-gps",
+      "gy-271-compass",
+      "l298n",
+      "dc-motor",
+      "robot-chassis-4wd",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "lora-long-range-rc-car",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 10,
+    "title": {
+      "en": "LoRa Kilometre-Range Rover",
+      "ru": "Ровер на LoRa с дальностью в километр",
+      "kk": "Километрлік LoRa роверi"
+    },
+    "summary": {
+      "en": "Two ESP32s with SX1278 LoRa modules drive a rover over a kilometre away and return battery telemetry to an OLED.",
+      "ru": "Два ESP32 с LoRa SX1278 управляют ровером на расстоянии больше километра и показывают заряд на OLED пульта.",
+      "kk": "SX1278 LoRa модульді екі ESP32 роверді бір шақырымнан астам қашықтықтан басқарып, батарея деректерін OLED-ке қайтарады."
+    },
+    "components": [
+      "esp32-devkit",
+      "lora-sx1278",
+      "joystick",
+      "tb6612fng",
+      "dc-motor",
+      "robot-chassis-4wd",
+      "battery-2s-lipo",
+      "oled-ssd1306"
+    ]
+  },
+  {
+    "slug": "pi-fpv-tank",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-4",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 14,
+    "title": {
+      "en": "Pi 4 FPV Tank with Pan Camera",
+      "ru": "FPV-танк на Pi 4 с поворотной камерой",
+      "kk": "Бұрылмалы камералы Pi 4 FPV танкі"
+    },
+    "summary": {
+      "en": "Stream low-latency video from a Pi 4 camera, steer the tank and pan the camera from a web dashboard.",
+      "ru": "Видео с малой задержкой с камеры Pi 4, управление танком и поворот камеры из веб-панели.",
+      "kk": "Pi 4 камерасынан кідірісі аз бейне, танкті басқару және камераны бұру веб-панельден."
+    },
+    "components": [
+      "raspberry-pi-4",
+      "robot-chassis-4wd",
+      "l298n",
+      "dc-motor",
+      "servo-sg90",
+      "battery-2s-lipo",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "arduino-rc-car-reverse-sensor",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 4,
+    "title": {
+      "en": "RC Car with Reversing Beeper",
+      "ru": "Машинка с парктроником",
+      "kk": "Парктроникі бар машина"
+    },
+    "summary": {
+      "en": "An IR-remote car that beeps faster as it backs toward a wall, just like a real parking sensor.",
+      "ru": "Машинка на ИК-пульте пищит всё чаще, когда сдаёт назад к стене — как настоящий парктроник.",
+      "kk": "ИҚ пультті машина қабырғаға артымен жақындағанда шынайы парктроник сияқты жиілей дыбыс береді."
+    },
+    "components": [
+      "arduino-uno",
+      "hc-sr04",
+      "buzzer-active",
+      "ir-receiver-vs1838b",
+      "ir-remote",
+      "l298n",
+      "dc-motor",
+      "robot-chassis-2wd",
+      "battery-4xaa"
+    ]
+  },
+  {
+    "slug": "pico-electric-skateboard-controller",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-pico",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 20,
+    "title": {
+      "en": "E-Skateboard Remote with Speedometer",
+      "ru": "Пульт для электроскейта со спидометром",
+      "kk": "Спидометрлі электроскейт пульті"
+    },
+    "summary": {
+      "en": "A Pico handheld remote sends throttle over NRF24L01 and shows speed from a hall-sensor wheel counter on an OLED.",
+      "ru": "Пульт на Pico передаёт газ по NRF24L01 и показывает скорость от датчика Холла на колесе на OLED.",
+      "kk": "Pico пульті NRF24L01 арқылы газды жібереді, доңғалақтағы Холл датчигінен жылдамдықты OLED-те көрсетеді."
+    },
+    "components": [
+      "raspberry-pi-pico",
+      "nrf24l01",
+      "hall-sensor-a3144",
+      "oled-ssd1306",
+      "battery-18650"
+    ]
+  },
+  {
+    "slug": "bike-speedometer-hall",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 3,
+    "title": {
+      "en": "Bike Speedometer and Trip Computer",
+      "ru": "Велоспидометр и бортовой компьютер",
+      "kk": "Велоспидометр және жол компьютері"
+    },
+    "summary": {
+      "en": "A magnet on the spoke and an A3144 hall sensor give speed, distance and max speed on a handlebar OLED.",
+      "ru": "Магнит на спице и датчик Холла A3144 показывают скорость, пробег и максимум на OLED на руле.",
+      "kk": "Шабақтағы магнит пен A3144 Холл датчигі рульдегі OLED-те жылдамдық, жүрілген жол мен максимумды көрсетеді."
+    },
+    "components": [
+      "arduino-nano",
+      "hall-sensor-a3144",
+      "oled-ssd1306",
+      "battery-18650",
+      "tp4056-charger"
+    ]
+  },
+  {
+    "slug": "bike-turn-signal-vest",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 3,
+    "title": {
+      "en": "Bike Turn-Signal Backpack",
+      "ru": "Рюкзак с поворотниками для велосипеда",
+      "kk": "Велосипедке арналған бұрылыс сигналды рюкзак"
+    },
+    "summary": {
+      "en": "Handlebar buttons send ESP-NOW messages to a backpack WS2812B panel that flashes left and right arrows.",
+      "ru": "Кнопки на руле по ESP-NOW включают стрелки влево и вправо на панели WS2812B на рюкзаке.",
+      "kk": "Рульдегі түймелер ESP-NOW арқылы рюкзактағы WS2812B панелінде сол және оң көрсеткілерді жандырады."
+    },
+    "components": [
+      "esp32-devkit",
+      "ws2812b-strip",
+      "push-button",
+      "battery-18650",
+      "tp4056-charger"
+    ]
+  },
+  {
+    "slug": "esp32-car-obd-free-dashcam",
+    "platform": "esp32",
+    "board": "esp32-cam",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 4,
+    "title": {
+      "en": "Loop-Recording Dash Cam",
+      "ru": "Видеорегистратор с циклической записью",
+      "kk": "Циклдік жазатын бейнетіркегіш"
+    },
+    "summary": {
+      "en": "An ESP32-CAM records looping video clips to microSD in your car, overwriting the oldest when the card is full.",
+      "ru": "ESP32-CAM записывает в машине циклическое видео на microSD, затирая старые ролики при заполнении карты.",
+      "kk": "ESP32-CAM көлікте бейнені microSD-ге циклмен жазады, карта толса ескі жазбаларды өшіреді."
+    },
+    "components": [
+      "esp32-cam",
+      "sd-card-module",
+      "usb-5v"
+    ]
+  },
+  {
+    "slug": "parking-garage-stop-light",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 1.5,
+    "title": {
+      "en": "Garage Parking Stop Light",
+      "ru": "Светофор для парковки в гараже",
+      "kk": "Гаражға тұраққа қоюға арналған бағдаршам"
+    },
+    "summary": {
+      "en": "An HC-SR04 on the garage wall turns green, yellow and red LEDs on as your car approaches the perfect spot.",
+      "ru": "HC-SR04 на стене гаража зажигает зелёный, жёлтый и красный светодиоды по мере приближения машины.",
+      "kk": "Гараж қабырғасындағы HC-SR04 көлік жақындағанда жасыл, сары және қызыл жарықдиодтарды жағады."
+    },
+    "components": [
+      "arduino-uno",
+      "hc-sr04",
+      "led",
+      "resistor"
+    ]
+  },
+  {
+    "slug": "arduino-model-railway-crossing",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 3,
+    "title": {
+      "en": "Model Railway Level Crossing",
+      "ru": "Железнодорожный переезд для макета",
+      "kk": "Макетке арналған теміржол өткелі"
+    },
+    "summary": {
+      "en": "IR sensors detect a passing train, lower servo barriers and flash red lights with a warning bell.",
+      "ru": "ИК-датчики замечают поезд, сервоприводы опускают шлагбаумы, мигают красные огни и звенит сигнал.",
+      "kk": "ИҚ датчиктер пойызды байқап, серво шлагбаумдарды түсіреді, қызыл шамдар жыпылықтап, қоңырау соғылады."
+    },
+    "components": [
+      "arduino-nano",
+      "ir-obstacle",
+      "servo-sg90",
+      "led",
+      "resistor",
+      "buzzer-active"
+    ]
+  },
+  {
+    "slug": "rc-car-tilt-controller",
+    "platform": "arduino",
+    "board": "arduino-uno",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "Tilt-Steered 4WD Car",
+      "ru": "4WD-машина с управлением наклоном",
+      "kk": "Еңкейтумен басқарылатын 4WD машина"
+    },
+    "summary": {
+      "en": "Tilt a handheld MPU6050 controller to steer a 4WD car, with commands sent over paired HC-05 modules.",
+      "ru": "Наклоняйте пульт с MPU6050, чтобы рулить 4WD-машиной; команды идут через пару модулей HC-05.",
+      "kk": "MPU6050 бар пультті еңкейтіп, 4WD машинаны басқарыңыз; командалар жұпталған HC-05 арқылы жіберіледі."
+    },
+    "components": [
+      "arduino-uno",
+      "mpu6050",
+      "hc-05",
+      "l298n",
+      "dc-motor",
+      "robot-chassis-4wd",
+      "battery-2s-lipo"
+    ]
+  },
+  {
+    "slug": "pi-pico-slot-car-lap-timer",
+    "platform": "raspberry_pi",
+    "board": "raspberry-pi-pico",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "beginner",
+    "hours": 3,
+    "title": {
+      "en": "Slot Car Lap Timer",
+      "ru": "Хронометр кругов для трека",
+      "kk": "Трекке арналған айналым таймері"
+    },
+    "summary": {
+      "en": "IR gates on the track count laps and show the best lap time on a TM1637 display for two lanes.",
+      "ru": "ИК-ворота на трассе считают круги и показывают лучшее время на дисплее TM1637 для двух дорожек.",
+      "kk": "Трассадағы ИҚ қақпалар айналымды санап, екі жолақ үшін ең жақсы уақытты TM1637-де көрсетеді."
+    },
+    "components": [
+      "raspberry-pi-pico",
+      "ir-obstacle",
+      "tm1637-display",
+      "buzzer-active"
+    ]
+  },
+  {
+    "slug": "esp32-ebike-battery-monitor",
+    "platform": "esp32",
+    "board": "esp32-devkit",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "E-Bike Battery Monitor",
+      "ru": "Монитор батареи электровелосипеда",
+      "kk": "Электровелосипед батареясының мониторы"
+    },
+    "summary": {
+      "en": "An INA219 tracks voltage, current and watt-hours of an e-bike pack and estimates remaining range on an OLED.",
+      "ru": "INA219 следит за напряжением, током и ватт-часами батареи электровелосипеда и прогнозирует запас хода на OLED.",
+      "kk": "INA219 электровелосипед батареясының кернеуін, тогын, ватт-сағатын бақылап, қалған жүрісті OLED-те болжайды."
+    },
+    "components": [
+      "esp32-devkit",
+      "ina219",
+      "oled-ssd1306",
+      "buck-converter-lm2596"
+    ]
+  },
+  {
+    "slug": "rc-crawler-lights-sound",
+    "platform": "arduino",
+    "board": "arduino-nano",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "RC Crawler Light and Sound Kit",
+      "ru": "Свет и звук для RC-краулера",
+      "kk": "RC краулерге жарық пен дыбыс"
+    },
+    "summary": {
+      "en": "Adds headlights, blinking indicators and engine sounds from a DFPlayer to any RC crawler, switched from an IR remote.",
+      "ru": "Добавляет фары, мигающие поворотники и звук мотора с DFPlayer к любому RC-краулеру, включение с ИК-пульта.",
+      "kk": "Кез келген RC краулерге шамдар, бұрылыс сигналдары мен DFPlayer мотор дыбысын қосады, ИҚ пультпен басқарылады."
+    },
+    "components": [
+      "arduino-nano",
+      "led",
+      "resistor",
+      "dfplayer-mini",
+      "speaker-8ohm",
+      "ir-receiver-vs1838b"
+    ]
+  },
+  {
+    "slug": "esp8266-car-gps-tracker",
+    "platform": "esp32",
+    "board": "esp8266-nodemcu",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "intermediate",
+    "hours": 5,
+    "title": {
+      "en": "Wi-Fi Car Trip Logger",
+      "ru": "Логгер поездок автомобиля по Wi-Fi",
+      "kk": "Wi-Fi көлік сапар тіркегіші"
+    },
+    "summary": {
+      "en": "A NodeMCU logs GPS tracks while driving and uploads them when the car is back in range of home Wi-Fi.",
+      "ru": "NodeMCU пишет GPS-трек во время поездки и выгружает его, когда машина возвращается в зону домашнего Wi-Fi.",
+      "kk": "NodeMCU жол кезінде GPS тректі жазып, көлік үй Wi-Fi аймағына оралғанда жүктейді."
+    },
+    "components": [
+      "esp8266-nodemcu",
+      "neo-6m-gps",
+      "buck-converter-lm2596",
+      "enclosure"
+    ]
+  },
+  {
+    "slug": "mega-autonomous-lawn-rover",
+    "platform": "arduino",
+    "board": "arduino-mega",
+    "category": "vehicles",
+    "robotics": true,
+    "difficulty": "advanced",
+    "hours": 35,
+    "title": {
+      "en": "Autonomous Lawn Rover Prototype",
+      "ru": "Прототип автономной газонокосилки",
+      "kk": "Автономды көгал шапқыш прототипі"
+    },
+    "summary": {
+      "en": "A Mega mows in GPS-bounded lanes, avoids obstacles ultrasonically and parks itself when the rain sensor gets wet.",
+      "ru": "Mega косит полосами внутри GPS-границ, объезжает препятствия по ультразвуку и уезжает на стоянку при дожде.",
+      "kk": "Mega GPS шекарасында жолақпен шабады, ультрадыбыспен кедергіні айналып өтеді, жаңбырда тұраққа барады."
+    },
+    "components": [
+      "arduino-mega",
+      "hc-sr04",
+      "neo-6m-gps",
+      "gy-271-compass",
+      "rain-sensor",
+      "l298n",
+      "dc-motor",
+      "robot-chassis-4wd",
+      "relay-module",
+      "battery-2s-lipo"
+    ]
+  }
+]

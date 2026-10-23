@@ -37,8 +37,8 @@ const CW: Record<Side, Side> = { top: "right", right: "bottom", bottom: "left", 
 const OUT: Record<Side, [number, number]> = { top: [0, -1], bottom: [0, 1], left: [-1, 0], right: [1, 0] };
 const SIDES: Side[] = ["top", "right", "bottom", "left"];
 
-type Group = "board" | "top" | "right" | "left" | "bottom" | "power";
-const FACING: Record<Exclude<Group, "board">, Side> = { top: "bottom", right: "left", left: "right", bottom: "top", power: "top" };
+type Group = "board" | "top" | "right" | "far" | "left" | "bottom" | "power";
+const FACING: Record<Exclude<Group, "board">, Side> = { top: "bottom", right: "left", far: "left", left: "right", bottom: "top", power: "top" };
 
 type Placed = { id: string; def: ComponentDef; label: string; rot: 0 | 1 | 2 | 3; w: number; h: number; x: number; y: number; group: Group; pins: LayoutPin[] };
 
@@ -78,7 +78,7 @@ function rotatePins(pins: LayoutPin[], w: number, h: number, rot: number): { pin
   return { pins: cur, w: cw, h: ch };
 }
 
-function groupOf(def: ComponentDef): Group {
+function groupOf(def: ComponentDef): Exclude<Group, "board"> {
   if (def.kind === "power") return "power";
   if (def.category === "Sensors" || def.category === "Displays" || def.category === "Wireless") return "top";
   return "right";
@@ -244,7 +244,7 @@ export function layoutCircuit(input: CircuitInput, getComponent: (id: string) =>
   const placed: Placed[] = [];
   placed.push({ id: "board", def: boardDef, label: boardDef.name, rot: 0, w: bw, h: bh, x: 0, y: 0, group: "board", pins: boardPins });
 
-  const groups: Record<Exclude<Group, "board">, Placed[]> = { top: [], right: [], left: [], bottom: [], power: [] };
+  const groups: Record<Exclude<Group, "board">, Placed[]> = { top: [], right: [], far: [], left: [], bottom: [], power: [] };
   const anchor = new Map<string, number>();
   for (const inst of insts) {
     if (inst.id === "board") continue;
@@ -257,13 +257,23 @@ export function layoutCircuit(input: CircuitInput, getComponent: (id: string) =>
       for (const p of all) counts[p.side]++;
       const side = SIDES.reduce((a, b) => (counts[b] > counts[a] ? b : a), all[0]?.side ?? "bottom");
       group = side;
-    } else group = groupOf(def);
+    } else {
+      group = groupOf(def);
+      // Loads driven only by another module (motors behind a driver) go one column further out.
+      if (group === "right" && !boardPinsOf(inst.id).length && (adj.get(inst.id) ?? []).some((e) => { const d = defs.get(e.other); return d !== undefined && d.kind === "module" && groupOf(d) === "right"; })) group = "far";
+    }
     // Orientation: the side carrying most connected pins faces the board.
     const used = new Set(conns.flatMap((c) => [c.from, c.to]).filter((e) => parseEnd(e)[0] === inst.id).map((e) => parseEnd(e)[1]));
     const score: Record<Side, number> = { top: 0, right: 0, bottom: 0, left: 0 };
-    for (const p of def.pins) score[p.side] += used.has(p.id) ? 10 : 1;
+    const toBoard = new Set(boardPinsOf(inst.id).length ? conns.flatMap((c) => [[c.from, c.to], [c.to, c.from]]).filter(([a, b]) => parseEnd(a!)[0] === inst.id && parseEnd(b!)[0] === "board").map(([a]) => parseEnd(a!)[1]) : []);
+    for (const p of def.pins) score[p.side] += toBoard.has(p.id) ? 100 : used.has(p.id) ? 10 : 1;
     const main = SIDES.reduce((a, b) => (score[b] > score[a] ? b : a), "top" as Side);
-    let rot = 0; for (let s = main; s !== FACING[group]; s = CW[s]) rot++;
+    // Two-terminal passives with pins on opposite sides lie parallel to the board edge.
+    const sidesUsed = new Set(def.pins.map((p) => p.side));
+    const axial = def.kind === "passive" && sidesUsed.size === 2 && (sidesUsed.has("left") ? sidesUsed.has("right") : sidesUsed.has("top") && sidesUsed.has("bottom"));
+    const target: Side = axial ? (FACING[group] === "top" || FACING[group] === "bottom" ? "left" : "top") : FACING[group];
+    const from: Side = axial ? (sidesUsed.has("left") ? "left" : "top") : main;
+    let rot = 0; for (let s = from; s !== target; s = CW[s]) rot++;
     const r = rotatePins(localPins(def), def.draw.w * UNIT, def.draw.h * UNIT, rot);
     const horizontal = group === "top" || group === "bottom" || group === "power";
     const a = all.length ? all.reduce((t, p) => t + (horizontal ? p.x : p.y), 0) / all.length : horizontal ? bw / 2 : bh / 2;
@@ -297,7 +307,21 @@ export function layoutCircuit(input: CircuitInput, getComponent: (id: string) =>
   colY(groups.right, () => bw + gR, -gT + GAP);
   colY(groups.left, (p) => -gL - p.w, -gT + GAP);
   rowX(groups.bottom, () => bh + gB);
-  const rightBottom = Math.max(bh, ...groups.right.map((p) => p.y + p.h), ...groups.bottom.map((p) => p.y + p.h));
+  {
+    const rightEdge = Math.max(bw + gR, ...groups.right.map((p) => p.x + p.w));
+    const gF = gapFor(groups.far);
+    for (const p of groups.far) {
+      const ys: number[] = [];
+      for (const e of adj.get(p.id) ?? []) {
+        const q = groups.right.find((r) => r.id === e.other); if (!q) continue;
+        for (const c of conns) for (const [a, b] of [[c.from, c.to], [c.to, c.from]] as const)
+          if (parseEnd(a)[0] === p.id && parseEnd(b)[0] === q.id) { const pin = q.pins.find((z) => z.id === parseEnd(b)[1]); if (pin) ys.push(q.y + pin.y); }
+      }
+      anchor.set(p.id, ys.length ? ys.reduce((t, v) => t + v, 0) / ys.length : bh / 2);
+    }
+    colY(groups.far, () => rightEdge + gF, -gT + GAP);
+  }
+  const rightBottom = Math.max(bh, ...groups.right.map((p) => p.y + p.h), ...groups.far.map((p) => p.y + p.h), ...groups.bottom.map((p) => p.y + p.h));
   const gP = gapFor(groups.power);
   {
     let cursor = bw + gR;
@@ -305,9 +329,9 @@ export function layoutCircuit(input: CircuitInput, getComponent: (id: string) =>
   }
 
   // Resolve any remaining overlaps by pushing parts away from the board.
-  const push: Record<Group, [number, number]> = { board: [0, 0], top: [0, -1], right: [0, 1], left: [0, 1], bottom: [0, 1], power: [1, 0] };
+  const push: Record<Group, [number, number]> = { board: [0, 0], top: [0, -1], right: [0, 1], far: [0, 1], left: [0, 1], bottom: [0, 1], power: [1, 0] };
   const overlaps = (a: Placed, b: Placed) => a.x < b.x + b.w + GAP && b.x < a.x + a.w + GAP && a.y < b.y + b.h + GAP && b.y < a.y + a.h + GAP;
-  for (const g of ["top", "right", "left", "bottom", "power"] as const) {
+  for (const g of ["top", "right", "far", "left", "bottom", "power"] as const) {
     for (const p of groups[g]) {
       let guard = 0;
       while (placed.some((q) => overlaps(p, q)) && guard++ < 500) { p.x += push[g][0] * UNIT; p.y += push[g][1] * UNIT; }
@@ -417,7 +441,7 @@ export function layoutCircuit(input: CircuitInput, getComponent: (id: string) =>
     if (t.rail) {
       const ry = (t.rail === "gnd" ? gndY : powerY) + oy;
       const row = ry / STEP; const goals = new Set<number>();
-      for (let i = Math.ceil((24 + 12) / STEP); i <= Math.floor((width - 36) / STEP); i++) { const n = row * ni + i; if (!railTaken.has(n) && !railTaken.has(n - 1) && !railTaken.has(n + 1)) goals.add(n); }
+      for (let i = Math.ceil((24 + 12) / STEP); i <= Math.floor((width - 96) / STEP); i++) { const n = row * ni + i; if (!railTaken.has(n) && !railTaken.has(n - 1) && !railTaken.has(n + 1)) goals.add(n); }
       path = route(grid, [A.stub[0] / STEP, A.stub[1] / STEP], A.dir, goals, null, row);
       if (path) railTaken.add(path[path.length - 1]!);
       const end = path ? path[path.length - 1]! : row * ni + A.stub[0] / STEP;
@@ -438,7 +462,7 @@ export function layoutCircuit(input: CircuitInput, getComponent: (id: string) =>
     if (path) for (let k = 0; k + 1 < path.length; k++) {
       const a = path[k]!, b = path[k + 1]!;
       const arr = Math.abs(a - b) === 1 ? grid.occH : grid.occV;
-      arr[a]!++; arr[b]!++;
+      arr[a] = arr[a]! + 1; arr[b] = arr[b]! + 1;
     }
     routed.set(t.id, simplify(pts));
   }

@@ -529,10 +529,13 @@ function extractCodePins(f: Family, sources: string[]): { strong: Set<string>; w
   for (const src of sources) {
     const consts = new Map<string, string>();
     const def = /#define\s+(\w+)\s+(\w+)/g;
+    // `const int A = 2, B = 4;` → expand each declarator into "A = 2;" so one regex handles both forms
+    const expanded = src.replace(/\b((?:const\s+)?(?:static\s+)?(?:constexpr\s+)?(?:int|uint8_t|byte|uint16_t|short|unsigned|int8_t|gpio_num_t|pin_size_t))\s+([^;(){}]+);/g,
+      (_all, type: string, decls: string) => decls.split(",").map((d) => `${type} ${d.trim()};`).join(" "));
     const cdecl = /\b(?:const\s+)?(?:static\s+)?(?:constexpr\s+)?(?:int|uint8_t|byte|uint16_t|short|unsigned|int8_t|gpio_num_t|pin_size_t)\s+(\w+)\s*=\s*(\w+)\s*;/g;
     const pyassign = /^\s*([A-Z][A-Z0-9_]*)\s*=\s*(\d+)\s*(?:#.*)?$/gm;
     for (const re of [def, cdecl, pyassign]) {
-      for (const m of src.matchAll(re)) {
+      for (const m of (re === cdecl ? expanded : src).matchAll(re)) {
         const name = m[1]!;
         const val = m[2]!;
         if (canonCodePin(f, val) === undefined) continue;
