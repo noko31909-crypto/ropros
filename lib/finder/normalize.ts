@@ -2,9 +2,9 @@ import { PARTS, type PartCategory } from "../parts-catalog.ts";
 
 export type CanonicalPart = { key: string; label: string; category: PartCategory | "Other" };
 
-/** "HC-SR04 Ultrasonic Sensor" -> "hc sr04 ultrasonic sensor" */
+/** "HC-SR04 Ultrasonic Sensor" -> "hc sr04 ultrasonic sensor". Cyrillic (ru/kk) letters are kept so local aliases match. */
 export function normalizeText(s: string): string {
-  return s.normalize("NFKD").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  return s.normalize("NFKD").toLowerCase().replace(/\p{M}+/gu, "").replace(/[^a-z0-9а-яёәғқңөұүһі]+/g, " ").trim();
 }
 
 // Lookup of every id, name and alias -> catalog part. Built once per server instance.

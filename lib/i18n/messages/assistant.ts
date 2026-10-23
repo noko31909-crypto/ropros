@@ -1,0 +1,129 @@
+import { defineMessages } from "../config";
+
+export type ReplyKey = "loop" | "pinout" | "esp32" | "jitter";
+
+const LOOP_CODE = (c1: string, c2: string) =>
+  "```cpp\nunsigned long last = 0;\nvoid loop() {\n  if (millis() - last >= 60) {\n    last = millis();\n    long d = readCm();\n    if (d > STOP_CM) drive(SPEED, SPEED);\n" +
+  `    else startScan();      // ${c1}\n  }\n  updateScan();            // ${c2}\n}\n` + "```";
+const ESP_CODE = "```cpp\nconst int PWMA = 25, AIN1 = 26, AIN2 = 27;\nconst int PWMB = 13, BIN1 = 32, BIN2 = 33;\n```";
+
+/** Build Assistant UI + localised mock replies (front-end mock until the server route exists). */
+export const assistant = defineMessages({
+  en: {
+    metaTitle: "Build Assistant",
+    pageTitle: "Build Assistant",
+    pageDescription: "Ask about wiring, code or debugging. On a guide page it reads that guide’s wiring and code; here it answers in general.",
+    launcher: "ask ropros",
+    dialogLabel: "ropros AI assistant",
+    clear: "Clear conversation",
+    close: "Close assistant",
+    contextLoaded: (t: string) => `context loaded: ${t} (wiring, code, known issues)`,
+    help: "Ask about wiring, code or debugging. I read the guide you’re on.",
+    keys: { send: "send", newline: "new line", close: "close" },
+    you: "you",
+    thinking: "thinking",
+    stopped: "stopped",
+    attachLabel: "paste code or a serial log",
+    attach: "Attach code",
+    message: "Message",
+    placeholder: "ask about wiring, code, errors…",
+    stop: "Stop generating",
+    send: "Send",
+    attached: "(attached code)",
+    disclaimer: "Answers can be wrong. Check wiring against datasheets before powering.",
+    mockNote: "Preview: replies are canned demos until the server route is connected.",
+    code: { lines: (n: number) => `${n} lines`, copy: "copy", copied: "copied", collapse: "collapse", showAll: (n: number) => `show all ${n} lines` },
+    suggestions: [
+      { key: "pinout", label: "Explain this pinout", prompt: "Explain this pinout: what each wire does and why those pins were chosen." },
+      { key: "loop", label: "Optimize this loop", prompt: "Optimize the main loop: remove blocking delays." },
+      { key: "jitter", label: "Why does my servo jitter?", prompt: "Why does my servo jitter when the motors start?" },
+      { key: "esp32", label: "Port to ESP32", prompt: "How would I port this build to an ESP32?" },
+    ] as { key: ReplyKey; label: string; prompt: string }[],
+    replies: {
+      loop: "The loop blocks on `delay()` during every scan, so the robot can’t react mid-turn. Use **millis()-based timing** instead:\n" +
+        LOOP_CODE("non-blocking state machine", "advances the servo one step") + "\nThis keeps distance checks running at ~16 Hz while the servo sweeps.",
+      pinout: "**ENA (D5) / ENB (D6)** set motor speed with PWM. **IN1–IN4 (D7, D8, D4, D2)** set direction. The servo sits on **D3** because the Servo library disables PWM on D9 and D10 on the Uno, which would break the speed pins.\n\nHC-SR04: **TRIG → A0**, **ECHO → A1**. Analog pins work fine as digital I/O and keep D-pins free.",
+      esp32: "The big one is **3.3 V logic**. The HC-SR04 ECHO pin outputs 5 V: add a `1 kΩ / 2 kΩ` divider. Swap the L298N for a TB6612FNG, which is happy at 3.3 V. Example pins:\n" +
+        ESP_CODE + "\nAvoid GPIO 0, 2, 5, 12 and 15: they affect boot.",
+      jitter: "Most jitter comes from power, not code. Check these in order:\n1. Servo powered from the Arduino 5V pin? Move it to a separate 5 V supply and **join the grounds**.\n2. Add a `470 µF` capacitor across the servo’s power leads.\n3. Keep signal wires away from motor leads.",
+    } as Record<ReplyKey, string>,
+  },
+  ru: {
+    metaTitle: "Build Assistant",
+    pageTitle: "Build Assistant",
+    pageDescription: "Спрашивайте о проводке, коде и отладке. На странице гайда ассистент читает его схему и код, здесь отвечает в общем.",
+    launcher: "спросить ropros",
+    dialogLabel: "AI-ассистент ropros",
+    clear: "Очистить диалог",
+    close: "Закрыть ассистента",
+    contextLoaded: (t: string) => `контекст загружен: ${t} (схема, код, известные проблемы)`,
+    help: "Спрашивайте о проводке, коде или отладке. Я читаю гайд, который вы открыли.",
+    keys: { send: "отправить", newline: "новая строка", close: "закрыть" },
+    you: "вы",
+    thinking: "думаю",
+    stopped: "остановлено",
+    attachLabel: "вставьте код или лог Serial",
+    attach: "Прикрепить код",
+    message: "Сообщение",
+    placeholder: "спросите о проводке, коде, ошибках…",
+    stop: "Остановить",
+    send: "Отправить",
+    attached: "(прикреплённый код)",
+    disclaimer: "Ответы могут быть неточными. Сверяйте проводку с даташитами перед подачей питания.",
+    mockNote: "Превью: ответы — заготовленные демо, пока не подключён серверный маршрут.",
+    code: { lines: (n: number) => `${n} стр.`, copy: "копировать", copied: "скопировано", collapse: "свернуть", showAll: (n: number) => `показать все ${n} строк` },
+    suggestions: [
+      { key: "pinout", label: "Объясни распиновку", prompt: "Объясни распиновку: что делает каждый провод и почему выбраны эти пины." },
+      { key: "loop", label: "Оптимизируй loop", prompt: "Оптимизируй главный loop: убери блокирующие задержки." },
+      { key: "jitter", label: "Почему дрожит серво?", prompt: "Почему серво дрожит, когда запускаются моторы?" },
+      { key: "esp32", label: "Перенос на ESP32", prompt: "Как перенести эту сборку на ESP32?" },
+    ],
+    replies: {
+      loop: "`loop()` блокируется на `delay()` во время каждого сканирования, поэтому робот не реагирует посреди поворота. Используйте **таймер на millis()**:\n" +
+        LOOP_CODE("неблокирующий автомат", "двигает серво на один шаг") + "\nТак расстояние проверяется ~16 раз в секунду, пока серво поворачивается.",
+      pinout: "**ENA (D5) / ENB (D6)** задают скорость моторов через ШИМ. **IN1–IN4 (D7, D8, D4, D2)** задают направление. Серво на **D3**, потому что библиотека Servo на Uno отключает ШИМ на D9 и D10 — это сломало бы управление скоростью.\n\nHC-SR04: **TRIG → A0**, **ECHO → A1** — аналоговые пины отлично работают как цифровые и оставляют D-пины свободными.",
+      esp32: "Главное — **логика 3,3 В**. ECHO у HC-SR04 выдаёт 5 В: поставьте делитель `1 кОм / 2 кОм`. L298N лучше заменить на TB6612FNG — он работает с 3,3 В. Пример пинов:\n" +
+        ESP_CODE + "\nИзбегайте пинов 0, 2, 5, 12, 15 — они влияют на загрузку.",
+      jitter: "Чаще всего дрожание — это питание, а не код. Проверьте по порядку:\n1. Серво питается от 5V Arduino? Переведите его на отдельный источник 5 В и **соедините земли**.\n2. Поставьте конденсатор `470 мкФ` на питание серво.\n3. Уберите сигнальные провода подальше от проводов моторов.",
+    },
+  },
+  kk: {
+    metaTitle: "Build Assistant",
+    pageTitle: "Build Assistant",
+    pageDescription: "Сымдар, код және жөндеу туралы сұраңыз. Нұсқаулық бетінде көмекші оның сызбасы мен кодын оқиды, мұнда жалпы жауап береді.",
+    launcher: "ropros-тан сұрау",
+    dialogLabel: "ropros AI көмекшісі",
+    clear: "Диалогты тазалау",
+    close: "Көмекшіні жабу",
+    contextLoaded: (t: string) => `контекст жүктелді: ${t} (сызба, код, белгілі мәселелер)`,
+    help: "Сымдар, код немесе жөндеу туралы сұраңыз. Мен сіз ашқан нұсқаулықты оқимын.",
+    keys: { send: "жіберу", newline: "жаңа жол", close: "жабу" },
+    you: "сіз",
+    thinking: "ойланып жатырмын",
+    stopped: "тоқтатылды",
+    attachLabel: "кодты немесе Serial логын қойыңыз",
+    attach: "Код тіркеу",
+    message: "Хабарлама",
+    placeholder: "сымдар, код, қателер туралы сұраңыз…",
+    stop: "Тоқтату",
+    send: "Жіберу",
+    attached: "(тіркелген код)",
+    disclaimer: "Жауаптар қате болуы мүмкін. Қуат бермес бұрын сымдарды даташиттермен салыстырыңыз.",
+    mockNote: "Превью: сервер маршруты қосылғанша жауаптар — дайын демо.",
+    code: { lines: (n: number) => `${n} жол`, copy: "көшіру", copied: "көшірілді", collapse: "жию", showAll: (n: number) => `барлық ${n} жолды көрсету` },
+    suggestions: [
+      { key: "pinout", label: "Пиндерді түсіндір", prompt: "Пиндерді түсіндір: әр сым не істейді және неге осы пиндер таңдалған." },
+      { key: "loop", label: "loop-ты оңтайландыр", prompt: "Негізгі loop-ты оңтайландыр: бөгейтін кідірістерді алып таста." },
+      { key: "jitter", label: "Серво неге дірілдейді?", prompt: "Моторлар іске қосылғанда серво неге дірілдейді?" },
+      { key: "esp32", label: "ESP32-ге көшіру", prompt: "Бұл құрастыруды ESP32-ге қалай көшіруге болады?" },
+    ],
+    replies: {
+      loop: "`loop()` әр сканерлеу кезінде `delay()`-де бөгеледі, сондықтан робот бұрылыс ортасында әрекет ете алмайды. Оның орнына **millis() таймерін** қолданыңыз:\n" +
+        LOOP_CODE("бөгемейтін автомат", "сервоны бір қадамға жылжытады") + "\nОсылай серво бұрылып жатқанда қашықтық секундына ~16 рет тексеріледі.",
+      pinout: "**ENA (D5) / ENB (D6)** ШИМ арқылы моторлардың жылдамдығын береді. **IN1–IN4 (D7, D8, D4, D2)** бағытты береді. Серво **D3**-те, себебі Uno-да Servo кітапханасы D9 және D10-дағы ШИМ-ді өшіреді — бұл жылдамдықты басқаруды бұзар еді.\n\nHC-SR04: **TRIG → A0**, **ECHO → A1** — аналогтық пиндер цифрлық ретінде жақсы жұмыс істейді және D-пиндерді бос қалдырады.",
+      esp32: "Ең бастысы — **3,3 В логика**. HC-SR04-тің ECHO пині 5 В береді: `1 кОм / 2 кОм` бөлгішін қойыңыз. L298N-ді 3,3 В-пен жұмыс істейтін TB6612FNG-ге ауыстырған дұрыс. Пиндер мысалы:\n" +
+        ESP_CODE + "\n0, 2, 5, 12, 15 пиндерінен аулақ болыңыз — олар жүктелуге әсер етеді.",
+      jitter: "Діріл көбіне кодтан емес, қуаттан болады. Ретімен тексеріңіз:\n1. Серво Arduino-ның 5V пинінен қоректене ме? Оны бөлек 5 В көзіне ауыстырып, **жерлерді қосыңыз**.\n2. Серво қуатына `470 мкФ` конденсатор қойыңыз.\n3. Сигнал сымдарын мотор сымдарынан алыс ұстаңыз.",
+    },
+  },
+});
