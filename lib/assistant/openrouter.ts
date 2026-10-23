@@ -1,7 +1,15 @@
 import "server-only";
 
-/** Default OpenRouter model; override with OPENROUTER_MODEL (any id from openrouter.ai/models). */
-export const OPENROUTER_DEFAULT_MODEL = "anthropic/claude-sonnet-4.5";
+/**
+ * Default: free OpenRouter models (":free" ids cost nothing and work without credits, with daily limits).
+ * Tried in order when an id is unknown or retired. Override with OPENROUTER_MODEL (any id from openrouter.ai/models).
+ */
+export const OPENROUTER_FREE_MODELS = [
+  "meta-llama/llama-3.3-70b-instruct:free",
+  "google/gemma-3-27b-it:free",
+  "deepseek/deepseek-chat-v3-0324:free",
+  "mistralai/mistral-small-3.1-24b-instruct:free",
+] as const;
 
 type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 
@@ -14,12 +22,14 @@ export class OpenRouterError extends Error {
  * The key stays on the server; callers pass only validated messages.
  */
 export async function* streamOpenRouter(messages: ChatMessage[], signal: AbortSignal): AsyncGenerator<string> {
-  const configured = process.env.OPENROUTER_MODEL?.trim() || OPENROUTER_DEFAULT_MODEL;
-  let res = await request(configured, messages, signal);
-  // Unknown or unavailable model id (400/404): retry once with OpenRouter's automatic model choice.
-  if ((res.status === 400 || res.status === 404) && configured !== "openrouter/auto") {
-    console.error("openrouter model rejected, retrying with openrouter/auto", { model: configured, status: res.status, detail: (await res.text()).slice(0, 300) });
-    res = await request("openrouter/auto", messages, signal);
+  const configured = process.env.OPENROUTER_MODEL?.trim();
+  const candidates = configured ? [configured] : [...OPENROUTER_FREE_MODELS];
+  let res!: Response;
+  for (const model of candidates) {
+    res = await request(model, messages, signal);
+    // Unknown, retired or overloaded free model: try the next one.
+    if (![400, 404, 429, 503].includes(res.status)) break;
+    console.error("openrouter model unavailable, trying next", { model, status: res.status, detail: (await res.text()).slice(0, 200) });
   }
   if (!res.ok || !res.body) {
     console.error("openrouter request failed", { status: res.status, detail: (await res.text().catch(() => "")).slice(0, 300) });
