@@ -4,7 +4,7 @@ export const projects = defineMessages({
   en: {
     metaTitle: "Project Hub",
     title: "Project Hub",
-    description: "166 builds on Arduino, ESP32 and Raspberry Pi. Filter by board, category and difficulty.",
+    description: "Step-by-step builds on Arduino, ESP32 and Raspberry Pi. Filter by board, category and difficulty.",
     searchLabel: "Search projects", searchPlaceholder: "Search builds, boards, sensors…",
     filters: "Filters", category: "Category", roboticsOnly: "Robotics only", board: "Board", difficulty: "Difficulty", any: "Any",
     reset: "Reset filters",
@@ -15,7 +15,7 @@ export const projects = defineMessages({
   ru: {
     metaTitle: "Project Hub",
     title: "Project Hub",
-    description: "166 сборок на Arduino, ESP32 и Raspberry Pi. Фильтруйте по плате, категории и сложности.",
+    description: "Пошаговые сборки на Arduino, ESP32 и Raspberry Pi. Фильтруйте по плате, категории и сложности.",
     searchLabel: "Поиск проектов", searchPlaceholder: "Поиск сборок, плат, датчиков…",
     filters: "Фильтры", category: "Категория", roboticsOnly: "Только робототехника", board: "Плата", difficulty: "Сложность", any: "Любая",
     reset: "Сбросить фильтры",
@@ -31,7 +31,7 @@ export const projects = defineMessages({
   kk: {
     metaTitle: "Project Hub",
     title: "Project Hub",
-    description: "Arduino, ESP32 және Raspberry Pi-дағы 166 құрастыру. Тақта, санат және күрделілік бойынша сүзіңіз.",
+    description: "Arduino, ESP32 және Raspberry Pi-дағы қадамдық құрастырулар. Плата, санат және күрделілік бойынша сүзіңіз.",
     searchLabel: "Жобаларды іздеу", searchPlaceholder: "Құрастыру, тақта, датчик іздеу…",
     filters: "Сүзгілер", category: "Санат", roboticsOnly: "Тек робототехника", board: "Тақта", difficulty: "Күрделілік", any: "Кез келген",
     reset: "Сүзгілерді тазалау",

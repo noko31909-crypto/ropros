@@ -39,7 +39,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
         <div className="grid gap-6 py-6 sm:py-12 lg:grid-cols-[260px_1fr] lg:gap-10">
           <Suspense fallback={null}><HubFilters /></Suspense>
           <div>
-            <p className="mb-6 text-sm text-fg-muted"><span className="font-semibold text-fg">{t.results(list.length)}</span> {t.demo}</p>
+            <p className="mb-6 text-sm text-fg-muted"><span className="font-semibold text-fg">{t.results(list.length)}</span></p>
             {list.length ? (
               <div className="columns-2 gap-3 sm:gap-6 xl:columns-3">
                 {list.map((p) => <ProjectCard key={p.slug} project={p} locale={locale} masonry />)}

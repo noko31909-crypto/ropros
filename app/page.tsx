@@ -6,7 +6,7 @@ import { RobotMark } from "@/components/brand/logo";
 import { ProjectCard } from "@/components/cards/project-card";
 import { getLocale } from "@/lib/i18n/server";
 import { home } from "@/lib/i18n/messages/home";
-import { FEATURED } from "@/lib/projects";
+import { CATALOG_COUNTS, FEATURED } from "@/lib/projects";
 
 function SectionHeading({ title, href, cta }: { title: string; href: string; cta: string }) {
   return (
@@ -52,7 +52,7 @@ export default async function HomePage() {
           <div className="relative grid items-center gap-10 py-14 sm:gap-14 sm:py-32 lg:grid-cols-[1.15fr_1fr]">
             <div className="animate-fade-up">
               <p className="inline-flex items-center gap-2 rounded-full border border-line bg-ink-900 px-3 py-1 font-mono text-xs text-fg-muted">
-                <span className="h-1.5 w-1.5 rounded-full bg-signal" />{t.eyebrow}
+                <span className="h-1.5 w-1.5 rounded-full bg-signal" />{t.eyebrow(CATALOG_COUNTS.builds, CATALOG_COUNTS.robotics)}
               </p>
               <h1 className="mt-6 text-[2.75rem] font-semibold leading-[1.02] tracking-[-0.035em] text-fg sm:text-7xl">
                 {t.titleA}<br /><span className={locale === "en" ? "font-display font-normal tracking-normal text-brand-gradient" : "font-sans font-semibold italic tracking-tight text-brand-gradient"}>{t.titleB}</span>
@@ -75,7 +75,7 @@ export default async function HomePage() {
 
       <Container>
         <dl className="grid grid-cols-1 divide-y divide-line border-x border-b border-line sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          {t.stats.map(([v, l]) => (
+          {([[String(CATALOG_COUNTS.builds), t.stats.builds], [String(CATALOG_COUNTS.robotics), t.stats.robotics], [String(CATALOG_COUNTS.platforms), t.stats.platforms]] as const).map(([v, l]) => (
             <div key={l} className="px-8 py-8">
               <dt className="text-sm text-fg-muted">{l}</dt>
               <dd className="mt-1 text-4xl font-semibold tracking-tight text-fg">{v}</dd>

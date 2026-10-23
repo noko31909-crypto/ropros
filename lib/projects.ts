@@ -1,7 +1,7 @@
 import type { Locale } from "@/lib/i18n/config";
 import type { CoverId } from "@/components/cards/covers";
 
-/** Catalog placeholder data (replace with a Supabase query). Only `fullGuide` entries have a page at /projects/<slug>. */
+/** Catalogue. Listing-only entries (no guide yet) are kept for later but not shown: the site lists only real guides. */
 export type Difficulty = "beginner" | "intermediate" | "advanced";
 export type Board = "arduino" | "esp32" | "pi";
 
@@ -25,7 +25,7 @@ export type Project = {
   aspect: string;
 };
 
-export const PROJECTS: Project[] = [
+const ALL_PROJECTS: Project[] = [
   { slug: "obstacle-avoiding-robot", title: "Obstacle Avoiding Robot", board: "arduino", difficulty: "intermediate", hours: 5, robotics: true, fullGuide: true, cover: "obstacle", aspect: "aspect-[4/5]",
     summary: { en: "Scans with a servo-mounted ultrasonic sensor and drives toward open space.", ru: "Сканирует пространство ультразвуком на сервоприводе и уезжает туда, где свободно.", kk: "Сервоға орнатылған ультрадыбыс датчигімен айналаны шолып, бос жаққа қарай жүреді." } },
   { slug: "line-follower", title: "Precision Line Following Bot", board: "arduino", difficulty: "intermediate", hours: 4, robotics: true, fullGuide: true, cover: "line", aspect: "aspect-[2/3]",
@@ -50,8 +50,18 @@ export const PROJECTS: Project[] = [
     summary: { en: "An 8×8 WS2812 matrix on a Raspberry Pi Pico shows icons and scrolling text.", ru: "Матрица WS2812 8×8 на Raspberry Pi Pico показывает иконки и бегущую строку.", kk: "Raspberry Pi Pico-дағы 8×8 WS2812 матрицасы белгішелер мен жүгіртпе жолды көрсетеді." } },
 ];
 
-/** First six are the home-page robotics showcase order. */
+/** Published projects: only entries with a full guide page. */
+export const PROJECTS: Project[] = ALL_PROJECTS.filter((p) => p.fullGuide);
+
+/** Home-page showcase order. */
 export const FEATURED: Project[] = PROJECTS.slice(0, 8);
+
+/** Real counts for the home page and menus (no hardcoded marketing numbers). */
+export const CATALOG_COUNTS = {
+  builds: PROJECTS.length,
+  robotics: PROJECTS.filter((p) => p.robotics).length,
+  platforms: new Set(PROJECTS.map((p) => p.board)).size,
+};
 
 /** Card link: full guides open their page; listings fall back to a hub search (never a 404). */
 export const projectHref = (p: Project) => (p.fullGuide ? `/projects/${p.slug}` : `/projects?q=${encodeURIComponent(p.title)}`);

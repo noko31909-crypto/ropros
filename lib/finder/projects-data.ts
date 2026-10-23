@@ -51,4 +51,4 @@ const RAW: unknown[] = [
 /** Projects that have a full guide page at /projects/<slug>. Others are not linked (no 404s). */
 export const GUIDE_SLUGS: ReadonlySet<string> = new Set(["obstacle-avoiding-robot", "line-follower", "iot-plant-care"]);
 
-export const PROJECTS: readonly ProjectRecord[] = Object.freeze(ProjectSchema.array().parse(RAW));
+export const PROJECTS: readonly ProjectRecord[] = Object.freeze(ProjectSchema.array().parse(RAW).filter((p) => GUIDE_SLUGS.has(p.project_id)));

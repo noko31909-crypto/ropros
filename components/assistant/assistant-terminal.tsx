@@ -24,7 +24,6 @@ function pickReply(prompt: string, key?: ReplyKey): ReplyKey {
   return "jitter";
 }
 
-/** Sample answer used only when the server has no API key configured (demo mode). */
 /**
  * Streams a real answer from POST /api/assistant (the server holds the API key, validates, rate-limits and
  * adds the guide's wiring + code). Yields text chunks; throws LiveError with a reason the UI can show.
@@ -45,14 +44,6 @@ async function* liveStream(body: unknown, signal: AbortSignal): AsyncGenerator<s
   }
 }
 
-async function* mockStream(reply: string, signal: AbortSignal): AsyncGenerator<string> {
-  for (const chunk of reply.match(/.{1,6}/gs) ?? []) {
-    if (signal.aborted) return;
-    await new Promise((r) => setTimeout(r, 18));
-    if (signal.aborted) return;
-    yield chunk;
-  }
-}
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
@@ -102,10 +93,8 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
         }
       } catch (err) {
         if (ctrl.signal.aborted) { /* stopped by the user */ }
-        else if (err instanceof LiveError && err.reason === "demo") {
-          append(`${t.live.demo}\n\n`);
-          for await (const chunk of mockStream(t.replies[pickReply(prompt, key)], ctrl.signal)) append(chunk);
-        } else if (err instanceof LiveError && err.reason === "signIn") { append(t.live.signIn); openAuth(t.live.signIn); }
+        else if (err instanceof LiveError && err.reason === "demo") append(t.live.demo);
+        else if (err instanceof LiveError && err.reason === "signIn") { append(t.live.signIn); openAuth(t.live.signIn); }
         else append(err instanceof LiveError && err.reason === "rateLimited" ? t.live.rateLimited : t.live.error);
       }
       // Server status markers can arrive split across chunks, so translate them on the finished text.
@@ -143,7 +132,6 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
             <p><span className="text-signal">$</span> ropros assistant --help</p>
             <p className="mt-2 text-fg-subtle">{t.help}</p>
             <p className="mt-4 text-fg-subtle"><span className="text-accent">↵</span> {t.keys.send} · <span className="text-accent">shift+↵</span> {t.keys.newline}{onClose && <> · <span className="text-accent">esc</span> {t.keys.close}</>}</p>
-            <p className="mt-4 text-[11px] text-fg-subtle">{t.mockNote}</p>
           </div>
         )}
         {messages.map((m, i) => {

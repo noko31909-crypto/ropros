@@ -17,7 +17,7 @@ const gloock = Gloock({ subsets: ["latin"], weight: "400", variable: "--font-glo
 
 export const metadata: Metadata = {
   title: { default: "ropros — hardware builds for engineers", template: "%s · ropros" },
-  description: "166 Arduino, ESP32 and Raspberry Pi builds and 40 robotics guides with wiring, code and AI help.",
+  description: "Arduino, ESP32 and Raspberry Pi build guides with wiring diagrams, code and an AI build assistant.",
 };
 
 export const viewport: Viewport = { themeColor: "#07090c", colorScheme: "dark", viewportFit: "cover" };

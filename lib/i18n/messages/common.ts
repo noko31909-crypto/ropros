@@ -4,8 +4,8 @@ import { defineMessages } from "../config";
 export const common = defineMessages({
   en: {
     nav: {
-      hub: "Project Hub", allBuilds: "All builds", allBuildsDesc: "166 builds on Arduino, ESP32 and Raspberry Pi",
-      robotics: "Robotics guides", roboticsDesc: "40 full guides: rovers, arms, walkers",
+      hub: "Project Hub", allBuilds: "All builds", allBuildsDesc: "Builds on Arduino, ESP32 and Raspberry Pi",
+      robotics: "Robotics guides", roboticsDesc: "Full guides: rovers, line followers and more",
       arduinoDesc: "Uno, Nano and Mega", esp32Desc: "Wi-Fi, Bluetooth and camera",
       components: "Components", ai: "AI Tools", finder: "Project Finder", finderDesc: "List your parts, get buildable projects",
       assistant: "Build Assistant", assistantDesc: "Ask about wiring, code and debugging",
@@ -26,8 +26,8 @@ export const common = defineMessages({
   },
   ru: {
     nav: {
-      hub: "Project Hub", allBuilds: "Все сборки", allBuildsDesc: "166 сборок на Arduino, ESP32 и Raspberry Pi",
-      robotics: "Гайды по робототехнике", roboticsDesc: "40 полных гайдов: роверы, манипуляторы, шагающие",
+      hub: "Project Hub", allBuilds: "Все сборки", allBuildsDesc: "Сборки на Arduino, ESP32 и Raspberry Pi",
+      robotics: "Гайды по робототехнике", roboticsDesc: "Полные гайды: роверы, роботы по линии и другие",
       arduinoDesc: "Uno, Nano и Mega", esp32Desc: "Wi-Fi, Bluetooth и камера",
       components: "Компоненты", ai: "AI-инструменты", finder: "Project Finder", finderDesc: "Укажите свои детали — получите проекты",
       assistant: "Build Assistant", assistantDesc: "Вопросы о проводке, коде и отладке",
@@ -48,8 +48,8 @@ export const common = defineMessages({
   },
   kk: {
     nav: {
-      hub: "Project Hub", allBuilds: "Барлық құрастырулар", allBuildsDesc: "Arduino, ESP32 және Raspberry Pi-дағы 166 құрастыру",
-      robotics: "Робототехника нұсқаулықтары", roboticsDesc: "40 толық нұсқаулық: роверлер, манипуляторлар, жүретін роботтар",
+      hub: "Project Hub", allBuilds: "Барлық құрастырулар", allBuildsDesc: "Arduino, ESP32 және Raspberry Pi-дағы құрастырулар",
+      robotics: "Робототехника нұсқаулықтары", roboticsDesc: "Толық нұсқаулықтар: роверлер, сызық бойымен жүретін роботтар және т.б.",
       arduinoDesc: "Uno, Nano және Mega", esp32Desc: "Wi-Fi, Bluetooth және камера",
       components: "Компоненттер", ai: "AI құралдары", finder: "Project Finder", finderDesc: "Бөлшектеріңізді жазыңыз — жобалар алыңыз",
       assistant: "Build Assistant", assistantDesc: "Сымдар, код және жөндеу туралы сұрақтар",

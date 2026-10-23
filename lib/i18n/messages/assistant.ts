@@ -11,7 +11,7 @@ const ESP_CODE = "```cpp\nconst int PWMA = 25, AIN1 = 26, AIN2 = 27;\nconst int 
 export const assistant = defineMessages({
   en: {
     live: {
-      demo: "Demo mode: the AI isn't connected yet (no API key on the server), so this is a sample answer.",
+      demo: "The assistant is temporarily unavailable. Please try again later.",
       signIn: "Sign in to chat with the Build Assistant.",
       rateLimited: "Too many questions in a minute. Wait a moment and try again.",
       refused: "The assistant can't help with that request.",
@@ -59,7 +59,7 @@ export const assistant = defineMessages({
   },
   ru: {
     live: {
-      demo: "Демо-режим: AI пока не подключён (на сервере нет API-ключа), это пример ответа.",
+      demo: "Ассистент временно недоступен. Попробуйте позже.",
       signIn: "Войдите, чтобы общаться с Build Assistant.",
       rateLimited: "Слишком много вопросов за минуту. Подождите немного и попробуйте снова.",
       refused: "Ассистент не может помочь с этим запросом.",
@@ -107,7 +107,7 @@ export const assistant = defineMessages({
   },
   kk: {
     live: {
-      demo: "Демо режимі: AI әлі қосылмаған (серверде API кілті жоқ), бұл жауап үлгісі.",
+      demo: "Ассистент уақытша қолжетімсіз. Кейінірек қайталап көріңіз.",
       signIn: "Build Assistant-пен сөйлесу үшін кіріңіз.",
       rateLimited: "Бір минутта тым көп сұрақ. Сәл күтіп, қайталап көріңіз.",
       refused: "Ассистент бұл сұраныс бойынша көмектесе алмайды.",
