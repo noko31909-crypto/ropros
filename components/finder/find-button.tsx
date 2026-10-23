@@ -3,17 +3,19 @@
 import { useEffect, useState } from "react";
 import { clsx } from "clsx";
 import { ArrowRight, Sparkles } from "lucide-react";
-
-const PHASES = ["Reading your parts…", "Checking voltages…", "Matching 166 builds…", "Ranking results…"];
+import { useMessages } from "@/components/i18n/locale-provider";
+import { finder } from "@/lib/i18n/messages/finder";
 
 /** Animated call-to-action: glow + light sweep at rest, scanning bar and cycling status while loading. */
 export function FindButton({ loading, disabled, onClick }: { loading: boolean; disabled?: boolean; onClick: () => void }) {
+  const t = useMessages(finder);
+  const PHASES = t.phases;
   const [phase, setPhase] = useState(0);
   useEffect(() => {
     if (!loading) { setPhase(0); return; }
     const t = setInterval(() => setPhase((p) => (p + 1) % PHASES.length), 900);
     return () => clearInterval(t);
-  }, [loading]);
+  }, [loading, PHASES.length]);
 
   const inert = disabled || loading;
   return (
@@ -47,18 +49,18 @@ export function FindButton({ loading, disabled, onClick }: { loading: boolean; d
         <>
           <span aria-hidden className="relative inline-flex h-5 w-5">
             <span className="absolute inset-0 animate-spin rounded-full border-2 border-accent/25 border-t-accent motion-reduce:animate-none" />
-            <span className="absolute inset-[6px] animate-pulse rounded-full bg-signal" />
+            <span className="absolute inset-[6px] animate-pulse rounded-full bg-signal motion-reduce:animate-none" />
           </span>
           <span key={phase} className="animate-fade-up text-fg">{PHASES[phase]}</span>
         </>
       ) : (
         <>
           <Sparkles className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" aria-hidden />
-          Find Matching Projects
+          {t.find}
           <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
         </>
       )}
-      <span className="sr-only" aria-live="polite">{loading ? "Searching for matching projects" : ""}</span>
+      <span className="sr-only" aria-live="polite">{loading ? t.searching : ""}</span>
     </button>
   );
 }

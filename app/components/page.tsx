@@ -1,23 +1,20 @@
 import type { Metadata } from "next";
 import { Boxes } from "lucide-react";
 import { Container, PageHeader } from "@/components/ui/container";
+import { ComponentLibrary } from "@/components/finder/component-library";
+import { getLocale } from "@/lib/i18n/server";
+import { components } from "@/lib/i18n/messages/components";
 
-export const metadata: Metadata = { title: "Component Library" };
-const CATEGORIES = ["Boards", "Sensors", "Actuators", "Drivers", "Displays", "Communication", "Power", "Mechanical"];
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: components[await getLocale()].metaTitle };
+}
 
-export default function ComponentsPage() {
+export default async function ComponentsPage() {
+  const t = components[await getLocale()];
   return (
     <>
-      <PageHeader eyebrowIcon={<Boxes className="h-5 w-5" aria-hidden />} title="Component Library"
-        description="Pinouts, voltages and the gotchas behind most failed builds. Add parts to your inventory and the Project Finder uses them." />
-      <Container className="grid gap-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
-        {CATEGORIES.map((c) => (
-          <div key={c} className="rounded-[var(--radius-card)] border border-line bg-ink-850 p-6">
-            <p className="text-lg font-semibold text-fg">{c}</p>
-            <p className="mt-1 font-mono text-xs text-fg-subtle">category slot</p>
-          </div>
-        ))}
-      </Container>
+      <PageHeader eyebrowIcon={<Boxes className="h-5 w-5" aria-hidden />} title={t.title} description={t.description} />
+      <Container className="py-12"><ComponentLibrary /></Container>
     </>
   );
 }

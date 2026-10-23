@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { clsx } from "clsx";
 import { Check, ChevronDown, Copy, FileCode2 } from "lucide-react";
+import { useMessages } from "@/components/i18n/locale-provider";
+import { assistant } from "@/lib/i18n/messages/assistant";
 
 type Segment = { kind: "text"; text: string } | { kind: "code"; lang: string; code: string };
 
@@ -22,6 +24,7 @@ export function parseSegments(src: string): Segment[] {
 
 /** Inline code preview: collapsed to 8 lines with a fade, expandable, copyable. */
 export function CodePreview({ lang, code }: { lang: string; code: string }) {
+  const t = useMessages(assistant).code;
   const lines = code.split("\n");
   const long = lines.length > 8;
   const [open, setOpen] = useState(!long);
@@ -31,9 +34,9 @@ export function CodePreview({ lang, code }: { lang: string; code: string }) {
   return (
     <div className="my-3 overflow-hidden rounded-xl border border-line bg-[#05080b]">
       <div className="flex items-center justify-between border-b border-line px-3 py-1.5">
-        <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-fg-subtle"><FileCode2 className="h-3.5 w-3.5 text-accent" aria-hidden />{lang} · {lines.length} lines</span>
+        <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-fg-subtle"><FileCode2 className="h-3.5 w-3.5 text-accent" aria-hidden />{lang} · {t.lines(lines.length)}</span>
         <button type="button" onClick={copy} className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-mono text-[11px] text-fg-muted hover:bg-ink-800 hover:text-fg">
-          {copied ? <Check className="h-3 w-3 text-signal" aria-hidden /> : <Copy className="h-3 w-3" aria-hidden />}{copied ? "copied" : "copy"}
+          {copied ? <Check className="h-3 w-3 text-signal" aria-hidden /> : <Copy className="h-3 w-3" aria-hidden />}{copied ? t.copied : t.copy}
         </button>
       </div>
       <div className="relative">
@@ -45,15 +48,15 @@ export function CodePreview({ lang, code }: { lang: string; code: string }) {
       {long && (
         <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
           className="flex w-full items-center justify-center gap-1 border-t border-line py-1.5 font-mono text-[11px] text-fg-muted hover:bg-ink-900 hover:text-fg">
-          <ChevronDown className={clsx("h-3.5 w-3.5 transition-transform", open && "rotate-180")} aria-hidden />{open ? "collapse" : `show all ${lines.length} lines`}
+          <ChevronDown className={clsx("h-3.5 w-3.5 transition-transform", open && "rotate-180")} aria-hidden />{open ? t.collapse : t.showAll(lines.length)}
         </button>
       )}
     </div>
   );
 }
 
-/** Text with `inline code` and **bold**, rendered safely as React nodes. */
-function RichText({ text }: { text: string }) {
+/** Text with `inline code` and **bold**, rendered safely as React nodes (never as HTML). */
+export function RichText({ text }: { text: string }) {
   const parts = text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
   return (
     <>

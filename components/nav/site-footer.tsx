@@ -1,19 +1,20 @@
 import Link from "next/link";
-import { FOOTER_LINKS } from "@/lib/nav";
+import { buildFooter } from "@/lib/nav";
+import { common } from "@/lib/i18n/messages/common";
+import { getLocale } from "@/lib/i18n/server";
 import { Logo } from "@/components/brand/logo";
 import { Container } from "@/components/ui/container";
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const t = common[await getLocale()];
   return (
-    <footer className="border-t border-line bg-ink-900/50">
-      <Container className="grid gap-12 py-16 md:grid-cols-[1.4fr_repeat(3,1fr)]">
-        <div>
+    <footer className="border-t border-line bg-ink-900/50 pb-20 lg:pb-0">
+      <Container className="grid grid-cols-2 gap-x-6 gap-y-10 py-12 sm:py-16 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+        <div className="col-span-2 md:col-span-1">
           <Logo />
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-fg-muted">
-            A repository of hardware builds for engineers and makers: wiring, code and guides for Arduino, ESP32 and Raspberry Pi.
-          </p>
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-fg-muted">{t.footer.tagline}</p>
         </div>
-        {FOOTER_LINKS.map((col) => (
+        {buildFooter(t).map((col) => (
           <div key={col.title}>
             <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-fg-subtle">{col.title}</h2>
             <ul className="mt-4 space-y-2.5">
@@ -25,8 +26,8 @@ export function SiteFooter() {
         ))}
       </Container>
       <Container className="flex flex-col gap-2 border-t border-line py-6 text-xs text-fg-subtle sm:flex-row sm:justify-between">
-        <span>© {new Date().getFullYear()} ropros</span>
-        <span>Verify every circuit against its datasheets before powering.</span>
+        <span>© {new Date().getFullYear()} {t.footer.rights}</span>
+        <span>{t.footer.safety}</span>
       </Container>
     </footer>
   );
