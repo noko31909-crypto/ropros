@@ -90,7 +90,7 @@ export default async function GuidePage({ params }: Props) {
       <Container>
         <GuideTabs
           guide={guide}
-          diagram={<GuideDiagram slug={guide.slug} label={t.diagram.aria(guide.title)} captions={t.diagram.captions} />}
+          diagram={<GuideDiagram guide={source} label={t.diagram.aria(guide.title)} captions={t.diagram.captions} />}
           progress={<ProgressActions projectId={projectId} simulation={guide.simulation} />}
         />
       </Container>

@@ -7,9 +7,10 @@ import type { LocalizedGuide } from "@/lib/guides";
 import { guideMessages } from "@/lib/i18n/messages/guide";
 import { useMessages } from "@/components/i18n/locale-provider";
 import { useToast } from "@/components/ui/toast";
+import { WIRE_HEX } from "./diagrams/auto-diagram";
 
-/** Frame around a static server-rendered SVG diagram: zoom toggle, copy-SVG, verification note and wire legend. */
-export function DiagramSlot({ children, verification, wires }: { children: ReactNode; verification: string; wires: LocalizedGuide["wires"] }) {
+/** Frame around a static server-rendered SVG diagram: zoom toggle, copy-SVG, verification note and the wire legend (from the checked connections). */
+export function DiagramSlot({ children, verification, wiring }: { children: ReactNode; verification: string; wiring: LocalizedGuide["wiring"] }) {
   const t = useMessages(guideMessages).diagram;
   const toast = useToast();
   const [zoomed, setZoomed] = useState(false);
@@ -37,19 +38,19 @@ export function DiagramSlot({ children, verification, wires }: { children: React
           </div>
         </div>
         <p className="flex items-center gap-2 border-b border-line px-5 py-2 text-xs text-fg-subtle sm:hidden"><ArrowLeftRight className="h-3.5 w-3.5" aria-hidden />{t.swipe}</p>
-        <div ref={box} tabIndex={0} className={clsx("overflow-auto overscroll-contain bg-[#F3F5F2]", zoomed ? "max-h-[85vh] [&>svg]:min-w-[1480px]" : "max-h-[70vh] sm:max-h-[640px]")}>
+        <div ref={box} tabIndex={0} className={clsx("overflow-auto overscroll-contain bg-[#F3F5F2]", zoomed ? "max-h-[85vh] [&>svg]:max-h-none [&>svg]:min-w-[1480px]" : "max-h-[70vh] sm:max-h-[640px]")}>
           {children}
         </div>
         <p className="border-t border-line px-5 py-3 text-xs text-fg-muted"><span className="font-semibold text-signal">{t.verification}</span> {verification}</p>
       </figure>
 
-      {wires.length > 0 && (
+      {wiring.length > 0 && (
         <section aria-labelledby="wire-legend" className="rounded-2xl border border-line bg-ink-900 p-5">
           <h3 id="wire-legend" className="mb-4 font-mono text-[11px] uppercase tracking-[0.12em] text-fg-subtle">{t.legend}</h3>
           <ul className="grid gap-x-6 gap-y-2.5 sm:grid-cols-2 lg:grid-cols-3">
-            {wires.map((w) => (
+            {wiring.map((w) => (
               <li key={`${w.from}-${w.to}`} className="flex items-start gap-3 text-sm">
-                <span className="mt-1.5 h-1.5 w-7 shrink-0 rounded-full ring-1 ring-white/10" style={{ background: w.color }} aria-hidden />
+                <span className="mt-1.5 h-1.5 w-7 shrink-0 rounded-full ring-1 ring-white/10" style={{ background: WIRE_HEX[w.color] ?? w.color }} aria-hidden />
                 <span className="min-w-0">
                   <span className="font-mono text-xs text-fg">{w.from} <span className="text-fg-subtle">→</span> {w.to}</span>
                   {w.note && <span className="block text-xs text-fg-subtle">{w.note}</span>}

@@ -10,7 +10,7 @@ export const guideMessages = defineMessages({
     tabs: { parts: "Parts", wiring: "Wiring diagram", steps: "Steps", code: "Code", troubleshooting: "Troubleshooting", label: "Guide sections", all: "All sections", showAll: "Show all", tabbed: "Tabbed view" },
     parts: { caption: "Parts list", part: "Part", qty: "Qty", spec: "Spec", role: "Role", optional: "optional", optionalShort: "opt." },
     diagram: {
-      captions: { leftMotor: "Left motor", rightMotor: "Right motor", battery: "Battery pack", rail5v: "5V rail", railGnd: "GND rail", rails: "5V rail · GND rail", railsPc: "3.3 V rail (top) · 5 V rail (bottom)", servo: "SG90 servo", signal: "Signal", terminals: "Terminals", hbridge: "dual H-bridge", soil: "SOIL", soilSub: "capacitive v1.2", relay: "RELAY", pump: "PUMP", pumpSub: "5 V submersible", waterPump: "Water pump" },
+      captions: { leftMotor: "Left motor", rightMotor: "Right motor", battery: "Battery pack", rail5v: "5V rail", rail3v3: "3V3 rail", railGnd: "GND rail", servo: "SG90 servo", signal: "Signal", terminals: "Terminals" },
       title: "Breadboard wiring", zoom: "Enlarge diagram", unzoom: "Shrink diagram", copySvg: "Copy SVG", copied: "SVG copied",
       swipe: "Swipe to pan the diagram · the button above enlarges it", verification: "Verification:", legend: "Wire legend",
       aria: (t: string) => `Breadboard wiring diagram for ${t}`,
@@ -37,7 +37,7 @@ export const guideMessages = defineMessages({
     tabs: { parts: "Детали", wiring: "Схема", steps: "Шаги", code: "Код", troubleshooting: "Неполадки", label: "Разделы гайда", all: "Все разделы", showAll: "Показать всё", tabbed: "Вкладки" },
     parts: { caption: "Список деталей", part: "Деталь", qty: "Кол-во", spec: "Характеристики", role: "Назначение", optional: "опционально", optionalShort: "опц." },
     diagram: {
-      captions: { leftMotor: "Левый мотор", rightMotor: "Правый мотор", battery: "Батарейный блок", rail5v: "Шина 5V", railGnd: "Шина GND", rails: "Шина 5V · шина GND", railsPc: "Шина 3,3 В (верх) · шина 5 В (низ)", servo: "Серво SG90", signal: "Сигнал", terminals: "Клеммы", hbridge: "двойной H-мост", soil: "ПОЧВА", soilSub: "емкостный v1.2", relay: "РЕЛЕ", pump: "НАСОС", pumpSub: "5 В погружной", waterPump: "Водяной насос" },
+      captions: { leftMotor: "Левый мотор", rightMotor: "Правый мотор", battery: "Батарейный блок", rail5v: "Шина 5V", rail3v3: "Шина 3V3", railGnd: "Шина GND", servo: "Серво SG90", signal: "Сигнал", terminals: "Клеммы" },
       title: "Схема на макетной плате", zoom: "Увеличить схему", unzoom: "Уменьшить схему", copySvg: "Скопировать SVG", copied: "SVG скопирован",
       swipe: "Листайте схему пальцем · кнопка выше увеличивает", verification: "Проверка:", legend: "Цвета проводов",
       aria: (t: string) => `Схема подключения на макетной плате: ${t}`,
@@ -64,7 +64,7 @@ export const guideMessages = defineMessages({
     tabs: { parts: "Бөлшектер", wiring: "Схема", steps: "Қадамдар", code: "Код", troubleshooting: "Ақаулар", label: "Нұсқаулық бөлімдері", all: "Барлық бөлімдер", showAll: "Барлығын көрсету", tabbed: "Қойындылар" },
     parts: { caption: "Бөлшектер тізімі", part: "Бөлшек", qty: "Саны", spec: "Сипаттамасы", role: "Мақсаты", optional: "міндетті емес", optionalShort: "қос." },
     diagram: {
-      captions: { leftMotor: "Сол мотор", rightMotor: "Оң мотор", battery: "Батарея блогы", rail5v: "5V шинасы", railGnd: "GND шинасы", rails: "5V шинасы · GND шинасы", railsPc: "3,3 В шинасы (жоғары) · 5 В шинасы (төмен)", servo: "SG90 серво", signal: "Сигнал", terminals: "Клеммалар", hbridge: "қос H-көпір", soil: "ТОПЫРАҚ", soilSub: "сыйымдылық v1.2", relay: "РЕЛЕ", pump: "СОРҒЫ", pumpSub: "5 В суға батырылатын", waterPump: "Су сорғысы" },
+      captions: { leftMotor: "Сол мотор", rightMotor: "Оң мотор", battery: "Батарея блогы", rail5v: "5V шинасы", rail3v3: "3V3 шинасы", railGnd: "GND шинасы", servo: "SG90 серво", signal: "Сигнал", terminals: "Клеммалар" },
       title: "Макет тақтасындағы схема", zoom: "Схеманы үлкейту", unzoom: "Схеманы кішірейту", copySvg: "SVG көшіру", copied: "SVG көшірілді",
       swipe: "Схеманы саусақпен жылжытыңыз · жоғарыдағы батырма үлкейтеді", verification: "Тексеру:", legend: "Сым түстері",
       aria: (t: string) => `Макет тақтасындағы қосылу схемасы: ${t}`,

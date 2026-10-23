@@ -19,7 +19,7 @@ export function GuideTabs({ guide, diagram, progress }: { guide: LocalizedGuide;
   const t = useMessages(guideMessages).tabs;
   const tabs: { id: TabId; label: string; icon: typeof Package; badge?: number; content: ReactNode }[] = [
     { id: "parts", label: t.parts, icon: Package, badge: guide.parts.length, content: <PartsTable parts={guide.parts} /> },
-    { id: "wiring", label: t.wiring, icon: CircuitBoard, content: <DiagramSlot verification={guide.verification} wires={guide.wires}>{diagram}</DiagramSlot> },
+    { id: "wiring", label: t.wiring, icon: CircuitBoard, content: <DiagramSlot verification={guide.verification} wiring={guide.wiring}>{diagram}</DiagramSlot> },
     { id: "steps", label: t.steps, icon: ListChecks, badge: guide.steps.length, content: <>{progress}<StepChecklist slug={guide.slug} steps={guide.steps} /></> },
     { id: "code", label: t.code, icon: Code2, content: <CodeBlock files={guide.code} /> },
     { id: "troubleshooting", label: t.troubleshooting, icon: AlertTriangle, content: <Troubleshooting issues={guide.troubleshooting} safety={guide.safety} /> },
