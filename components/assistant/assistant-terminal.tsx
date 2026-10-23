@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState, type FormEvent, type Keyboard
 import { clsx } from "clsx";
 import { Bot, Code2, CornerDownLeft, Paperclip, Sparkles, Square, Trash2, X } from "lucide-react";
 import { CodePreview, MessageContent } from "./message-content";
-import { useMessages } from "@/components/i18n/locale-provider";
+import { useLocale, useMessages } from "@/components/i18n/locale-provider";
+import { useAuth } from "@/components/auth/auth-provider";
 import { assistant, type ReplyKey } from "@/lib/i18n/messages/assistant";
 
 type Role = "user" | "assistant";
@@ -23,11 +24,27 @@ function pickReply(prompt: string, key?: ReplyKey): ReplyKey {
   return "jitter";
 }
 
+/** Sample answer used only when the server has no API key configured (demo mode). */
 /**
- * Front-end mock. TODO: replace with a streaming call to a server route (e.g. POST /api/assistant)
- * that holds the API key server-side, validates input with zod, rate-limits, and injects the guide's wiring + code as context.
- * Never call a model provider from the browser.
+ * Streams a real answer from POST /api/assistant (the server holds the API key, validates, rate-limits and
+ * adds the guide's wiring + code). Yields text chunks; throws LiveError with a reason the UI can show.
  */
+class LiveError extends Error { constructor(public reason: "demo" | "signIn" | "rateLimited" | "error") { super(reason); } }
+async function* liveStream(body: unknown, signal: AbortSignal): AsyncGenerator<string> {
+  const res = await fetch("/api/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal });
+  if (res.status === 503) throw new LiveError("demo");
+  if (res.status === 401) throw new LiveError("signIn");
+  if (res.status === 429) throw new LiveError("rateLimited");
+  if (!res.ok || !res.body) throw new LiveError("error");
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) return;
+    yield decoder.decode(value, { stream: true });
+  }
+}
+
 async function* mockStream(reply: string, signal: AbortSignal): AsyncGenerator<string> {
   for (const chunk of reply.match(/.{1,6}/gs) ?? []) {
     if (signal.aborted) return;
@@ -50,6 +67,8 @@ type Props = {
 /** Terminal-style chat: transcript, quick suggestions, composer with code attachment, stop and clear. */
 export function AssistantTerminal({ context, onClose, inputRef, className }: Props) {
   const t = useMessages(assistant);
+  const { locale } = useLocale();
+  const { openAuth } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [attachment, setAttachment] = useState("");
@@ -71,14 +90,27 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
     setMessages((m) => [...m, { id: uid(), role: "user", text: prompt || t.attached, attachment: att || undefined }, { id: assistantId, role: "assistant", text: "" }]);
     setInput(""); setAttachment(""); setShowAttach(false); setStreaming(true);
     const ctrl = new AbortController(); abortRef.current = ctrl;
-    const reply = t.replies[pickReply(prompt, key)];
+    const append = (chunk: string) => setMessages((m) => m.map((msg) => (msg.id === assistantId ? { ...msg, text: msg.text + chunk } : msg)));
+    const history = [...messages, { role: "user" as const, text: prompt || t.attached, attachment: att || undefined }]
+      .filter((m) => m.text.trim())
+      .slice(-12)
+      .map((m) => ({ role: m.role, content: m.attachment ? `${m.text}\n\n\`\`\`\n${m.attachment}\n\`\`\`` : m.text }));
     try {
-      for await (const chunk of mockStream(reply, ctrl.signal)) {
-        setMessages((m) => m.map((msg) => (msg.id === assistantId ? { ...msg, text: msg.text + chunk } : msg)));
+      try {
+        for await (const chunk of liveStream({ locale, guideSlug: context?.guideSlug, messages: history }, ctrl.signal)) {
+          append(chunk.replace("[refused]", t.live.refused).replace("[truncated]", t.live.truncated).replace("[error]", t.live.error));
+        }
+      } catch (err) {
+        if (ctrl.signal.aborted) { /* stopped by the user */ }
+        else if (err instanceof LiveError && err.reason === "demo") {
+          append(`${t.live.demo}\n\n`);
+          for await (const chunk of mockStream(t.replies[pickReply(prompt, key)], ctrl.signal)) append(chunk);
+        } else if (err instanceof LiveError && err.reason === "signIn") { append(t.live.signIn); openAuth(t.live.signIn); }
+        else append(err instanceof LiveError && err.reason === "rateLimited" ? t.live.rateLimited : t.live.error);
       }
       if (ctrl.signal.aborted) setMessages((m) => m.map((msg) => (msg.id === assistantId ? { ...msg, stopped: true } : msg)));
     } finally { setStreaming(false); abortRef.current = null; }
-  }, [attachment, streaming, t]);
+  }, [attachment, streaming, t, messages, locale, context?.guideSlug, openAuth]);
 
   const clear = () => { abortRef.current?.abort(); setMessages([]); };
   const onSubmit = (e: FormEvent) => { e.preventDefault(); void send(input); };

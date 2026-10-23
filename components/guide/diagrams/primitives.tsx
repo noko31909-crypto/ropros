@@ -1,4 +1,9 @@
 /** Small SVG building blocks shared by the simpler breadboard diagrams (same visual language as the obstacle robot). */
+import type { guideMessages } from "@/lib/i18n/messages/guide";
+
+/** Localised human-language captions (part and pin names stay untranslated). */
+export type DiagramCaptions = (typeof guideMessages)["en"]["diagram"]["captions"];
+
 export const SANS = "Atkinson Hyperlegible, Arial, sans-serif";
 export const MONO = "JetBrains Mono, Menlo, monospace";
 

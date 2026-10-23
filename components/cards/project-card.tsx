@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { clsx } from "clsx";
-import { Bookmark, Clock, Gauge } from "lucide-react";
+import { Clock, Gauge } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
 import { common } from "@/lib/i18n/messages/common";
 import { projects as projectsMsg } from "@/lib/i18n/messages/projects";
 import { BOARD_LABEL, projectHref, type Board, type Difficulty, type Project } from "@/lib/projects";
 import { Cover } from "./covers";
+import { BookmarkButton } from "./bookmark-button";
 
 export const diffTone: Record<Difficulty, string> = {
   beginner: "text-emerald-300 bg-emerald-400/10",
@@ -43,9 +44,7 @@ export function ProjectCard({ project, locale, masonry = false }: { project: Pro
             <span className="h-1.5 w-1.5 rounded-full bg-signal" />{t.fullGuide}
           </span>
         )}
-        <span className="absolute right-3 top-3 inline-flex h-9 w-9 translate-y-1 items-center justify-center rounded-full bg-ink-950/60 text-fg opacity-0 backdrop-blur-md transition-all group-hover:translate-y-0 group-hover:opacity-100">
-          <Bookmark className="h-4 w-4" aria-hidden />
-        </span>
+        <BookmarkButton slug={project.slug} title={project.title} />
       </div>
       <div className="flex flex-col gap-2 p-3 sm:gap-3 sm:p-5">
         <PlatformPill board={project.board} />

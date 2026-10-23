@@ -1,9 +1,10 @@
+import type { DiagramCaptions } from "./primitives";
 import { BoardBg, Breadboard, Caption, Module, PinRow, Wire, MONO } from "./primitives";
 
 const ID = "pc";
 
 /** Breadboard wiring for the IoT plant care station (ESP32, soil sensor, DHT22, SSD1306, relay + pump). */
-export function IotPlantCareDiagram({ label }: { label: string }) {
+export function IotPlantCareDiagram({ label, c }: { label: string; c: DiagramCaptions }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 800" width="1300" height="800" role="img" aria-label={label} className="block h-auto min-w-[820px] w-full">
       <BoardBg w={1300} h={800} id={ID} />
@@ -15,7 +16,7 @@ export function IotPlantCareDiagram({ label }: { label: string }) {
       <PinRow x={400} y={452} labels={["VIN", "GND", "D13", "D12", "D14", "D27", "D26", "D25", "D33", "D32", "D35", "D34", "EN"]} step={30} dir="up" />
 
       {/* sensors and outputs */}
-      <Module x={60} y={560} w={110} h={200} fill="#263238" label="SOIL" sub="capacitive v1.2" />
+      <Module x={60} y={560} w={110} h={200} fill="#263238" label={c.soil} sub={c.soilSub} />
       <PinRow x={85} y={570} labels={["AOUT", "VCC", "GND"]} step={30} />
       <Module x={410} y={60} w={110} h={120} fill="#ECEFF1" label="DHT22" sub="AM2302" light />
       <PinRow x={440} y={172} labels={["VCC", "DATA", "GND"]} step={25} dir="up" />
@@ -29,14 +30,14 @@ export function IotPlantCareDiagram({ label }: { label: string }) {
       <text x={672} y={78} fontFamily={MONO} fontSize="14" fill="#2EE6C9">58%  23.4C</text>
       <PinRow x={660} y={172} labels={["GND", "VCC", "SCL", "SDA"]} step={30} dir="up" />
 
-      <Module x={1020} y={300} w={150} h={110} fill="#1565C0" label="RELAY" sub="5 V · 1 ch" />
+      <Module x={1020} y={300} w={150} h={110} fill="#1565C0" label={c.relay} sub="5 V · 1 ch" />
       {[["IN", 325], ["VCC", 355], ["GND", 385]].map(([l, y]) => (
         <g key={l}><rect x={1024} y={Number(y) - 4} width="8" height="8" rx="1.5" fill="#C49000" /><text x={1038} y={Number(y) + 3} fontFamily={MONO} fontSize="9" fill="#FFFFFF">{l}</text></g>
       ))}
       {[["NO", 320], ["COM", 350], ["NC", 380]].map(([l, y]) => (
         <g key={l}><rect x={1158} y={Number(y) - 6} width="12" height="12" rx="2" fill="#26A69A" /><text x={1152} y={Number(y) + 3} fontFamily={MONO} fontSize="9" fill="#FFFFFF" textAnchor="end">{l}</text></g>
       ))}
-      <Module x={1040} y={600} w={150} h={90} fill="#00838F" label="PUMP" sub="5 V submersible" />
+      <Module x={1040} y={600} w={150} h={90} fill="#00838F" label={c.pump} sub={c.pumpSub} />
 
       {/* rails: top = 3.3 V, bottom = 5 V */}
       <Wire pts={[[400, 348], [400, 268]]} color="#F57C00" />
@@ -68,8 +69,8 @@ export function IotPlantCareDiagram({ label }: { label: string }) {
       <Wire pts={[[1164, 350], [1250, 350], [1250, 740], [924, 740], [924, 504]]} color="#E53935" width={4} />
       <Wire pts={[[1040, 670], [912, 670], [912, 532]]} color="#1F1F1F" width={4} />
 
-      <Caption x={580} y={590}>3.3 V rail (top) · 5 V rail (bottom)</Caption>
-      <Caption x={1115} y={712}>Water pump</Caption>
+      <Caption x={580} y={590}>{c.railsPc}</Caption>
+      <Caption x={1115} y={712}>{c.waterPump}</Caption>
     </svg>
   );
 }

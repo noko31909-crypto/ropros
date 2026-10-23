@@ -10,12 +10,13 @@ export const guideMessages = defineMessages({
     tabs: { parts: "Parts", wiring: "Wiring diagram", steps: "Steps", code: "Code", troubleshooting: "Troubleshooting", label: "Guide sections", all: "All sections", showAll: "Show all", tabbed: "Tabbed view" },
     parts: { caption: "Parts list", part: "Part", qty: "Qty", spec: "Spec", role: "Role", optional: "optional", optionalShort: "opt." },
     diagram: {
+      captions: { leftMotor: "Left motor", rightMotor: "Right motor", battery: "Battery pack", rail5v: "5V rail", railGnd: "GND rail", rails: "5V rail · GND rail", railsPc: "3.3 V rail (top) · 5 V rail (bottom)", servo: "SG90 servo", signal: "Signal", terminals: "Terminals", hbridge: "dual H-bridge", soil: "SOIL", soilSub: "capacitive v1.2", relay: "RELAY", pump: "PUMP", pumpSub: "5 V submersible", waterPump: "Water pump" },
       title: "Breadboard wiring", zoom: "Enlarge diagram", unzoom: "Shrink diagram", copySvg: "Copy SVG", copied: "SVG copied",
       swipe: "Swipe to pan the diagram · the button above enlarges it", verification: "Verification:", legend: "Wire legend",
       aria: (t: string) => `Breadboard wiring diagram for ${t}`,
     },
     steps: { progress: "Build progress", reset: "Reset", mark: (n: number) => `Mark step ${n} as done`, expect: "You’ll see", careful: "Careful", allDone: "All steps done. Great build!" },
-    code: { copy: "Copy code", copied: "Copied", markdown: "Markdown", libraries: "Libraries:", source: (f: string) => `${f} source`, copiedSr: "Copied to clipboard" },
+    code: { files: "Files", copy: "Copy code", copied: "Copied", markdown: "Markdown", libraries: "Libraries:", source: (f: string) => `${f} source`, copiedSr: "Copied to clipboard" },
     trouble: { title: "Something not working?", intro: "Most likely causes first. Check power and ground before anything else.", cause: "Cause", fix: "Fix", safety: "Safety" },
     progress: {
       status: "Build status", notStarted: "Not started yet.", inProgress: "In progress.", simulated: "Simulation passed. Now build it for real.",
@@ -36,12 +37,13 @@ export const guideMessages = defineMessages({
     tabs: { parts: "Детали", wiring: "Схема", steps: "Шаги", code: "Код", troubleshooting: "Неполадки", label: "Разделы гайда", all: "Все разделы", showAll: "Показать всё", tabbed: "Вкладки" },
     parts: { caption: "Список деталей", part: "Деталь", qty: "Кол-во", spec: "Характеристики", role: "Назначение", optional: "опционально", optionalShort: "опц." },
     diagram: {
+      captions: { leftMotor: "Левый мотор", rightMotor: "Правый мотор", battery: "Батарейный блок", rail5v: "Шина 5V", railGnd: "Шина GND", rails: "Шина 5V · шина GND", railsPc: "Шина 3,3 В (верх) · шина 5 В (низ)", servo: "Серво SG90", signal: "Сигнал", terminals: "Клеммы", hbridge: "двойной H-мост", soil: "ПОЧВА", soilSub: "емкостный v1.2", relay: "РЕЛЕ", pump: "НАСОС", pumpSub: "5 В погружной", waterPump: "Водяной насос" },
       title: "Схема на макетной плате", zoom: "Увеличить схему", unzoom: "Уменьшить схему", copySvg: "Скопировать SVG", copied: "SVG скопирован",
       swipe: "Листайте схему пальцем · кнопка выше увеличивает", verification: "Проверка:", legend: "Цвета проводов",
       aria: (t: string) => `Схема подключения на макетной плате: ${t}`,
     },
     steps: { progress: "Прогресс сборки", reset: "Сбросить", mark: (n: number) => `Отметить шаг ${n} выполненным`, expect: "Что увидите", careful: "Осторожно", allDone: "Все шаги выполнены. Отличная сборка!" },
-    code: { copy: "Скопировать код", copied: "Скопировано", markdown: "Markdown", libraries: "Библиотеки:", source: (f: string) => `Исходный код ${f}`, copiedSr: "Скопировано в буфер обмена" },
+    code: { files: "Файлы", copy: "Скопировать код", copied: "Скопировано", markdown: "Markdown", libraries: "Библиотеки:", source: (f: string) => `Исходный код ${f}`, copiedSr: "Скопировано в буфер обмена" },
     trouble: { title: "Что-то не работает?", intro: "Сначала самые вероятные причины. Прежде всего проверьте питание и землю.", cause: "Причина", fix: "Решение", safety: "Безопасность" },
     progress: {
       status: "Статус сборки", notStarted: "Ещё не запускали.", inProgress: "В процессе.", simulated: "Симуляция пройдена. Осталось собрать вживую.",
@@ -62,12 +64,13 @@ export const guideMessages = defineMessages({
     tabs: { parts: "Бөлшектер", wiring: "Схема", steps: "Қадамдар", code: "Код", troubleshooting: "Ақаулар", label: "Нұсқаулық бөлімдері", all: "Барлық бөлімдер", showAll: "Барлығын көрсету", tabbed: "Қойындылар" },
     parts: { caption: "Бөлшектер тізімі", part: "Бөлшек", qty: "Саны", spec: "Сипаттамасы", role: "Мақсаты", optional: "міндетті емес", optionalShort: "қос." },
     diagram: {
+      captions: { leftMotor: "Сол мотор", rightMotor: "Оң мотор", battery: "Батарея блогы", rail5v: "5V шинасы", railGnd: "GND шинасы", rails: "5V шинасы · GND шинасы", railsPc: "3,3 В шинасы (жоғары) · 5 В шинасы (төмен)", servo: "SG90 серво", signal: "Сигнал", terminals: "Клеммалар", hbridge: "қос H-көпір", soil: "ТОПЫРАҚ", soilSub: "сыйымдылық v1.2", relay: "РЕЛЕ", pump: "СОРҒЫ", pumpSub: "5 В суға батырылатын", waterPump: "Су сорғысы" },
       title: "Макет тақтасындағы схема", zoom: "Схеманы үлкейту", unzoom: "Схеманы кішірейту", copySvg: "SVG көшіру", copied: "SVG көшірілді",
       swipe: "Схеманы саусақпен жылжытыңыз · жоғарыдағы батырма үлкейтеді", verification: "Тексеру:", legend: "Сым түстері",
       aria: (t: string) => `Макет тақтасындағы қосылу схемасы: ${t}`,
     },
     steps: { progress: "Құрастыру барысы", reset: "Тазалау", mark: (n: number) => `${n}-қадамды орындалды деп белгілеу`, expect: "Не көресіз", careful: "Абай болыңыз", allDone: "Барлық қадам орындалды. Керемет құрастыру!" },
-    code: { copy: "Кодты көшіру", copied: "Көшірілді", markdown: "Markdown", libraries: "Кітапханалар:", source: (f: string) => `${f} бастапқы коды`, copiedSr: "Алмасу буферіне көшірілді" },
+    code: { files: "Файлдар", copy: "Кодты көшіру", copied: "Көшірілді", markdown: "Markdown", libraries: "Кітапханалар:", source: (f: string) => `${f} бастапқы коды`, copiedSr: "Алмасу буферіне көшірілді" },
     trouble: { title: "Бірдеңе жұмыс істемей ме?", intro: "Алдымен ең ықтимал себептер. Ең әуелі қуат пен жерді тексеріңіз.", cause: "Себебі", fix: "Шешімі", safety: "Қауіпсіздік" },
     progress: {
       status: "Құрастыру күйі", notStarted: "Әлі басталмаған.", inProgress: "Орындалуда.", simulated: "Симуляция өтті. Енді шынайы құрастырыңыз.",

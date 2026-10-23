@@ -10,7 +10,7 @@ export const projects = defineMessages({
     reset: "Reset filters",
     results: (n: number) => (n === 1 ? "1 result" : `${n} results`), demo: "(demo data)",
     empty: "Nothing found. Try resetting the filters.",
-    card: { fullGuide: "Full guide", save: "Save", coverAlt: (t: string) => `Illustration: ${t}` },
+    card: { fullGuide: "Full guide", save: "Save", saveLabel: (t: string) => `Save ${t}`, unsave: (t: string) => `Remove ${t} from saved`, coverAlt: (t: string) => `Illustration: ${t}` },
   },
   ru: {
     metaTitle: "Project Hub",
@@ -26,7 +26,7 @@ export const projects = defineMessages({
     },
     demo: "(демо-данные)",
     empty: "Ничего не найдено. Сбросьте фильтры.",
-    card: { fullGuide: "Полный гайд", save: "Сохранить", coverAlt: (t: string) => `Иллюстрация: ${t}` },
+    card: { fullGuide: "Полный гайд", save: "Сохранить", saveLabel: (t: string) => `Сохранить «${t}»`, unsave: (t: string) => `Убрать «${t}» из сохранённых`, coverAlt: (t: string) => `Иллюстрация: ${t}` },
   },
   kk: {
     metaTitle: "Project Hub",
@@ -37,6 +37,6 @@ export const projects = defineMessages({
     reset: "Сүзгілерді тазалау",
     results: (n: number) => `${n} нәтиже`, demo: "(демо-деректер)",
     empty: "Ештеңе табылмады. Сүзгілерді тазалап көріңіз.",
-    card: { fullGuide: "Толық нұсқаулық", save: "Сақтау", coverAlt: (t: string) => `Иллюстрация: ${t}` },
+    card: { fullGuide: "Толық нұсқаулық", save: "Сақтау", saveLabel: (t: string) => `«${t}» сақтау`, unsave: (t: string) => `«${t}» сақталғандардан алып тастау`, coverAlt: (t: string) => `Иллюстрация: ${t}` },
   },
 });

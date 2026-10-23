@@ -17,7 +17,7 @@ export const home = defineMessages({
   },
   ru: {
     eyebrow: "166 сборок · 40 гайдов по робототехнике",
-    titleA: "Build real hardware.", titleB: "Ship real robots.",
+    titleA: "Собирайте настоящее железо.", titleB: "Запускайте настоящих роботов.",
     subtitle: "Схемы подключения, гайды, сверенные с даташитами, и готовый к прошивке код для Arduino, ESP32 и Raspberry Pi — плюс AI-ассистент, который знает вашу сборку.",
     ctaRobotics: "Робототехника", ctaFinder: "Подобрать по моим деталям",
     stats: [["166", "аппаратных сборок"], ["40", "гайдов по робототехнике"], ["3", "платформы: Arduino, ESP32, Pi"]] as [string, string][],
@@ -31,7 +31,7 @@ export const home = defineMessages({
   },
   kk: {
     eyebrow: "166 құрастыру · 40 робототехника нұсқаулығы",
-    titleA: "Build real hardware.", titleB: "Ship real robots.",
+    titleA: "Нағыз құрылғылар жинаңыз.", titleB: "Нағыз роботтар іске қосыңыз.",
     subtitle: "Arduino, ESP32 және Raspberry Pi үшін қосылу схемалары, даташиттермен тексерілген нұсқаулықтар және жүктеуге дайын код — оған қоса құрастыруыңызды білетін AI-көмекші.",
     ctaRobotics: "Робототехника", ctaFinder: "Бөлшектерім бойынша табу",
     stats: [["166", "аппараттық құрастыру"], ["40", "робототехника нұсқаулығы"], ["3", "платформа: Arduino, ESP32, Pi"]] as [string, string][],

@@ -1,3 +1,4 @@
+import type { DiagramCaptions } from "./primitives";
 import { BoardBg, Breadboard, Caption, Module, Motor, PinRow, Wire, MONO } from "./primitives";
 
 const ID = "lf";
@@ -14,7 +15,7 @@ const L298N_PINS: { label: string; d: number; y: number; color: string }[] = [
 ];
 
 /** Breadboard wiring for the PID line follower (Arduino Nano, 4× TCRT5000, L298N, two motors). */
-export function LineFollowerDiagram({ label }: { label: string }) {
+export function LineFollowerDiagram({ label, c }: { label: string; c: DiagramCaptions }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 780" width="1300" height="780" role="img" aria-label={label} className="block h-auto min-w-[820px] w-full">
       <BoardBg w={1300} h={780} id={ID} />
@@ -34,7 +35,7 @@ export function LineFollowerDiagram({ label }: { label: string }) {
       <PinRow x={400} y={402} labels={["A0", "A1", "A2", "A3", "A4", "A5", "5V", "GND", "VIN"]} step={36} dir="up" />
 
       {/* L298N */}
-      <Module x={980} y={240} w={180} h={220} fill="#C62828" label="L298N" sub="dual H-bridge" />
+      <Module x={980} y={240} w={180} h={220} fill="#C62828" label="L298N" sub={c.hbridge} />
       {L298N_PINS.map((p) => (
         <g key={p.label}>
           <rect x={984} y={p.y - 4} width="8" height="8" rx="1.5" fill="#C49000" />
@@ -45,10 +46,10 @@ export function LineFollowerDiagram({ label }: { label: string }) {
       <PinRow x={1100} y={250} labels={["OUT3", "OUT4"]} step={30} />
       <PinRow x={1010} y={450} labels={["12V", "GND", "5V"]} step={40} dir="up" />
 
-      <Motor x={860} y={40} label="Left motor" />
-      <Motor x={1080} y={40} label="Right motor" />
+      <Motor x={860} y={40} label={c.leftMotor} />
+      <Motor x={1080} y={40} label={c.rightMotor} />
       <Module x={960} y={620} w={200} h={70} fill="#263238" label="2× 18650" sub="7.4 V" />
-      <Caption x={1060} y={720}>Battery pack</Caption>
+      <Caption x={1060} y={720}>{c.battery}</Caption>
 
       {/* rail bridges */}
       <Wire pts={[[236, 238], [236, 454]]} color="#E53935" />
@@ -82,7 +83,7 @@ export function LineFollowerDiagram({ label }: { label: string }) {
       <Wire pts={[[616, 402], [616, 454]]} color="#E53935" />
       <Wire pts={[[652, 402], [652, 482]]} color="#1F1F1F" />
 
-      <Caption x={570} y={520}>5V rail · GND rail</Caption>
+      <Caption x={570} y={520}>{c.rails}</Caption>
     </svg>
   );
 }
