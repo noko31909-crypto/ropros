@@ -2,6 +2,7 @@ import { defineMessages } from "../config";
 
 export const home = defineMessages({
   en: {
+    video: { title: "ropros intro video", unmute: "Turn sound on", mute: "Turn sound off", play: "Play video", pause: "Pause video" },
     eyebrow: (b: number, r: number) => `${b} ${b === 1 ? "build" : "builds"} · ${r} robotics ${r === 1 ? "guide" : "guides"}`,
     titleA: "Build real hardware.", titleB: "Ship real robots.",
     subtitle: "Wiring diagrams, datasheet-checked guides and flash-ready code for Arduino, ESP32 and Raspberry Pi — plus an AI assistant that knows your build.",
@@ -16,6 +17,7 @@ export const home = defineMessages({
     communityTitle: "Share your build log", communityBody: "Photos, mods and lessons learned. Real builds only: no fake likes, no bots.", communityCta: "Join",
   },
   ru: {
+    video: { title: "Видео о ropros", unmute: "Включить звук", mute: "Выключить звук", play: "Воспроизвести видео", pause: "Пауза" },
     eyebrow: (b: number, r: number) => `Сборок: ${b} · гайдов по робототехнике: ${r}`,
     titleA: "Собирайте настоящее железо.", titleB: "Запускайте настоящих роботов.",
     subtitle: "Схемы подключения, гайды, сверенные с даташитами, и готовый к прошивке код для Arduino, ESP32 и Raspberry Pi — плюс AI-ассистент, который знает вашу сборку.",
@@ -30,6 +32,7 @@ export const home = defineMessages({
     communityTitle: "Поделитесь журналом сборки", communityBody: "Фото, доработки и выводы. Только реальные сборки: без накруток и ботов.", communityCta: "Присоединиться",
   },
   kk: {
+    video: { title: "ropros туралы бейне", unmute: "Дыбысты қосу", mute: "Дыбысты өшіру", play: "Бейнені ойнату", pause: "Кідірту" },
     eyebrow: (b: number, r: number) => `Құрастыру: ${b} · робототехника нұсқаулығы: ${r}`,
     titleA: "Нағыз құрылғылар жинаңыз.", titleB: "Нағыз роботтар іске қосыңыз.",
     subtitle: "Arduino, ESP32 және Raspberry Pi үшін қосылу схемалары, даташиттермен тексерілген нұсқаулықтар және жүктеуге дайын код — оған қоса құрастыруыңызды білетін AI-көмекші.",

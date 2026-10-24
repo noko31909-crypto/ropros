@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Bot, Boxes, Cpu, MessagesSquare, Radio, Sparkles, Users, type LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { ButtonLink } from "@/components/ui/button";
-import { RobotMark } from "@/components/brand/logo";
+import { IntroVideo } from "@/components/home/intro-video";
 import { ProjectCard } from "@/components/cards/project-card";
 import { getLocale } from "@/lib/i18n/server";
 import { home } from "@/lib/i18n/messages/home";
@@ -63,12 +63,7 @@ export default async function HomePage() {
                 <ButtonLink href="/ai/finder" variant="secondary"><Sparkles className="h-4 w-4 text-signal" aria-hidden />{t.ctaFinder}</ButtonLink>
               </div>
             </div>
-            <div className="relative aspect-square max-h-[460px] rounded-3xl border border-line bg-ink-900/80 p-8 shadow-2xl">
-              <div className="absolute inset-0 rounded-3xl bg-grid opacity-60" />
-              <div className="relative flex h-full flex-col items-center justify-center gap-6">
-                <RobotMark className="h-40 w-40 drop-shadow-[0_20px_60px_rgba(255,122,26,0.25)]" />
-              </div>
-            </div>
+            <IntroVideo labels={t.video} />
           </div>
         </Container>
       </section>
