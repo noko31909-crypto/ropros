@@ -44,3 +44,9 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
 - No dangerouslySetInnerHTML for user or model content. No secrets with NEXT_PUBLIC_. No service-role key in client code.
 - No fake community activity in production: seed data belongs in dev fixtures only.
 - Before finishing a task: `npm run typecheck` and `npm test`.
+
+## Social video (owner's standing rule)
+- Every time a video is created (Reels, TikTok, promos), start with the `/promo` command and the enabled skills
+  (`ig-reel` for hook, script and beat sheet; `ig-caption` + `ig-human` for the text) and generate the footage with
+  Higgsfield AI video models. Plain text-on-dark Remotion slideshows are not acceptable as finished posts.
+- Always send the finished video and caption for approval before publishing (the Instagram API cannot delete posts).
