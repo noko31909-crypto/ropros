@@ -62,7 +62,7 @@ export function PromoOverlay() {
         <Card len={a}>
           <Line size={120}>Stop frying</Line>
           <Line size={120} delay={4}>your Arduino</Line>
-          <Line size={120} delay={8} style={{ backgroundImage: brandGradient, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>boards.</Line>
+          <Line size={120} delay={8} style={{ backgroundImage: brandGradient, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent", textShadow: "none", filter: "drop-shadow(0 4px 18px rgba(0,0,0,.9))" }}>boards.</Line>
         </Card>
       </Sequence>
       <Sequence from={s(START[1]!)} durationInFrames={s(b)}>
