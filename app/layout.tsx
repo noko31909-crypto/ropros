@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Gloock, IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/nav/site-header";
 import { SiteFooter } from "@/components/nav/site-footer";
@@ -41,6 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </AuthProvider>
           </ToastProvider>
         </LocaleProvider>
+        <Analytics />
       </body>
     </html>
   );
