@@ -375,11 +375,15 @@ export function checkCircuit(guide: CheckInput, registry: (id: ComponentId) => C
 
     // missing_capability / nondefault_bus_pin
     for (const n of modulePins) {
-      for (const cap of n.pin.caps ?? []) {
-        if (cap === "digital") continue; // every io pin reads/writes digital; input-only handled below
+      for (const modCap of n.pin.caps ?? []) {
+        if (modCap === "digital") continue; // every io pin reads/writes digital; input-only handled below
+        // UART crosses over: a module's TX lands on the board's RX and vice versa.
+        const cap: PinCap = modCap === "uart_tx" ? "uart_rx" : modCap === "uart_rx" ? "uart_tx" : modCap;
         if (boardIo.some((b) => hasCap(b.pin, cap))) continue;
         const boards = boardIo.map((b) => b.key).join(", ");
-        if (BUS_CAPS.has(cap) && remappable) {
+        if ((cap === "uart_rx" || cap === "uart_tx") && !remappable) {
+          warn("software_serial", `${n.key} is wired to ${boards}, which is not a hardware ${cap === "uart_rx" ? "RX" : "TX"} pin. It works with SoftwareSerial (as most Uno/Nano sketches do); keep D0/D1 free for USB uploads.`, n.key);
+        } else if (BUS_CAPS.has(cap) && remappable) {
           warn("nondefault_bus_pin", `${n.key} needs ${cap} and is wired to ${boards}, which is not the default ${cap} pin of ${boardDef?.name ?? guide.board}. It works only if the code remaps the bus (e.g. Wire.begin(sda, scl) / I2C(scl=…, sda=…)).`, n.key);
         } else if (cap === "interrupt") {
           warn("missing_capability", `${n.key} works best on an interrupt-capable pin, but ${boards} has no hardware interrupt; fast signals may be missed.`, n.key);
