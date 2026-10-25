@@ -3,7 +3,9 @@ import type { GuideContent } from "../../lib/content/schema.ts";
 import g_arduino_voltmeter from "./arduino-voltmeter.ts";
 import g_automatic_night_light from "./automatic-night-light.ts";
 import g_camera_slider_nema17 from "./camera-slider-nema17.ts";
+import g_desk_clock_ds3231 from "./desk-clock-ds3231.ts";
 import g_digital_dice from "./digital-dice.ts";
+import g_digital_kitchen_scale from "./digital-kitchen-scale.ts";
 import g_eight_key_piano from "./eight-key-piano.ts";
 import g_encoder_led_dimmer from "./encoder-led-dimmer.ts";
 import g_esp32_air_quality_monitor from "./esp32-air-quality-monitor.ts";
@@ -16,6 +18,8 @@ import g_esp32_telegram_door_alarm from "./esp32-telegram-door-alarm.ts";
 import g_esp32_weather_dashboard from "./esp32-weather-dashboard.ts";
 import g_esp32_wifi_led_lamp from "./esp32-wifi-led-lamp.ts";
 import g_esp32_wifi_relay_switch from "./esp32-wifi-relay-switch.ts";
+import g_flame_detector_alarm from "./flame-detector-alarm.ts";
+import g_gas_leak_alarm_mq2 from "./gas-leak-alarm-mq2.ts";
 import g_gps_speedometer from "./gps-speedometer.ts";
 import g_haptic_reminder_band from "./haptic-reminder-band.ts";
 import g_ir_remote_decoder from "./ir-remote-decoder.ts";
@@ -41,6 +45,8 @@ import g_pico_plant_moisture_alarm from "./pico-plant-moisture-alarm.ts";
 import g_pico_reaction_game from "./pico-reaction-game.ts";
 import g_pico_servo_radar from "./pico-servo-radar.ts";
 import g_pico_weather_station from "./pico-weather-station.ts";
+import g_pulse_oximeter_max30102 from "./pulse-oximeter-max30102.ts";
+import g_rain_alert_window_reminder from "./rain-alert-window-reminder.ts";
 import g_reaction_time_game from "./reaction-time-game.ts";
 import g_rfid_access_control from "./rfid-access-control.ts";
 import g_rgb_mood_lamp from "./rgb-mood-lamp.ts";
@@ -48,15 +54,21 @@ import g_servo_knob_control from "./servo-knob-control.ts";
 import g_simon_says_memory_game from "./simon-says-memory-game.ts";
 import g_smart_trash_can from "./smart-trash-can.ts";
 import g_snake_game_led_matrix from "./snake-game-led-matrix.ts";
+import g_sound_reactive_led_bar from "./sound-reactive-led-bar.ts";
 import g_stepper_turntable from "./stepper-turntable.ts";
 import g_temperature_controlled_fan from "./temperature-controlled-fan.ts";
+import g_tilt_alarm_mpu6050 from "./tilt-alarm-mpu6050.ts";
 import g_ultrasonic_radar from "./ultrasonic-radar.ts";
+import g_water_tank_level_alarm from "./water-tank-level-alarm.ts";
+import g_weather_station_oled from "./weather-station-oled.ts";
 
 export const CONTENT_GUIDES: GuideContent[] = [
   g_arduino_voltmeter,
   g_automatic_night_light,
   g_camera_slider_nema17,
+  g_desk_clock_ds3231,
   g_digital_dice,
+  g_digital_kitchen_scale,
   g_eight_key_piano,
   g_encoder_led_dimmer,
   g_esp32_air_quality_monitor,
@@ -69,6 +81,8 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_esp32_weather_dashboard,
   g_esp32_wifi_led_lamp,
   g_esp32_wifi_relay_switch,
+  g_flame_detector_alarm,
+  g_gas_leak_alarm_mq2,
   g_gps_speedometer,
   g_haptic_reminder_band,
   g_ir_remote_decoder,
@@ -94,6 +108,8 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_pico_reaction_game,
   g_pico_servo_radar,
   g_pico_weather_station,
+  g_pulse_oximeter_max30102,
+  g_rain_alert_window_reminder,
   g_reaction_time_game,
   g_rfid_access_control,
   g_rgb_mood_lamp,
@@ -101,7 +117,11 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_simon_says_memory_game,
   g_smart_trash_can,
   g_snake_game_led_matrix,
+  g_sound_reactive_led_bar,
   g_stepper_turntable,
   g_temperature_controlled_fan,
+  g_tilt_alarm_mpu6050,
   g_ultrasonic_radar,
+  g_water_tank_level_alarm,
+  g_weather_station_oled,
 ];
