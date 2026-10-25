@@ -2,8 +2,13 @@
 import type { GuideContent } from "../../lib/content/schema.ts";
 import g_arduino_voltmeter from "./arduino-voltmeter.ts";
 import g_automatic_night_light from "./automatic-night-light.ts";
+import g_battery_18650_checker from "./battery-18650-checker.ts";
+import g_bedside_alarm_clock from "./bedside-alarm-clock.ts";
+import g_bike_speedometer_hall from "./bike-speedometer-hall.ts";
 import g_camera_slider_nema17 from "./camera-slider-nema17.ts";
+import g_dc_motor_speed_controller from "./dc-motor-speed-controller.ts";
 import g_desk_clock_ds3231 from "./desk-clock-ds3231.ts";
+import g_digital_compass from "./digital-compass.ts";
 import g_digital_dice from "./digital-dice.ts";
 import g_digital_kitchen_scale from "./digital-kitchen-scale.ts";
 import g_eight_key_piano from "./eight-key-piano.ts";
@@ -34,6 +39,8 @@ import g_gps_speedometer from "./gps-speedometer.ts";
 import g_haptic_reminder_band from "./haptic-reminder-band.ts";
 import g_ir_remote_decoder from "./ir-remote-decoder.ts";
 import g_keypad_door_lock from "./keypad-door-lock.ts";
+import g_keypad_safe_lock from "./keypad-safe-lock.ts";
+import g_laser_tape_measure from "./laser-tape-measure.ts";
 import g_lcd_thermometer_ds18b20 from "./lcd-thermometer-ds18b20.ts";
 import g_led_chaser_knight_rider from "./led-chaser-knight-rider.ts";
 import g_led_strip_effects from "./led-strip-effects.ts";
@@ -45,6 +52,7 @@ import g_oled_pong_game from "./oled-pong-game.ts";
 import g_pan_tilt_joystick from "./pan-tilt-joystick.ts";
 import g_parking_distance_sensor from "./parking-distance-sensor.ts";
 import g_pedestrian_traffic_light from "./pedestrian-traffic-light.ts";
+import g_people_counter_beam from "./people-counter-beam.ts";
 import g_pi_motion_logger_pir from "./pi-motion-logger-pir.ts";
 import g_pi_oled_system_monitor from "./pi-oled-system-monitor.ts";
 import g_pi_pico_led_matrix from "./pi-pico-led-matrix.ts";
@@ -60,10 +68,13 @@ import g_rain_alert_window_reminder from "./rain-alert-window-reminder.ts";
 import g_reaction_time_game from "./reaction-time-game.ts";
 import g_rfid_access_control from "./rfid-access-control.ts";
 import g_rgb_mood_lamp from "./rgb-mood-lamp.ts";
+import g_sd_card_climate_logger from "./sd-card-climate-logger.ts";
 import g_servo_knob_control from "./servo-knob-control.ts";
 import g_simon_says_memory_game from "./simon-says-memory-game.ts";
+import g_smart_street_light from "./smart-street-light.ts";
 import g_smart_trash_can from "./smart-trash-can.ts";
 import g_snake_game_led_matrix from "./snake-game-led-matrix.ts";
+import g_solar_battery_monitor from "./solar-battery-monitor.ts";
 import g_sound_reactive_led_bar from "./sound-reactive-led-bar.ts";
 import g_stepper_turntable from "./stepper-turntable.ts";
 import g_temperature_controlled_fan from "./temperature-controlled-fan.ts";
@@ -75,8 +86,13 @@ import g_weather_station_oled from "./weather-station-oled.ts";
 export const CONTENT_GUIDES: GuideContent[] = [
   g_arduino_voltmeter,
   g_automatic_night_light,
+  g_battery_18650_checker,
+  g_bedside_alarm_clock,
+  g_bike_speedometer_hall,
   g_camera_slider_nema17,
+  g_dc_motor_speed_controller,
   g_desk_clock_ds3231,
+  g_digital_compass,
   g_digital_dice,
   g_digital_kitchen_scale,
   g_eight_key_piano,
@@ -107,6 +123,8 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_haptic_reminder_band,
   g_ir_remote_decoder,
   g_keypad_door_lock,
+  g_keypad_safe_lock,
+  g_laser_tape_measure,
   g_lcd_thermometer_ds18b20,
   g_led_chaser_knight_rider,
   g_led_strip_effects,
@@ -118,6 +136,7 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_pan_tilt_joystick,
   g_parking_distance_sensor,
   g_pedestrian_traffic_light,
+  g_people_counter_beam,
   g_pi_motion_logger_pir,
   g_pi_oled_system_monitor,
   g_pi_pico_led_matrix,
@@ -133,10 +152,13 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_reaction_time_game,
   g_rfid_access_control,
   g_rgb_mood_lamp,
+  g_sd_card_climate_logger,
   g_servo_knob_control,
   g_simon_says_memory_game,
+  g_smart_street_light,
   g_smart_trash_can,
   g_snake_game_led_matrix,
+  g_solar_battery_monitor,
   g_sound_reactive_led_bar,
   g_stepper_turntable,
   g_temperature_controlled_fan,
