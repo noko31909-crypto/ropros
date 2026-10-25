@@ -50,3 +50,5 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
   (`ig-reel` for hook, script and beat sheet; `ig-caption` + `ig-human` for the text) and generate the footage with
   Higgsfield AI video models. Plain text-on-dark Remotion slideshows are not acceptable as finished posts.
 - Always send the finished video and caption for approval before publishing (the Instagram API cannot delete posts).
+- TikTok titles always include #fyp #recommendations #рекомендации (owner request, 2026-10-25), max 150 chars.
+- Post at most 1 Reel per day via the Instagram API (6 in two hours got the app temporarily blocked).
