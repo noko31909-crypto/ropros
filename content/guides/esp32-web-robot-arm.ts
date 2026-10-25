@@ -53,7 +53,7 @@ export default {
     { from: "buck.OUT-", to: "s_shoulder.GND", color: "brown" },
     { from: "buck.OUT-", to: "s_elbow.GND", color: "brown" },
     { from: "buck.OUT-", to: "s_grip.GND", color: "brown" },
-    { from: "buck.OUT-", to: "board.GND", color: "black", note: { en: "shared ground: without it the servos ignore the signal", ru: "общая земля: без неё сервы не видят сигнал", kk: "ортақ жер: онсыз сервол сигналды көрмейді" } },
+    { from: "buck.OUT-", to: "board.GND", color: "black", note: { en: "shared ground: without it the servos ignore the signal", ru: "общая земля: без неё сервы не видят сигнал", kk: "ортақ жер: онсыз серволар сигналды көрмейді" } },
     { from: "board.GPIO13", to: "s_base.SIG", color: "orange" },
     { from: "board.GPIO14", to: "s_shoulder.SIG", color: "orange" },
     { from: "board.GPIO27", to: "s_elbow.SIG", color: "orange" },
@@ -108,7 +108,7 @@ export default {
         kk: "Әр жүгірткіні баяу шеттеріне дейін жылжытып, буын рамаға тірелетін не қармауыш толық жабылатын жерді жазып алыңыз. Бұл сандарды скетчтегі MIN_ANGLE мен MAX_ANGLE-ге жазып, қайта жүктеңіз. Тірекке тірелген серво 650 мА-ға дейін тартып, бір минутта қызып кетеді.",
       },
       expect: { en: "No joint can hit its frame, and the gripper stops just as it closes.", ru: "Ни один сустав не упирается в раму, захват останавливается ровно при смыкании.", kk: "Бірде-бір буын рамаға тірелмейді, қармауыш дәл жабылғанда тоқтайды." },
-      mistake: { en: "Leaving the gripper limit at 0°: it keeps squeezing and buzzing on every object.", ru: "Оставить предел захвата 0°: он будет сжимать и жужжать на каждом предмете.", kk: "Қармауыш шегін 0° күйінде қалдыру: ол әр заттағы қысып, ызыңдай береді." },
+      mistake: { en: "Leaving the gripper limit at 0°: it keeps squeezing and buzzing on every object.", ru: "Оставить предел захвата 0°: он будет сжимать и жужжать на каждом предмете.", kk: "Қармауыш шегін 0° күйінде қалдыру: ол әр затты қысып, ызыңдай береді." },
     },
   ],
   code: [{
@@ -143,11 +143,11 @@ label{display:block;margin:18px 0}input{width:100%;accent-color:#ff7a1a}
 button{font-size:18px;padding:12px 22px;border:0;border-radius:12px;background:#ff7a1a}</style></head><body>
 <h2>ropros arm</h2><div id="s"></div><button id="home">HOME</button>
 <script>
-const names=['base','shoulder','elbow','gripper'],box=document.getElementById('s');let timer=null;
+const names=['base','shoulder','elbow','gripper'],box=document.getElementById('s'),timers=[];
 names.forEach((n,i)=>{const l=document.createElement('label');l.innerHTML=n+' <b id="v'+i+'">90</b>&deg;'+
 '<input type="range" id="r'+i+'" min="0" max="180" value="90">';box.appendChild(l)});
 function send(i){const v=document.getElementById('r'+i).value;document.getElementById('v'+i).textContent=v;
-clearTimeout(timer);timer=setTimeout(()=>fetch('/set?j='+i+'&a='+v),40)}
+clearTimeout(timers[i]);timers[i]=setTimeout(()=>fetch('/set?j='+i+'&a='+v),40)}
 names.forEach((n,i)=>document.getElementById('r'+i).oninput=()=>send(i));
 async function load(){const j=await (await fetch('/state')).json();
 j.t.forEach((a,i)=>{const r=document.getElementById('r'+i);r.min=j.min[i];r.max=j.max[i];r.value=a;
