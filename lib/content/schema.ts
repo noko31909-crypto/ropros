@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { COMPONENT_IDS } from "@/lib/hardware/ids";
+import { COMPONENT_IDS } from "../hardware/ids.ts";
 
 /**
  * Guide content format: one JSON file per guide in content/guides/<slug>.json.

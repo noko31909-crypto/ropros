@@ -1,8 +1,10 @@
 import type { Locale } from "@/lib/i18n/config";
 import type { ComponentId } from "./hardware/ids.ts";
 import type { CheckInput } from "./hardware/check.ts";
-import type { WIRE_COLORS } from "./content/schema.ts";
+import type { GuideContent, WIRE_COLORS } from "./content/schema.ts";
+import type { CoverId as CardCoverId } from "../components/cards/covers.tsx";
 import { getComponent } from "./hardware/components.ts";
+import { CONTENT_GUIDES } from "../content/guides/index.ts";
 
 /**
  * Guide content model. Human-language text is stored per locale; part names, pins and code stay untranslated.
@@ -24,7 +26,7 @@ export type Simulation = { baud: number; lines: string[]; leds: { label: string;
 
 export type Platform = "arduino" | "esp32" | "raspberry_pi";
 export type Difficulty = "beginner" | "intermediate" | "advanced";
-export type CoverId = "obstacle" | "line" | "plant";
+export type CoverId = CardCoverId;
 
 export type Guide = {
   slug: string; title: L; summary: L; board: string; boardComponent: ComponentId; platform: Platform; cover: CoverId;
@@ -518,7 +520,43 @@ void loop() {
   },
 };
 
-const GUIDES: Guide[] = [OBSTACLE, LINE, PLANT];
+const UNVERIFIED: L = {
+  en: "Wiring checked by the automatic circuit checker against the ropros hardware registry (datasheet pinouts). Not yet bench-tested on real hardware.",
+  ru: "Проводка проверена автоматической проверкой схемы по реестру компонентов ropros (распиновки из даташитов). На реальном железе ещё не тестировалась.",
+  kk: "Сымдар ropros компоненттер тізілімі (даташит распиновкалары) бойынша автоматты схема тексерісімен тексерілді. Нақты құрылғыда әлі тексерілмеген.",
+};
+const VERIFIED: L = {
+  en: "Wiring checked by the automatic circuit checker and verified by a person on real hardware.",
+  ru: "Проводка проверена автоматической проверкой схемы и человеком на реальном железе.",
+  kk: "Сымдарды автоматты схема тексерісі және адам нақты құрылғыда тексерді.",
+};
+
+/** Cover art per category; robotics rotates through the robot covers so the hub doesn't repeat one image. */
+const COVERS: Record<GuideContent["category"], readonly CoverId[]> = {
+  robotics: ["obstacle", "line", "arm", "walker", "balance", "mecanum"], vehicles: ["mecanum", "camera", "obstacle"],
+  iot: ["plant", "logger"], home: ["plant", "logger"], energy: ["logger", "plant"], tools: ["logger", "radar"],
+  sensors: ["radar", "logger"], security: ["camera", "radar"], displays: ["matrix"], games: ["matrix", "radar"],
+  audio: ["matrix", "radar"], wearables: ["matrix"],
+};
+const hash = (s: string) => [...s].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7);
+export const coverFor = (c: Pick<GuideContent, "slug" | "category">): CoverId => {
+  const list = COVERS[c.category];
+  return list[hash(c.slug) % list.length] ?? "obstacle";
+};
+
+/** A content file (content/guides/<slug>.ts, validated by GuideSchema) as a Guide. Part and board names come from the registry. */
+export function fromContent(c: GuideContent): Guide {
+  return {
+    slug: c.slug, title: c.title, summary: c.summary, board: getComponent(c.board).name, boardComponent: c.board, platform: c.platform,
+    cover: coverFor(c), difficulty: c.difficulty, hours: c.hours, costUsd: c.costUsd, xpReward: c.xpReward,
+    verification: c.status === "verified" ? VERIFIED : UNVERIFIED,
+    parts: c.parts.map((p) => ({ name: getComponent(p.component).name, component: p.component, qty: p.qty, spec: p.spec, role: p.role, ...(p.optional ? { optional: true } : {}) })),
+    steps: c.steps, code: c.code, troubleshooting: c.troubleshooting, safety: c.safety,
+    instances: c.instances, connections: c.connections, simulation: c.simulation,
+  };
+}
+
+const GUIDES: Guide[] = [OBSTACLE, LINE, PLANT, ...CONTENT_GUIDES.map(fromContent)];
 
 export function getGuide(slug: string): Guide | undefined {
   return GUIDES.find((g) => g.slug === slug);

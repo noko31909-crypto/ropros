@@ -1,5 +1,7 @@
 import type { Locale } from "@/lib/i18n/config";
 import type { CoverId } from "@/components/cards/covers";
+import { CONTENT_GUIDES } from "@/content/guides";
+import { coverFor } from "@/lib/guides";
 
 /** Catalogue. Listing-only entries (no guide yet) are kept for later but not shown: the site lists only real guides. */
 export type Difficulty = "beginner" | "intermediate" | "advanced";
@@ -50,8 +52,17 @@ const ALL_PROJECTS: Project[] = [
     summary: { en: "An 8×8 WS2812 matrix on a Raspberry Pi Pico shows icons and scrolling text.", ru: "Матрица WS2812 8×8 на Raspberry Pi Pico показывает иконки и бегущую строку.", kk: "Raspberry Pi Pico-дағы 8×8 WS2812 матрицасы белгішелер мен жүгіртпе жолды көрсетеді." } },
 ];
 
+const ASPECTS = ["aspect-[4/5]", "aspect-[3/4]", "aspect-square", "aspect-[2/3]", "aspect-[5/6]", "aspect-[6/7]"] as const;
+const BOARD_OF = { arduino: "arduino", esp32: "esp32", raspberry_pi: "pi" } as const satisfies Record<string, Board>;
+
+/** Every guide file in content/guides becomes a published card. */
+const CONTENT_PROJECTS: Project[] = CONTENT_GUIDES.map((g, i) => ({
+  slug: g.slug, title: g.title.en, summary: g.summary, board: BOARD_OF[g.platform], difficulty: g.difficulty, hours: g.hours,
+  robotics: g.robotics, fullGuide: true, cover: coverFor(g), aspect: ASPECTS[i % ASPECTS.length] ?? "aspect-[4/5]",
+}));
+
 /** Published projects: only entries with a full guide page. */
-export const PROJECTS: Project[] = ALL_PROJECTS.filter((p) => p.fullGuide);
+export const PROJECTS: Project[] = [...ALL_PROJECTS.filter((p) => p.fullGuide), ...CONTENT_PROJECTS];
 
 /** Home-page showcase order. */
 export const FEATURED: Project[] = PROJECTS.slice(0, 8);
