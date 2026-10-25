@@ -14,6 +14,7 @@ import { common } from "@/lib/i18n/messages/common";
 import { profile as profileMsgs } from "@/lib/i18n/messages/profile";
 import { DeletePost } from "@/components/community/delete-post";
 import { Cover } from "@/components/cards/covers";
+import { coverImage } from "@/lib/covers";
 import { PlatformPill } from "@/components/cards/project-card";
 import { getProject, projectHref } from "@/lib/projects";
 import { useSavedBuilds } from "@/lib/saved";
@@ -184,7 +185,7 @@ export function ProfileView() {
                 <Link key={p.slug} href={projectHref(p)}
                   className="group mb-4 block break-inside-avoid overflow-hidden rounded-[28px] border border-line bg-ink-850 transition-colors hover:border-accent/40">
                   <div className="relative aspect-[4/3] overflow-hidden">
-                    <Cover id={p.cover} title={p.title} className="absolute inset-0 h-full w-full" />
+                    <Cover id={p.cover} image={coverImage(p.slug)} title={p.title} className="absolute inset-0 h-full w-full" />
                   </div>
                   <div className="flex flex-col gap-2 p-4">
                     <PlatformPill board={p.board} />

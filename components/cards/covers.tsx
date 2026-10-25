@@ -135,9 +135,21 @@ const SPECS: Record<CoverId, Spec> = {
     <rect width="600" height="700" fill={u("f")} /></>) },
 };
 
-/** Inline SVG cover that fills its box (object-cover style). Give the parent a size/aspect. */
-export function Cover({ id, className, title }: { id: CoverId; className?: string; title?: string }) {
+/**
+ * Cover that fills its box (object-cover style). Give the parent a size/aspect. With `image` it shows the
+ * project photo; otherwise the inline SVG art for `id`.
+ */
+export function Cover({ id, className, title, image, priority = false }: {
+  id: CoverId; className?: string; title?: string; image?: string; priority?: boolean;
+}) {
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  if (image) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- pre-sized WebP from our CDN; next/image adds nothing here
+      <img src={image} alt={title ?? ""} aria-hidden={title ? undefined : true} loading={priority ? "eager" : "lazy"} decoding="async"
+        fetchPriority={priority ? "high" : "auto"} className={`${className ?? "absolute inset-0 h-full w-full"} object-cover`} />
+    );
+  }
   const spec = SPECS[id] ?? SPECS.obstacle;
   const ids: Ids = { g: `${uid}g`, f: `${uid}f`, s: `${uid}s`, b: `${uid}b` };
   const u = (k: keyof Ids) => `url(#${ids[k]})`;

@@ -1,6 +1,7 @@
 import { ListChecks, Package } from "lucide-react";
 import { clsx } from "clsx";
 import { Cover } from "@/components/cards/covers";
+import { coverImage } from "@/lib/covers";
 import type { LocalizedGuide, Platform } from "@/lib/guides";
 
 export const PLATFORM_TONE: Record<Platform, string> = {
@@ -13,7 +14,7 @@ export const PLATFORM_TONE: Record<Platform, string> = {
 export function GuideBanner({ guide, welcome, steps, parts }: { guide: LocalizedGuide; welcome: string; steps: string; parts: string }) {
   return (
     <div className="relative isolate min-h-[300px] overflow-hidden rounded-[28px] border border-white/10 shadow-[0_40px_90px_-40px_rgba(0,0,0,.9)] sm:min-h-[380px] sm:rounded-[32px] lg:min-h-[460px]">
-      <div className="absolute inset-0 -z-20 scale-105"><Cover id={guide.cover} /></div>
+      <div className="absolute inset-0 -z-20 scale-105"><Cover id={guide.cover} image={coverImage(guide.slug)} priority /></div>
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-ink-950/30 to-ink-950" />
       <div className="absolute inset-x-0 bottom-0 -z-10 h-[58%] backdrop-blur-xl [mask-image:linear-gradient(to_bottom,transparent,black_45%)]" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(255,122,26,.18),transparent_60%)]" />

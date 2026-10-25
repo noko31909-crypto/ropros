@@ -5,6 +5,7 @@ import type { Locale } from "@/lib/i18n/config";
 import { common } from "@/lib/i18n/messages/common";
 import { projects as projectsMsg } from "@/lib/i18n/messages/projects";
 import { BOARD_LABEL, projectHref, type Board, type Difficulty, type Project } from "@/lib/projects";
+import { coverImage } from "@/lib/covers";
 import { Cover } from "./covers";
 import { BookmarkButton } from "./bookmark-button";
 
@@ -36,7 +37,7 @@ export function ProjectCard({ project, locale, masonry = false }: { project: Pro
     <Link href={projectHref(project)}
       className="group mb-3 flex break-inside-avoid flex-col overflow-hidden rounded-[20px] border border-line bg-ink-850 transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-[0_30px_60px_-30px_rgba(255,122,26,.45)] motion-reduce:hover:translate-y-0 sm:mb-6 sm:rounded-[28px]">
       <div className={clsx("relative overflow-hidden", masonry ? project.aspect : "aspect-[4/3]")}>
-        <Cover id={project.cover} title={t.coverAlt(project.title)}
+        <Cover id={project.cover} image={coverImage(project.slug)} title={t.coverAlt(project.title)}
           className="absolute inset-0 h-full w-full transition-transform duration-700 group-hover:scale-[1.05] motion-reduce:group-hover:scale-100" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink-850 to-transparent" />
         {project.fullGuide && (
