@@ -31,6 +31,16 @@ import g_oled_pong_game from "./oled-pong-game.ts";
 import g_pan_tilt_joystick from "./pan-tilt-joystick.ts";
 import g_parking_distance_sensor from "./parking-distance-sensor.ts";
 import g_pedestrian_traffic_light from "./pedestrian-traffic-light.ts";
+import g_pi_motion_logger_pir from "./pi-motion-logger-pir.ts";
+import g_pi_oled_system_monitor from "./pi-oled-system-monitor.ts";
+import g_pi_pico_led_matrix from "./pi-pico-led-matrix.ts";
+import g_pi_smart_fan_controller from "./pi-smart-fan-controller.ts";
+import g_pi_temperature_logger from "./pi-temperature-logger.ts";
+import g_pi_traffic_light_python from "./pi-traffic-light-python.ts";
+import g_pico_plant_moisture_alarm from "./pico-plant-moisture-alarm.ts";
+import g_pico_reaction_game from "./pico-reaction-game.ts";
+import g_pico_servo_radar from "./pico-servo-radar.ts";
+import g_pico_weather_station from "./pico-weather-station.ts";
 import g_reaction_time_game from "./reaction-time-game.ts";
 import g_rfid_access_control from "./rfid-access-control.ts";
 import g_rgb_mood_lamp from "./rgb-mood-lamp.ts";
@@ -74,6 +84,16 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_pan_tilt_joystick,
   g_parking_distance_sensor,
   g_pedestrian_traffic_light,
+  g_pi_motion_logger_pir,
+  g_pi_oled_system_monitor,
+  g_pi_pico_led_matrix,
+  g_pi_smart_fan_controller,
+  g_pi_temperature_logger,
+  g_pi_traffic_light_python,
+  g_pico_plant_moisture_alarm,
+  g_pico_reaction_game,
+  g_pico_servo_radar,
+  g_pico_weather_station,
   g_reaction_time_game,
   g_rfid_access_control,
   g_rgb_mood_lamp,

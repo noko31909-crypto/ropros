@@ -5,6 +5,7 @@ import { getComponent } from "../lib/hardware/components.ts";
 
 const want = process.argv.slice(2);
 for (const id of want.length ? want : COMPONENT_IDS) {
+  if (!(COMPONENT_IDS as readonly string[]).includes(id)) { console.log(`${id}: not in the registry (see lib/hardware/ids.ts)`); continue; }
   const d = getComponent(id as (typeof COMPONENT_IDS)[number]);
   const head = [d.id, d.kind, d.name, d.logicVolts ? `logic ${d.logicVolts}V` : "", d.fiveVoltTolerant ? "5V-tolerant" : "", d.supply ? `supply ${d.supply.min}-${d.supply.max}V` : "", d.drawMa ? `draw ${d.drawMa}mA` : ""].filter(Boolean).join(" | ");
   console.log(head);
