@@ -10,11 +10,21 @@ import g_eight_key_piano from "./eight-key-piano.ts";
 import g_encoder_led_dimmer from "./encoder-led-dimmer.ts";
 import g_esp32_air_quality_monitor from "./esp32-air-quality-monitor.ts";
 import g_esp32_aquarium_thermometer from "./esp32-aquarium-thermometer.ts";
+import g_esp32_ble_gamepad from "./esp32-ble-gamepad.ts";
+import g_esp32_cam_security_camera from "./esp32-cam-security-camera.ts";
 import g_esp32_current_monitor_acs712 from "./esp32-current-monitor-acs712.ts";
+import g_esp32_epaper_calendar from "./esp32-epaper-calendar.ts";
+import g_esp32_garage_door_monitor from "./esp32-garage-door-monitor.ts";
 import g_esp32_gps_tracker from "./esp32-gps-tracker.ts";
+import g_esp32_lora_sensor_node from "./esp32-lora-sensor-node.ts";
 import g_esp32_mqtt_motion_sensor from "./esp32-mqtt-motion-sensor.ts";
+import g_esp32_nursery_monitor from "./esp32-nursery-monitor.ts";
+import g_esp32_pet_feeder from "./esp32-pet-feeder.ts";
 import g_esp32_power_meter_ina219 from "./esp32-power-meter-ina219.ts";
+import g_esp32_rfid_attendance from "./esp32-rfid-attendance.ts";
+import g_esp32_smart_doorbell from "./esp32-smart-doorbell.ts";
 import g_esp32_telegram_door_alarm from "./esp32-telegram-door-alarm.ts";
+import g_esp32_touch_light_switch from "./esp32-touch-light-switch.ts";
 import g_esp32_weather_dashboard from "./esp32-weather-dashboard.ts";
 import g_esp32_wifi_led_lamp from "./esp32-wifi-led-lamp.ts";
 import g_esp32_wifi_relay_switch from "./esp32-wifi-relay-switch.ts";
@@ -73,11 +83,21 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_encoder_led_dimmer,
   g_esp32_air_quality_monitor,
   g_esp32_aquarium_thermometer,
+  g_esp32_ble_gamepad,
+  g_esp32_cam_security_camera,
   g_esp32_current_monitor_acs712,
+  g_esp32_epaper_calendar,
+  g_esp32_garage_door_monitor,
   g_esp32_gps_tracker,
+  g_esp32_lora_sensor_node,
   g_esp32_mqtt_motion_sensor,
+  g_esp32_nursery_monitor,
+  g_esp32_pet_feeder,
   g_esp32_power_meter_ina219,
+  g_esp32_rfid_attendance,
+  g_esp32_smart_doorbell,
   g_esp32_telegram_door_alarm,
+  g_esp32_touch_light_switch,
   g_esp32_weather_dashboard,
   g_esp32_wifi_led_lamp,
   g_esp32_wifi_relay_switch,
