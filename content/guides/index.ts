@@ -2,10 +2,24 @@
 import type { GuideContent } from "../../lib/content/schema.ts";
 import g_arduino_voltmeter from "./arduino-voltmeter.ts";
 import g_automatic_night_light from "./automatic-night-light.ts";
+import g_camera_slider_nema17 from "./camera-slider-nema17.ts";
 import g_digital_dice from "./digital-dice.ts";
 import g_eight_key_piano from "./eight-key-piano.ts";
+import g_encoder_led_dimmer from "./encoder-led-dimmer.ts";
+import g_esp32_air_quality_monitor from "./esp32-air-quality-monitor.ts";
+import g_esp32_aquarium_thermometer from "./esp32-aquarium-thermometer.ts";
+import g_esp32_current_monitor_acs712 from "./esp32-current-monitor-acs712.ts";
+import g_esp32_gps_tracker from "./esp32-gps-tracker.ts";
+import g_esp32_mqtt_motion_sensor from "./esp32-mqtt-motion-sensor.ts";
+import g_esp32_power_meter_ina219 from "./esp32-power-meter-ina219.ts";
+import g_esp32_telegram_door_alarm from "./esp32-telegram-door-alarm.ts";
+import g_esp32_weather_dashboard from "./esp32-weather-dashboard.ts";
+import g_esp32_wifi_led_lamp from "./esp32-wifi-led-lamp.ts";
+import g_esp32_wifi_relay_switch from "./esp32-wifi-relay-switch.ts";
 import g_gps_speedometer from "./gps-speedometer.ts";
+import g_haptic_reminder_band from "./haptic-reminder-band.ts";
 import g_ir_remote_decoder from "./ir-remote-decoder.ts";
+import g_keypad_door_lock from "./keypad-door-lock.ts";
 import g_lcd_thermometer_ds18b20 from "./lcd-thermometer-ds18b20.ts";
 import g_led_chaser_knight_rider from "./led-chaser-knight-rider.ts";
 import g_led_strip_effects from "./led-strip-effects.ts";
@@ -14,21 +28,41 @@ import g_morse_code_beacon from "./morse-code-beacon.ts";
 import g_mp3_player_dfplayer from "./mp3-player-dfplayer.ts";
 import g_nrf24_wireless_sensor_link from "./nrf24-wireless-sensor-link.ts";
 import g_oled_pong_game from "./oled-pong-game.ts";
+import g_pan_tilt_joystick from "./pan-tilt-joystick.ts";
 import g_parking_distance_sensor from "./parking-distance-sensor.ts";
 import g_pedestrian_traffic_light from "./pedestrian-traffic-light.ts";
 import g_reaction_time_game from "./reaction-time-game.ts";
+import g_rfid_access_control from "./rfid-access-control.ts";
 import g_rgb_mood_lamp from "./rgb-mood-lamp.ts";
+import g_servo_knob_control from "./servo-knob-control.ts";
 import g_simon_says_memory_game from "./simon-says-memory-game.ts";
+import g_smart_trash_can from "./smart-trash-can.ts";
 import g_snake_game_led_matrix from "./snake-game-led-matrix.ts";
+import g_stepper_turntable from "./stepper-turntable.ts";
+import g_temperature_controlled_fan from "./temperature-controlled-fan.ts";
 import g_ultrasonic_radar from "./ultrasonic-radar.ts";
 
 export const CONTENT_GUIDES: GuideContent[] = [
   g_arduino_voltmeter,
   g_automatic_night_light,
+  g_camera_slider_nema17,
   g_digital_dice,
   g_eight_key_piano,
+  g_encoder_led_dimmer,
+  g_esp32_air_quality_monitor,
+  g_esp32_aquarium_thermometer,
+  g_esp32_current_monitor_acs712,
+  g_esp32_gps_tracker,
+  g_esp32_mqtt_motion_sensor,
+  g_esp32_power_meter_ina219,
+  g_esp32_telegram_door_alarm,
+  g_esp32_weather_dashboard,
+  g_esp32_wifi_led_lamp,
+  g_esp32_wifi_relay_switch,
   g_gps_speedometer,
+  g_haptic_reminder_band,
   g_ir_remote_decoder,
+  g_keypad_door_lock,
   g_lcd_thermometer_ds18b20,
   g_led_chaser_knight_rider,
   g_led_strip_effects,
@@ -37,11 +71,17 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_mp3_player_dfplayer,
   g_nrf24_wireless_sensor_link,
   g_oled_pong_game,
+  g_pan_tilt_joystick,
   g_parking_distance_sensor,
   g_pedestrian_traffic_light,
   g_reaction_time_game,
+  g_rfid_access_control,
   g_rgb_mood_lamp,
+  g_servo_knob_control,
   g_simon_says_memory_game,
+  g_smart_trash_can,
   g_snake_game_led_matrix,
+  g_stepper_turntable,
+  g_temperature_controlled_fan,
   g_ultrasonic_radar,
 ];

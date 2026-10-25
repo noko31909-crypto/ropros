@@ -17,7 +17,7 @@ const ComponentRef = z.enum(COMPONENT_IDS);
 /** Instance id used in connections: "board" for the main board, otherwise lowercase like "us", "m1", "led_red". */
 const InstanceId = z.string().regex(/^[a-z][a-z0-9_]{0,23}$/);
 /** "<instance>.<pin>", e.g. "board.D9", "us.TRIG", "r1.A". */
-const Endpoint = z.string().regex(/^[a-z][a-z0-9_]{0,23}\.[A-Za-z0-9_+\-/]{1,16}$/);
+const Endpoint = z.string().regex(/^[a-z][a-z0-9_]{0,23}\.[A-Za-z0-9_+\-/.]{1,16}$/); // pin ids may contain dots, e.g. "rfid.3.3V"
 
 export const WIRE_COLORS = ["red", "black", "yellow", "orange", "green", "blue", "purple", "white", "gray", "brown", "pink", "cyan"] as const;
 
