@@ -33,6 +33,7 @@ function avr328Caps(n: number): PinCap[] {
   if (n === 11) c.push("spi_mosi");
   if (n === 12) c.push("spi_miso");
   if (n === 13) c.push("spi_sck");
+  if (n >= 2) c.push("onewire"); // OneWire is bit-banged: any digital pin except the USB serial pins
   return c;
 }
 function avr328Analog(n: number): PinCap[] {
@@ -92,6 +93,7 @@ function megaCaps(n: number): PinCap[] {
   if (n === 51) c.push("spi_mosi");
   if (n === 52) c.push("spi_sck");
   if (n === 53) c.push("spi_cs");
+  if (n >= 2) c.push("onewire"); // OneWire is bit-banged: any digital pin except the USB serial pins
   return c;
 }
 const MEGA_LABELS: Record<number, string> = {

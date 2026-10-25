@@ -3,7 +3,17 @@ insert into public.projects (slug, title, platform, difficulty, components_requi
   ('obstacle-avoiding-robot', 'Obstacle Avoiding Robot', 'arduino', 'intermediate', array['Arduino Uno R3','HC-SR04 ultrasonic sensor','SG90 micro servo','L298N motor driver','TT gear motor','2× 18650 battery pack','LM2596 buck converter','TB6612FNG driver'], 250, true),
   ('line-follower', 'PID Line Follower', 'arduino', 'intermediate', array['Arduino Nano','TCRT5000 IR sensor module','L298N motor driver','N20 / TT DC gear motor','2× 18650 battery pack','Black electrical tape (19 mm)'], 200, true),
   ('iot-plant-care', 'IoT Plant Care Station', 'esp32', 'beginner', array['ESP32 DevKit V1','Capacitive soil moisture sensor v1.2','DHT22 (AM2302)','SSD1306 OLED 0.96″ I²C','1-channel 5 V relay module','5 V submersible pump + tubing','10 kΩ resistor','5 V 2 A USB supply'], 180, true),
-  ('pedestrian-traffic-light', 'Pedestrian Traffic Light', 'arduino', 'beginner', array['Arduino Uno R3','LED 5 mm (needs series resistor)','Resistor (¼ W)','Tactile push button 6×6 mm'], 120, true)
+  ('automatic-night-light', 'Automatic Night Light', 'arduino', 'beginner', array['Arduino Nano','Photoresistor (LDR, GL5528)','Resistor (¼ W)','LED 5 mm (needs series resistor)'], 120, true),
+  ('digital-dice', 'Digital Dice', 'arduino', 'beginner', array['Arduino Uno R3','TM1637 4-digit 7-segment display','Tactile push button 6×6 mm','Active buzzer (5 V, beeps on DC)'], 140, true),
+  ('lcd-thermometer-ds18b20', 'LCD Thermometer with DS18B20', 'arduino', 'beginner', array['Arduino Uno R3','DS18B20 temperature sensor (needs 4.7 kΩ pull-up)','Resistor (¼ W)','LCD 1602 with I2C backpack (PCF8574)'], 150, true),
+  ('led-chaser-knight-rider', 'Knight Rider LED Chaser', 'arduino', 'beginner', array['Arduino Uno R3','LED 5 mm (needs series resistor)','Resistor (¼ W)','Potentiometer 10 kΩ'], 110, true),
+  ('morse-code-beacon', 'Morse Code Beacon', 'arduino', 'beginner', array['Arduino Uno R3','Tactile push button 6×6 mm','Active buzzer (5 V, beeps on DC)','LED 5 mm (needs series resistor)','Resistor (¼ W)'], 150, true),
+  ('parking-distance-sensor', 'Parking Distance Sensor', 'arduino', 'beginner', array['Arduino Uno R3','HC-SR04 ultrasonic sensor','Passive buzzer (needs tone/PWM)','LED 5 mm (needs series resistor)','Resistor (¼ W)'], 150, true),
+  ('pedestrian-traffic-light', 'Pedestrian Traffic Light', 'arduino', 'beginner', array['Arduino Uno R3','LED 5 mm (needs series resistor)','Resistor (¼ W)','Tactile push button 6×6 mm'], 120, true),
+  ('reaction-time-game', 'Reaction Time Game', 'arduino', 'beginner', array['Arduino Uno R3','LED 5 mm (needs series resistor)','Resistor (¼ W)','Tactile push button 6×6 mm','Passive buzzer (needs tone/PWM)'], 120, true),
+  ('rgb-mood-lamp', 'RGB Mood Lamp', 'arduino', 'beginner', array['Arduino Nano','RGB LED 5 mm (common cathode)','Resistor (¼ W)','Potentiometer 10 kΩ','Tactile push button 6×6 mm'], 130, true),
+  ('simon-says-memory-game', 'Simon Says Memory Game', 'arduino', 'intermediate', array['Arduino Uno R3','LED 5 mm (needs series resistor)','Resistor (¼ W)','Tactile push button 6×6 mm','Passive buzzer (needs tone/PWM)'], 220, true),
+  ('ultrasonic-radar', 'Ultrasonic Radar Sweep', 'arduino', 'beginner', array['Arduino Uno R3','HC-SR04 ultrasonic sensor','SG90 micro servo','MB102 breadboard power module','9 V battery (PP3) with snap'], 170, true)
 on conflict (slug) do update set
   title = excluded.title, platform = excluded.platform, difficulty = excluded.difficulty,
   components_required = excluded.components_required, xp_reward = excluded.xp_reward, is_published = true;
