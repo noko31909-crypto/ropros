@@ -485,10 +485,10 @@ export const COMPONENTS: Record<ComponentId, ComponentDef> = {
 
   // Actuators & drivers
   "servo-sg90": c("servo-sg90", { name: "SG90 micro servo", category: "Actuators", kind: "module", supply: { min: 4.8, max: 6 }, drawMa: 650,
-    pins: [gnd("GND", "left", "GND (brown)"), vcc("VCC", "left", "VCC (red)"), inp("SIG", "left", ["pwm"], "SIG (orange)")],
+    pins: [gnd("GND", "left", "GND (brown)"), vcc("VCC", "left", "VCC (red)"), inp("SIG", "left", ["digital"], "SIG (orange)") /* Servo.h / ESP32Servo drive any digital pin */],
     draw: { w: 8, h: 4, color: "#1565C0", textColor: "#FFFFFF" }, finderPartId: "sg90" }),
   "servo-mg996r": c("servo-mg996r", { name: "MG996R metal-gear servo", category: "Actuators", kind: "module", supply: { min: 4.8, max: 6.6 }, drawMa: 1500,
-    pins: [gnd("GND", "left", "GND (brown)"), vcc("VCC", "left", "VCC (red)"), inp("SIG", "left", ["pwm"], "SIG (orange)")],
+    pins: [gnd("GND", "left", "GND (brown)"), vcc("VCC", "left", "VCC (red)"), inp("SIG", "left", ["digital"], "SIG (orange)") /* Servo.h / ESP32Servo drive any digital pin */],
     draw: { w: 14, h: 7, color: "#212121", textColor: "#FFFFFF" }, finderPartId: "mg996r" }),
   "dc-motor": c("dc-motor", { name: "DC gear motor (TT, 3–6 V)", category: "Actuators", kind: "module", supply: { min: 3, max: 6 }, drawMa: 800,
     pins: motorLeads(), draw: { w: 7, h: 4, color: "#FBC02D", textColor: "#111111" }, finderPartId: "tt" }),

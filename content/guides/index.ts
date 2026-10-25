@@ -5,12 +5,14 @@ import g_automatic_night_light from "./automatic-night-light.ts";
 import g_battery_18650_checker from "./battery-18650-checker.ts";
 import g_bedside_alarm_clock from "./bedside-alarm-clock.ts";
 import g_bike_speedometer_hall from "./bike-speedometer-hall.ts";
+import g_bluetooth_rc_car from "./bluetooth-rc-car.ts";
 import g_camera_slider_nema17 from "./camera-slider-nema17.ts";
 import g_dc_motor_speed_controller from "./dc-motor-speed-controller.ts";
 import g_desk_clock_ds3231 from "./desk-clock-ds3231.ts";
 import g_digital_compass from "./digital-compass.ts";
 import g_digital_dice from "./digital-dice.ts";
 import g_digital_kitchen_scale from "./digital-kitchen-scale.ts";
+import g_edge_avoiding_desk_robot from "./edge-avoiding-desk-robot.ts";
 import g_eight_key_piano from "./eight-key-piano.ts";
 import g_encoder_led_dimmer from "./encoder-led-dimmer.ts";
 import g_esp32_air_quality_monitor from "./esp32-air-quality-monitor.ts";
@@ -34,9 +36,11 @@ import g_esp32_weather_dashboard from "./esp32-weather-dashboard.ts";
 import g_esp32_wifi_led_lamp from "./esp32-wifi-led-lamp.ts";
 import g_esp32_wifi_relay_switch from "./esp32-wifi-relay-switch.ts";
 import g_flame_detector_alarm from "./flame-detector-alarm.ts";
+import g_four_wheel_drive_rover from "./four-wheel-drive-rover.ts";
 import g_gas_leak_alarm_mq2 from "./gas-leak-alarm-mq2.ts";
 import g_gps_speedometer from "./gps-speedometer.ts";
 import g_haptic_reminder_band from "./haptic-reminder-band.ts";
+import g_ir_remote_car from "./ir-remote-car.ts";
 import g_ir_remote_decoder from "./ir-remote-decoder.ts";
 import g_keypad_door_lock from "./keypad-door-lock.ts";
 import g_keypad_safe_lock from "./keypad-safe-lock.ts";
@@ -44,7 +48,9 @@ import g_laser_tape_measure from "./laser-tape-measure.ts";
 import g_lcd_thermometer_ds18b20 from "./lcd-thermometer-ds18b20.ts";
 import g_led_chaser_knight_rider from "./led-chaser-knight-rider.ts";
 import g_led_strip_effects from "./led-strip-effects.ts";
+import g_light_seeking_robot from "./light-seeking-robot.ts";
 import g_light_theremin from "./light-theremin.ts";
+import g_mini_sumo_robot from "./mini-sumo-robot.ts";
 import g_morse_code_beacon from "./morse-code-beacon.ts";
 import g_mp3_player_dfplayer from "./mp3-player-dfplayer.ts";
 import g_nrf24_wireless_sensor_link from "./nrf24-wireless-sensor-link.ts";
@@ -64,11 +70,14 @@ import g_pico_reaction_game from "./pico-reaction-game.ts";
 import g_pico_servo_radar from "./pico-servo-radar.ts";
 import g_pico_weather_station from "./pico-weather-station.ts";
 import g_pulse_oximeter_max30102 from "./pulse-oximeter-max30102.ts";
+import g_quadruped_walker from "./quadruped-walker.ts";
 import g_rain_alert_window_reminder from "./rain-alert-window-reminder.ts";
 import g_reaction_time_game from "./reaction-time-game.ts";
 import g_rfid_access_control from "./rfid-access-control.ts";
 import g_rgb_mood_lamp from "./rgb-mood-lamp.ts";
+import g_robot_arm from "./robot-arm.ts";
 import g_sd_card_climate_logger from "./sd-card-climate-logger.ts";
+import g_self_balancing_robot from "./self-balancing-robot.ts";
 import g_servo_knob_control from "./servo-knob-control.ts";
 import g_simon_says_memory_game from "./simon-says-memory-game.ts";
 import g_smart_street_light from "./smart-street-light.ts";
@@ -80,6 +89,7 @@ import g_stepper_turntable from "./stepper-turntable.ts";
 import g_temperature_controlled_fan from "./temperature-controlled-fan.ts";
 import g_tilt_alarm_mpu6050 from "./tilt-alarm-mpu6050.ts";
 import g_ultrasonic_radar from "./ultrasonic-radar.ts";
+import g_wall_follower_maze_robot from "./wall-follower-maze-robot.ts";
 import g_water_tank_level_alarm from "./water-tank-level-alarm.ts";
 import g_weather_station_oled from "./weather-station-oled.ts";
 
@@ -89,12 +99,14 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_battery_18650_checker,
   g_bedside_alarm_clock,
   g_bike_speedometer_hall,
+  g_bluetooth_rc_car,
   g_camera_slider_nema17,
   g_dc_motor_speed_controller,
   g_desk_clock_ds3231,
   g_digital_compass,
   g_digital_dice,
   g_digital_kitchen_scale,
+  g_edge_avoiding_desk_robot,
   g_eight_key_piano,
   g_encoder_led_dimmer,
   g_esp32_air_quality_monitor,
@@ -118,9 +130,11 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_esp32_wifi_led_lamp,
   g_esp32_wifi_relay_switch,
   g_flame_detector_alarm,
+  g_four_wheel_drive_rover,
   g_gas_leak_alarm_mq2,
   g_gps_speedometer,
   g_haptic_reminder_band,
+  g_ir_remote_car,
   g_ir_remote_decoder,
   g_keypad_door_lock,
   g_keypad_safe_lock,
@@ -128,7 +142,9 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_lcd_thermometer_ds18b20,
   g_led_chaser_knight_rider,
   g_led_strip_effects,
+  g_light_seeking_robot,
   g_light_theremin,
+  g_mini_sumo_robot,
   g_morse_code_beacon,
   g_mp3_player_dfplayer,
   g_nrf24_wireless_sensor_link,
@@ -148,11 +164,14 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_pico_servo_radar,
   g_pico_weather_station,
   g_pulse_oximeter_max30102,
+  g_quadruped_walker,
   g_rain_alert_window_reminder,
   g_reaction_time_game,
   g_rfid_access_control,
   g_rgb_mood_lamp,
+  g_robot_arm,
   g_sd_card_climate_logger,
+  g_self_balancing_robot,
   g_servo_knob_control,
   g_simon_says_memory_game,
   g_smart_street_light,
@@ -164,6 +183,7 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_temperature_controlled_fan,
   g_tilt_alarm_mpu6050,
   g_ultrasonic_radar,
+  g_wall_follower_maze_robot,
   g_water_tank_level_alarm,
   g_weather_station_oled,
 ];
