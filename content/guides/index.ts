@@ -18,11 +18,15 @@ import g_encoder_led_dimmer from "./encoder-led-dimmer.ts";
 import g_esp32_air_quality_monitor from "./esp32-air-quality-monitor.ts";
 import g_esp32_aquarium_thermometer from "./esp32-aquarium-thermometer.ts";
 import g_esp32_ble_gamepad from "./esp32-ble-gamepad.ts";
+import g_esp32_bluetooth_tank from "./esp32-bluetooth-tank.ts";
+import g_esp32_cam_fpv_rover from "./esp32-cam-fpv-rover.ts";
 import g_esp32_cam_security_camera from "./esp32-cam-security-camera.ts";
 import g_esp32_current_monitor_acs712 from "./esp32-current-monitor-acs712.ts";
 import g_esp32_epaper_calendar from "./esp32-epaper-calendar.ts";
+import g_esp32_espnow_remote from "./esp32-espnow-remote.ts";
 import g_esp32_garage_door_monitor from "./esp32-garage-door-monitor.ts";
 import g_esp32_gps_tracker from "./esp32-gps-tracker.ts";
+import g_esp32_line_follower_web_tuning from "./esp32-line-follower-web-tuning.ts";
 import g_esp32_lora_sensor_node from "./esp32-lora-sensor-node.ts";
 import g_esp32_mqtt_motion_sensor from "./esp32-mqtt-motion-sensor.ts";
 import g_esp32_nursery_monitor from "./esp32-nursery-monitor.ts";
@@ -33,8 +37,13 @@ import g_esp32_smart_doorbell from "./esp32-smart-doorbell.ts";
 import g_esp32_telegram_door_alarm from "./esp32-telegram-door-alarm.ts";
 import g_esp32_touch_light_switch from "./esp32-touch-light-switch.ts";
 import g_esp32_weather_dashboard from "./esp32-weather-dashboard.ts";
+import g_esp32_web_robot_arm from "./esp32-web-robot-arm.ts";
 import g_esp32_wifi_led_lamp from "./esp32-wifi-led-lamp.ts";
 import g_esp32_wifi_relay_switch from "./esp32-wifi-relay-switch.ts";
+import g_esp32_wifi_robot_car from "./esp32-wifi-robot-car.ts";
+import g_esp8266_matrix_clock from "./esp8266-matrix-clock.ts";
+import g_esp8266_smart_plug_lowvoltage from "./esp8266-smart-plug-lowvoltage.ts";
+import g_esp8266_wifi_thermometer from "./esp8266-wifi-thermometer.ts";
 import g_flame_detector_alarm from "./flame-detector-alarm.ts";
 import g_four_wheel_drive_rover from "./four-wheel-drive-rover.ts";
 import g_gas_leak_alarm_mq2 from "./gas-leak-alarm-mq2.ts";
@@ -50,6 +59,7 @@ import g_led_chaser_knight_rider from "./led-chaser-knight-rider.ts";
 import g_led_strip_effects from "./led-strip-effects.ts";
 import g_light_seeking_robot from "./light-seeking-robot.ts";
 import g_light_theremin from "./light-theremin.ts";
+import g_mecanum_rover from "./mecanum-rover.ts";
 import g_mini_sumo_robot from "./mini-sumo-robot.ts";
 import g_morse_code_beacon from "./morse-code-beacon.ts";
 import g_mp3_player_dfplayer from "./mp3-player-dfplayer.ts";
@@ -112,11 +122,15 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_esp32_air_quality_monitor,
   g_esp32_aquarium_thermometer,
   g_esp32_ble_gamepad,
+  g_esp32_bluetooth_tank,
+  g_esp32_cam_fpv_rover,
   g_esp32_cam_security_camera,
   g_esp32_current_monitor_acs712,
   g_esp32_epaper_calendar,
+  g_esp32_espnow_remote,
   g_esp32_garage_door_monitor,
   g_esp32_gps_tracker,
+  g_esp32_line_follower_web_tuning,
   g_esp32_lora_sensor_node,
   g_esp32_mqtt_motion_sensor,
   g_esp32_nursery_monitor,
@@ -127,8 +141,13 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_esp32_telegram_door_alarm,
   g_esp32_touch_light_switch,
   g_esp32_weather_dashboard,
+  g_esp32_web_robot_arm,
   g_esp32_wifi_led_lamp,
   g_esp32_wifi_relay_switch,
+  g_esp32_wifi_robot_car,
+  g_esp8266_matrix_clock,
+  g_esp8266_smart_plug_lowvoltage,
+  g_esp8266_wifi_thermometer,
   g_flame_detector_alarm,
   g_four_wheel_drive_rover,
   g_gas_leak_alarm_mq2,
@@ -144,6 +163,7 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_led_strip_effects,
   g_light_seeking_robot,
   g_light_theremin,
+  g_mecanum_rover,
   g_mini_sumo_robot,
   g_morse_code_beacon,
   g_mp3_player_dfplayer,
