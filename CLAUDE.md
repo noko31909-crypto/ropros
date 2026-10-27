@@ -6,7 +6,7 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
 ## Stack
 - Next.js (App Router) + TypeScript (strict) + Tailwind CSS v4 + lucide-react
 - Supabase (Postgres + Auth + Storage). Schema: `supabase/migrations/0001_init.sql` + `0002_security_hardening.sql`
-  (dashboard copies in `supabase/dashboard/`; keep their comments free of quotes and semicolons for the SQL editor)
+  (dashboard copies in `supabase/dashboard/` (6a–6e, run in order; max 2 functions per file, unique dollar tags — the SQL editor mis-parses bigger scripts); keep their comments free of quotes and semicolons for the SQL editor)
 - zod for every external input. Versions are pinned exactly in package.json; verify they are current before installing.
 
 ## Design system (do not drift)

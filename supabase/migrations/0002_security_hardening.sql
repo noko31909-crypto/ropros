@@ -29,7 +29,7 @@ revoke all on public.post_usage from anon, authenticated;
 create index if not exists community_posts_image_idx on public.community_posts (image_url);
 
 create or replace function public.check_new_post() returns trigger
-language plpgsql security definer set search_path = '' as $fn$
+language plpgsql security definer set search_path = '' as $check_new_post$
 declare
   used integer;
 begin
@@ -54,7 +54,7 @@ begin
     raise exception 'post limit reached' using errcode = '54000';
   end if;
   return new;
-end $fn$;
+end $check_new_post$;
 drop trigger if exists community_posts_check on public.community_posts;
 create trigger community_posts_check before insert on public.community_posts
   for each row execute function public.check_new_post();
@@ -64,7 +64,7 @@ revoke execute on function public.check_new_post() from public, anon, authentica
 -- The share flow uploads a photo and posts it right away, so honest users never hold more than one.
 -- The per-user lock makes parallel uploads queue up, so a burst cannot slip past the count.
 create or replace function public.community_upload_allowed() returns boolean
-language plpgsql security definer set search_path = '' as $fn$
+language plpgsql security definer set search_path = '' as $community_upload_allowed$
 declare
   uid     uuid := auth.uid();
   waiting integer;
@@ -78,7 +78,7 @@ begin
    where o.bucket_id = 'community' and o.name like uid::text || '/%'
      and not exists (select 1 from public.community_posts p where p.image_url = o.name);
   return waiting < 5;
-end $fn$;
+end $community_upload_allowed$;
 revoke execute on function public.community_upload_allowed() from public, anon;
 grant  execute on function public.community_upload_allowed() to authenticated;
 
@@ -87,13 +87,13 @@ revoke update (avatar_url) on public.users from authenticated;
 
 -- ---------- 4. Display names ----------
 create or replace function public.is_reserved_name(p_name text) returns boolean
-language sql immutable set search_path = '' as $fn$
+language sql immutable set search_path = '' as $is_reserved_name$
   select p_name ~* '(ropros|admin|moderat|support|official|staff|system|security)'
-$fn$;
+$is_reserved_name$;
 
 -- Renames through the API cannot pick a staff-like name. The SQL editor (database owner) still can.
 create or replace function public.guard_user_rename() returns trigger
-language plpgsql set search_path = '' as $fn$
+language plpgsql set search_path = '' as $guard_user_rename$
 begin
   if new.name is distinct from old.name
      and current_user in ('anon', 'authenticated')
@@ -101,7 +101,7 @@ begin
     raise exception 'name reserved' using errcode = '23514';
   end if;
   return new;
-end $fn$;
+end $guard_user_rename$;
 drop trigger if exists users_guard_rename on public.users;
 create trigger users_guard_rename before update of name on public.users
   for each row execute function public.guard_user_rename();
@@ -109,7 +109,7 @@ revoke execute on function public.guard_user_rename() from public, anon, authent
 
 -- Sign-up profile: name from the sign-up form only, 8 random hex characters as suffix, retried on a clash.
 create or replace function public.handle_new_user() returns trigger
-language plpgsql security definer set search_path = '' as $fn$
+language plpgsql security definer set search_path = '' as $handle_new_user$
 declare
   clean text := left(regexp_replace(coalesce(new.raw_user_meta_data ->> 'name', ''), '[^A-Za-z0-9_.]', '', 'g'), 15);
   tries integer := 0;
@@ -129,12 +129,12 @@ begin
       end if;
     end;
   end loop;
-end $fn$;
+end $handle_new_user$;
 
 -- ---------- 5. Progress XP cap ----------
 create or replace function public.award_xp_capped(p_user uuid, p_reason text, p_ref uuid, p_amount integer, p_daily_cap integer)
 returns void
-language plpgsql security definer set search_path = '' as $fn$
+language plpgsql security definer set search_path = '' as $award_xp_capped$
 declare
   paid_today integer;
 begin
@@ -146,14 +146,14 @@ begin
   if paid_today < p_daily_cap then
     perform public.award_xp(p_user, p_reason, p_ref, p_amount);
   end if;
-end $fn$;
+end $award_xp_capped$;
 revoke execute on function public.award_xp_capped(uuid, text, uuid, integer, integer) from public, anon, authenticated;
 
 -- Same as 0001 except the two award lines, which now go through the daily cap.
 -- A guide that was not paid today still pays when it is completed again on a later day.
 create or replace function public.record_progress(p_project uuid, p_action text)
 returns table (status public.progress_status, is_completed boolean, xp integer, level integer)
-language plpgsql security definer set search_path = '' as $fn$
+language plpgsql security definer set search_path = '' as $record_progress$
 #variable_conflict use_column
 declare
   uid        uuid := auth.uid();
@@ -196,7 +196,7 @@ begin
     select up.status, up.is_completed, u.xp, u.level
       from public.user_progress up join public.users u on u.id = up.user_id
      where up.user_id = uid and up.project_id = p_project;
-end $fn$;
+end $record_progress$;
 
 -- ---------- 6. Assistant daily quota ----------
 create table if not exists public.assistant_usage (
@@ -215,7 +215,7 @@ create policy assistant_usage_read_own on public.assistant_usage for select to a
 -- Counts one request for the caller and says whether it fits under the daily limit.
 -- The caller is always auth.uid(). Calling it directly only spends your own quota.
 create or replace function public.consume_assistant_quota(p_daily_limit integer) returns boolean
-language plpgsql security definer set search_path = '' as $fn$
+language plpgsql security definer set search_path = '' as $consume_assistant_quota$
 declare
   uid  uuid := auth.uid();
   used integer;
@@ -230,7 +230,7 @@ begin
     where au.requests < greatest(1, least(p_daily_limit, 1000))
   returning au.requests into used;
   return used is not null;
-end $fn$;
+end $consume_assistant_quota$;
 revoke execute on function public.consume_assistant_quota(integer) from public, anon;
 grant  execute on function public.consume_assistant_quota(integer) to authenticated;
 
