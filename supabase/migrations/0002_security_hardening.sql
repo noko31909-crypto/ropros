@@ -1,5 +1,7 @@
 -- =====================================================================
--- ropros · security hardening (audit 2026-10-27). Safe to run once after 0001_init.sql.
+-- ropros · security hardening (audit 2026-10-27). Safe to run as often as you like:
+-- every statement either creates what is missing or replaces what is there, so a run that
+-- stops on an error can simply be run again after the cause is fixed.
 -- 1. Community photos are readable only while a post shows them, or by their owner.
 -- 2. New posts: the photo must be uploaded by the author, a linked project must be published,
 --    and at most 10 posts per user per UTC day (deleting a post does not give the slot back).
@@ -10,19 +12,12 @@
 -- 6. Progress XP: at most 3 completed and 5 simulated guides pay XP per user per UTC day.
 -- 7. Assistant quota per user per UTC day, counted in the database so all server instances share it.
 -- Every limit is enforced by one atomic statement or under a per-user lock, so parallel requests cannot overshoot.
+-- The two storage policies come last: they need ownership of storage.objects, which the SQL editor
+-- has and a plain database user may not, so everything else is already in place if they fail.
 -- =====================================================================
 
--- ---------- 1. Storage: no more listing every photo in the bucket ----------
-create index if not exists community_posts_image_idx on public.community_posts (image_url);
-
-drop policy if exists community_read on storage.objects;
-create policy community_read on storage.objects for select
-  using (bucket_id = 'community'
-         and ((storage.foldername(name))[1] = (select auth.uid())::text
-              or exists (select 1 from public.community_posts p where p.image_url = objects.name)));
-
--- ---------- 2. New posts ----------
-create table public.post_usage (
+-- ---------- 1. New posts ----------
+create table if not exists public.post_usage (
   user_id  uuid not null references public.users (id) on delete cascade,
   day      date not null,
   posts    integer not null default 0 check (posts >= 0),
@@ -31,7 +26,9 @@ create table public.post_usage (
 alter table public.post_usage enable row level security;
 revoke all on public.post_usage from anon, authenticated;
 
-create function public.check_new_post() returns trigger
+create index if not exists community_posts_image_idx on public.community_posts (image_url);
+
+create or replace function public.check_new_post() returns trigger
 language plpgsql security definer set search_path = '' as $fn$
 declare
   used integer;
@@ -58,14 +55,15 @@ begin
   end if;
   return new;
 end $fn$;
+drop trigger if exists community_posts_check on public.community_posts;
 create trigger community_posts_check before insert on public.community_posts
   for each row execute function public.check_new_post();
 revoke execute on function public.check_new_post() from public, anon, authenticated;
 
--- ---------- 3. Upload quota ----------
+-- ---------- 2. Upload quota ----------
 -- The share flow uploads a photo and posts it right away, so honest users never hold more than one.
 -- The per-user lock makes parallel uploads queue up, so a burst cannot slip past the count.
-create function public.community_upload_allowed() returns boolean
+create or replace function public.community_upload_allowed() returns boolean
 language plpgsql security definer set search_path = '' as $fn$
 declare
   uid     uuid := auth.uid();
@@ -84,23 +82,17 @@ end $fn$;
 revoke execute on function public.community_upload_allowed() from public, anon;
 grant  execute on function public.community_upload_allowed() to authenticated;
 
-drop policy if exists community_upload_own on storage.objects;
-create policy community_upload_own on storage.objects for insert to authenticated
-  with check (bucket_id = 'community'
-              and (storage.foldername(name))[1] = (select auth.uid())::text
-              and public.community_upload_allowed());
-
--- ---------- 4. Avatars ----------
+-- ---------- 3. Avatars ----------
 revoke update (avatar_url) on public.users from authenticated;
 
--- ---------- 5. Display names ----------
-create function public.is_reserved_name(p_name text) returns boolean
+-- ---------- 4. Display names ----------
+create or replace function public.is_reserved_name(p_name text) returns boolean
 language sql immutable set search_path = '' as $fn$
   select p_name ~* '(ropros|admin|moderat|support|official|staff|system|security)'
 $fn$;
 
 -- Renames through the API cannot pick a staff-like name. The SQL editor (database owner) still can.
-create function public.guard_user_rename() returns trigger
+create or replace function public.guard_user_rename() returns trigger
 language plpgsql set search_path = '' as $fn$
 begin
   if new.name is distinct from old.name
@@ -110,6 +102,7 @@ begin
   end if;
   return new;
 end $fn$;
+drop trigger if exists users_guard_rename on public.users;
 create trigger users_guard_rename before update of name on public.users
   for each row execute function public.guard_user_rename();
 revoke execute on function public.guard_user_rename() from public, anon, authenticated;
@@ -138,8 +131,8 @@ begin
   end loop;
 end $fn$;
 
--- ---------- 6. Progress XP cap ----------
-create function public.award_xp_capped(p_user uuid, p_reason text, p_ref uuid, p_amount integer, p_daily_cap integer)
+-- ---------- 5. Progress XP cap ----------
+create or replace function public.award_xp_capped(p_user uuid, p_reason text, p_ref uuid, p_amount integer, p_daily_cap integer)
 returns void
 language plpgsql security definer set search_path = '' as $fn$
 declare
@@ -205,8 +198,8 @@ begin
      where up.user_id = uid and up.project_id = p_project;
 end $fn$;
 
--- ---------- 7. Assistant daily quota ----------
-create table public.assistant_usage (
+-- ---------- 6. Assistant daily quota ----------
+create table if not exists public.assistant_usage (
   user_id   uuid not null references public.users (id) on delete cascade,
   day       date not null,
   requests  integer not null default 0 check (requests >= 0),
@@ -215,12 +208,13 @@ create table public.assistant_usage (
 alter table public.assistant_usage enable row level security;
 revoke all on public.assistant_usage from anon, authenticated;
 grant select on public.assistant_usage to authenticated;
+drop policy if exists assistant_usage_read_own on public.assistant_usage;
 create policy assistant_usage_read_own on public.assistant_usage for select to authenticated
   using (user_id = (select auth.uid()));
 
 -- Counts one request for the caller and says whether it fits under the daily limit.
 -- The caller is always auth.uid(). Calling it directly only spends your own quota.
-create function public.consume_assistant_quota(p_daily_limit integer) returns boolean
+create or replace function public.consume_assistant_quota(p_daily_limit integer) returns boolean
 language plpgsql security definer set search_path = '' as $fn$
 declare
   uid  uuid := auth.uid();
@@ -239,3 +233,16 @@ begin
 end $fn$;
 revoke execute on function public.consume_assistant_quota(integer) from public, anon;
 grant  execute on function public.consume_assistant_quota(integer) to authenticated;
+
+-- ---------- 7. Storage policies (last: these need ownership of storage.objects) ----------
+drop policy if exists community_read on storage.objects;
+create policy community_read on storage.objects for select
+  using (bucket_id = 'community'
+         and ((storage.foldername(name))[1] = (select auth.uid())::text
+              or exists (select 1 from public.community_posts p where p.image_url = objects.name)));
+
+drop policy if exists community_upload_own on storage.objects;
+create policy community_upload_own on storage.objects for insert to authenticated
+  with check (bucket_id = 'community'
+              and (storage.foldername(name))[1] = (select auth.uid())::text
+              and public.community_upload_allowed());
