@@ -2,6 +2,14 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { recentHistory, type ChatTurn } from "../lib/assistant/history.ts";
 import { parseAssistantRequest } from "../lib/assistant/request.ts";
+import { configuredModels } from "../lib/assistant/models.ts";
+
+test("OPENROUTER_MODEL takes a primary and ordered backups", () => {
+  assert.deepEqual(configuredModels(undefined), []);
+  assert.deepEqual(configuredModels("vendor/main"), ["vendor/main"]);
+  assert.deepEqual(configuredModels(" vendor/main , vendor/backup-1,vendor/backup:2 "), ["vendor/main", "vendor/backup-1", "vendor/backup:2"]);
+  assert.deepEqual(configuredModels("vendor/main,,vendor/main, not a model ,x"), ["vendor/main"]);
+});
 
 test("a normal chat request parses", () => {
   const r = parseAssistantRequest(JSON.stringify({ locale: "ru", guideSlug: "line-follower", messages: [{ role: "user", content: "Почему мотор дёргается?" }] }));
