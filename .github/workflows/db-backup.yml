@@ -1,0 +1,37 @@
+name: Database backup
+
+# Nightly encrypted copy of the Supabase database, kept 30 days as a workflow artifact.
+# Needs two repository secrets: SUPABASE_DB_URL (session pooler connection string) and BACKUP_PASSPHRASE.
+# Runs only on a schedule or by hand, never on pull requests, so the secrets never reach outside code.
+on:
+  schedule:
+    - cron: "41 21 * * *" # 21:41 UTC = 02:41 in Astana
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Dump and encrypt the database
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+          PG_DUMP: docker run --rm postgres:17 pg_dump
+        run: mkdir -p backup && supabase/backup/backup.sh backup
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ropros-db-${{ github.run_id }}
+          path: backup/*.gpg
+          retention-days: 30
+          if-no-files-found: error
