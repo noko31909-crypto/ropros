@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # Weekly update PRs; CI checks each one before you merge. Security fixes also arrive outside this schedule
+  # once Dependabot security updates are switched on in Settings -> Code security.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday

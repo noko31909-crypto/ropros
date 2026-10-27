@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { redactSecrets } from "../lib/assistant/redact.ts";
 import { isCrossSiteRequest, isJsonRequest } from "../lib/request-guard.ts";
 
-const TG = "123456789:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw1";
+// Obviously fake values in real-key shapes, so secret scanners never mistake them for leaks.
+const TG = "123456789:FAKE_TOKEN_FOR_TESTS_00000000000000";
 
 test("secrets in sketches are masked, the rest of the code is kept", () => {
   const sketch = [
@@ -27,10 +28,10 @@ test("secrets in sketches are masked, the rest of the code is kept", () => {
 });
 
 test("well-known key shapes and emails are masked anywhere in prose", () => {
-  const out = redactSecrets(`my bot is ${TG}, key sk-ant-api03-abcdefghijklmnopqrstuvwxyz, {"apiKey": "AIzaSyD-1234567890abcdefghijklmnopqrstu"}, mail jane.doe@example.com`);
+  const out = redactSecrets(`my bot is ${TG}, key sk-ant-FAKE-KEY-FOR-TESTS-ONLY-0000, {"apiKey": "AIzaFAKE_KEY_FOR_TESTS_0000000000000000"}, mail jane.doe@example.com`);
   assert.ok(!out.includes(TG));
-  assert.ok(!out.includes("sk-ant-api03"));
-  assert.ok(!out.includes("AIzaSyD"));
+  assert.ok(!out.includes("sk-ant-FAKE"));
+  assert.ok(!out.includes("AIzaFAKE"));
   assert.ok(out.includes("[email]") && !out.includes("jane.doe@"));
 });
 
