@@ -43,6 +43,7 @@ export const assistant = defineMessages({
     send: "Send",
     attached: "(attached code)",
     disclaimer: "Answers can be wrong. Check wiring against datasheets before powering.",
+    training: "Messages go to third-party AI providers and may be used to improve their models. Don't share personal data.",
     mockNote: "Preview: replies are canned demos until the server route is connected.",
     code: { lines: (n: number) => `${n} lines`, copy: "copy", copied: "copied", collapse: "collapse", showAll: (n: number) => `show all ${n} lines` },
     suggestions: [
@@ -93,6 +94,7 @@ export const assistant = defineMessages({
     send: "Отправить",
     attached: "(прикреплённый код)",
     disclaimer: "Ответы могут быть неточными. Сверяйте проводку с даташитами перед подачей питания.",
+    training: "Сообщения обрабатывают сторонние AI-провайдеры и могут использовать их для улучшения своих моделей. Не пишите личные данные.",
     mockNote: "Превью: ответы — заготовленные демо, пока не подключён серверный маршрут.",
     code: { lines: (n: number) => `${n} стр.`, copy: "копировать", copied: "скопировано", collapse: "свернуть", showAll: (n: number) => `показать все ${n} строк` },
     suggestions: [
@@ -143,6 +145,7 @@ export const assistant = defineMessages({
     send: "Жіберу",
     attached: "(тіркелген код)",
     disclaimer: "Жауаптар қате болуы мүмкін. Қуат бермес бұрын сымдарды даташиттермен салыстырыңыз.",
+    training: "Хабарламаларды үшінші тарап AI провайдерлері өңдейді және оларды өз модельдерін жақсарту үшін пайдалануы мүмкін. Жеке деректеріңізді жазбаңыз.",
     mockNote: "Превью: сервер маршруты қосылғанша жауаптар — дайын демо.",
     code: { lines: (n: number) => `${n} жол`, copy: "көшіру", copied: "көшірілді", collapse: "жию", showAll: (n: number) => `барлық ${n} жолды көрсету` },
     suggestions: [

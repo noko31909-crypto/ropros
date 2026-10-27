@@ -215,6 +215,7 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
           )}
         </div>
         <p className="mt-2 px-1 font-mono text-[10px] text-fg-subtle">{t.disclaimer}</p>
+        <p className="mt-1 px-1 font-mono text-[10px] text-fg-subtle">{t.training}</p>
       </form>
     </div>
   );
