@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { AUTH_COOKIE_OPTIONS, supabasePublicConfig } from "@/lib/supabase/public-config";
+import { TURNSTILE_ORIGIN } from "@/lib/turnstile";
 
 // Guide covers are served from this CDN (content/covers.json).
 const COVER_CDN = "https://d2ol7oe51mr4n9.cloudfront.net";
@@ -14,7 +15,8 @@ function contentSecurityPolicy(nonce: string, supabaseUrl: string): string {
   const dev = process.env.NODE_ENV === "development";
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? " 'unsafe-eval'" : ""}`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${TURNSTILE_ORIGIN}${dev ? " 'unsafe-eval'" : ""}`,
+    `frame-src ${TURNSTILE_ORIGIN}`,
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob: ${supabaseUrl} ${COVER_CDN} https://images.unsplash.com`,
     "font-src 'self'",

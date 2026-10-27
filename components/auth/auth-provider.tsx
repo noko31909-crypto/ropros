@@ -8,6 +8,7 @@ import { authMessages } from "@/lib/i18n/messages/auth";
 import { LEVEL_FLOORS } from "@/lib/i18n/messages/common";
 import { useMessages } from "@/components/i18n/locale-provider";
 import { useToast } from "@/components/ui/toast";
+import { Turnstile } from "@/components/auth/turnstile";
 
 /** Public profile row from public.users. XP and level are written only by database functions. */
 export type Profile = { id: string; name: string; xp: number; level: number };
@@ -93,6 +94,9 @@ function AuthModal({ reason, onClose }: { reason?: string; onClose: () => void }
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ tone: "error" | "info"; text: string } | null>(null);
+  // Turnstile token: Supabase checks it once CAPTCHA is on (Authentication → Attack Protection).
+  const [captcha, setCaptcha] = useState<string | null>(null);
+  const [captchaReset, setCaptchaReset] = useState(0);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -102,17 +106,20 @@ function AuthModal({ reason, onClose }: { reason?: string; onClose: () => void }
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!captcha) { setMessage({ tone: "error", text: t.captchaWait }); return; }
     setBusy(true); setMessage(null);
+    const captchaToken = captcha;
+    setCaptchaReset((n) => n + 1);   // a token works once: get a fresh one for the next attempt
     const supabase = getSupabaseBrowserClient();
     if (mode === "signin") {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } });
       setBusy(false);
       if (error) { setMessage({ tone: "error", text: error.message }); return; }
       toast(t.welcomeToast((data.user.user_metadata?.name as string | undefined) ?? email.split("@")[0] ?? ""));
       onClose();
       return;
     }
-    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name }, emailRedirectTo: window.location.origin } });
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name }, emailRedirectTo: window.location.origin, captchaToken } });
     setBusy(false);
     if (error) setMessage({ tone: "error", text: error.message });
     else if (!data.session) setMessage({ tone: "info", text: t.confirm });
@@ -143,8 +150,9 @@ function AuthModal({ reason, onClose }: { reason?: string; onClose: () => void }
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t.email} autoComplete="email" className={field} />
           <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t.password}
             autoComplete={mode === "signin" ? "current-password" : "new-password"} className={field} />
+          <Turnstile resetKey={captchaReset} onToken={setCaptcha} onError={() => setMessage({ tone: "error", text: t.captchaError })} />
           {message && <p className={clsx("text-sm", message.tone === "error" ? "text-accent" : "text-signal")}>{message.text}</p>}
-          <button type="submit" disabled={busy} className="h-11 w-full rounded-xl bg-accent text-sm font-semibold text-ink-950 shadow-glow hover:bg-accent-hover disabled:opacity-60">
+          <button type="submit" disabled={busy || !captcha} className="h-11 w-full rounded-xl bg-accent text-sm font-semibold text-ink-950 shadow-glow hover:bg-accent-hover disabled:opacity-60">
             {busy ? t.wait : mode === "signin" ? t.submitSignIn : t.submitRegister}
           </button>
         </form>
