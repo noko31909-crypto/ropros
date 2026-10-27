@@ -12,9 +12,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
-    formats: ["image/avif", "image/webp"],
-    // Allow photo hosts you actually use. Add your own CDN here too.
-    remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
+    // Covers and photos are plain <img> tags (pre-sized WebP from the CDN, signed Supabase URLs), so the
+    // optimizer stays off: /_next/image cannot be used to fetch or transform outside images.
+    unoptimized: true,
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

@@ -8,6 +8,12 @@ const DEFAULT_URL = "https://jwmaapbmsxzekbdnfbxf.supabase.co";
 const DEFAULT_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3bWFhcGJtc3h6ZWtiZG5mYnhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1NTgxODksImV4cCI6MjEwODEzNDE4OX0.8IO8g65Yvwdwm3f3sWtG9Fxr_xEoNgSJPRRoGMe_waI";
 
+/**
+ * Auth cookie flags for every Supabase client (merged over @supabase/ssr defaults, which omit Secure).
+ * HttpOnly stays off because the browser client reads the session; the CSP in proxy.ts guards against XSS.
+ */
+export const AUTH_COOKIE_OPTIONS = { path: "/", sameSite: "lax", secure: process.env.NODE_ENV === "production" } as const;
+
 // Pasted values often carry invisible characters; URLs and JWTs are plain ASCII.
 const clean = (v: string | undefined) => v?.replace(/[^\x21-\x7E]/g, "") || undefined;
 

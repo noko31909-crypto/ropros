@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+// No eval-based fast path: the Content-Security-Policy in proxy.ts forbids eval in the browser.
+z.config({ jitless: true });
+
 /** Matches the ropros project JSON schema (snake_case, as stored). */
 export const ProjectSchema = z.object({
   project_id: z.string().regex(/^[a-z0-9-]{3,64}$/),

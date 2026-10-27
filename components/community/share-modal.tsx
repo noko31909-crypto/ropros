@@ -60,7 +60,11 @@ export function ShareModal({ userId, onClose, onPublished }: { userId: string; o
     if (up.error) { setBusy(false); setError(t.errors.upload); return; }
     const { error: err } = await supabase.from("community_posts")
       .insert({ user_id: userId, title: clean, status, image_url: path, project_id: projectId || null });
-    if (err) { await supabase.storage.from("community").remove([path]); setBusy(false); setError(t.errors.publish); return; }
+    if (err) {
+      await supabase.storage.from("community").remove([path]); setBusy(false);
+      setError(err.code === "54000" ? t.errors.limit : t.errors.publish);   // 54000: 10 posts per 24 h (check_new_post)
+      return;
+    }
     onPublished();
   };
 

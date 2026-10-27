@@ -5,7 +5,8 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
 
 ## Stack
 - Next.js (App Router) + TypeScript (strict) + Tailwind CSS v4 + lucide-react
-- Supabase (Postgres + Auth + Storage). Schema: `supabase/migrations/0001_init.sql`
+- Supabase (Postgres + Auth + Storage). Schema: `supabase/migrations/0001_init.sql` + `0002_security_hardening.sql`
+  (dashboard copies in `supabase/dashboard/`; keep their comments free of quotes and semicolons for the SQL editor)
 - zod for every external input. Versions are pinned exactly in package.json; verify they are current before installing.
 
 ## Design system (do not drift)
@@ -36,12 +37,16 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
 3. Learning paths have no table yet: module progress is local-only and awards no XP.
 4. Replace placeholder data in `lib/projects.ts`, `lib/guides.ts`, `lib/finder/projects-data.ts` with Supabase queries.
 5. Done: daily cap of 3 rewarded posts per user (`reward_post()`).
-6. Rate limiter in `lib/rate-limit.ts` is in-memory; move to a shared store before multi-instance deploys.
+6. Rate limiter in `lib/rate-limit.ts` is in-memory (per-instance burst control only). Daily limits that matter live in
+   Postgres (0002): 10 posts, 5 photos waiting without a post, 3 completed / 5 simulated guides paying XP, assistant quota.
 
 ## Rules
 - Never trust ids from request bodies for ownership; use the verified session (`supabase.auth.getUser()`).
 - XP, levels, likes_count and progress are written only by DB functions/triggers. Never from the client.
 - No dangerouslySetInnerHTML for user or model content. No secrets with NEXT_PUBLIC_. No service-role key in client code.
+- Cookie-authenticated POST routes call `isCrossSiteRequest` and `isJsonRequest` (`lib/request-guard.ts`). Assistant input goes
+  through `parseAssistantRequest` (size and count before zod) and `redactSecrets` before any provider call.
+- The CSP in `proxy.ts` is nonce-based: no inline scripts or eval; a new image or API host must be added there.
 - No fake community activity in production: seed data belongs in dev fixtures only.
 - Before finishing a task: `npm run typecheck` and `npm test`.
 
