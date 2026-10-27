@@ -1,4 +1,5 @@
 import "server-only";
+import { configuredModels } from "./models.ts";
 
 type ModelInfo = { id: string; pricing?: { prompt?: string; completion?: string }; architecture?: { output_modalities?: string[] } };
 let cached: { at: number; ids: string[] } | undefined;
@@ -38,13 +39,13 @@ export class OpenRouterError extends Error {
  * The key stays on the server; callers pass only validated messages.
  */
 export async function* streamOpenRouter(messages: ChatMessage[], signal: AbortSignal): AsyncGenerator<string> {
-  const configured = process.env.OPENROUTER_MODEL?.trim();
-  const candidates = configured ? [configured] : await cheapestModels();
+  const configured = configuredModels(process.env.OPENROUTER_MODEL);
+  const candidates = configured.length ? configured : await cheapestModels();
   let res!: Response;
   for (const model of candidates) {
     res = await request(model, messages, signal);
-    // Unknown, retired or overloaded model: drop the cached list and try the next one.
-    if (![400, 404, 429, 503].includes(res.status)) break;
+    // Unknown, retired, overloaded or failing model: drop the cached list and try the next one.
+    if (![400, 404, 429, 500, 502, 503].includes(res.status)) break;
     if (res.status === 404) cached = undefined;
     console.error("openrouter model unavailable, trying next", { model, status: res.status, detail: (await res.text()).slice(0, 200) });
   }
