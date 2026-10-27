@@ -7,6 +7,7 @@ import { CodePreview, MessageContent } from "./message-content";
 import { useLocale, useMessages } from "@/components/i18n/locale-provider";
 import { useAuth } from "@/components/auth/auth-provider";
 import { assistant, type ReplyKey } from "@/lib/i18n/messages/assistant";
+import { MAX_CONTEXT_CHARS, MAX_MESSAGE_CHARS, recentHistory } from "@/lib/assistant/history";
 
 type Role = "user" | "assistant";
 type Message = { id: string; role: Role; text: string; attachment?: string; stopped?: boolean };
@@ -28,12 +29,15 @@ function pickReply(prompt: string, key?: ReplyKey): ReplyKey {
  * Streams a real answer from POST /api/assistant (the server holds the API key, validates, rate-limits and
  * adds the guide's wiring + code). Yields text chunks; throws LiveError with a reason the UI can show.
  */
-class LiveError extends Error { constructor(public reason: "demo" | "signIn" | "rateLimited" | "error") { super(reason); } }
+class LiveError extends Error { constructor(public reason: "demo" | "signIn" | "rateLimited" | "dailyLimit" | "error") { super(reason); } }
 async function* liveStream(body: unknown, signal: AbortSignal): AsyncGenerator<string> {
   const res = await fetch("/api/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal });
   if (res.status === 503) throw new LiveError("demo");
   if (res.status === 401) throw new LiveError("signIn");
-  if (res.status === 429) throw new LiveError("rateLimited");
+  if (res.status === 429) {
+    const { error } = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new LiveError(error === "daily_limit" ? "dailyLimit" : "rateLimited");
+  }
   if (!res.ok || !res.body) throw new LiveError("error");
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
@@ -82,10 +86,12 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
     setInput(""); setAttachment(""); setShowAttach(false); setStreaming(true);
     const ctrl = new AbortController(); abortRef.current = ctrl;
     const append = (chunk: string) => setMessages((m) => m.map((msg) => (msg.id === assistantId ? { ...msg, text: msg.text + chunk } : msg)));
-    const history = [...messages, { role: "user" as const, text: prompt || t.attached, attachment: att || undefined }]
+    // Same budget the server enforces, so long chats drop their oldest turns instead of failing.
+    const history = recentHistory([...messages, { role: "user" as const, text: prompt || t.attached, attachment: att || undefined }]
       .filter((m) => m.text.trim())
       .slice(-12)
-      .map((m) => ({ role: m.role, content: m.attachment ? `${m.text}\n\n\`\`\`\n${m.attachment}\n\`\`\`` : m.text }));
+      .map((m) => ({ role: m.role, content: (m.attachment ? `${m.text}\n\n\`\`\`\n${m.attachment}\n\`\`\`` : m.text).slice(0, MAX_MESSAGE_CHARS) })),
+      MAX_CONTEXT_CHARS);
     try {
       try {
         for await (const chunk of liveStream({ locale, guideSlug: context?.guideSlug, messages: history }, ctrl.signal)) {
@@ -95,6 +101,7 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
         if (ctrl.signal.aborted) { /* stopped by the user */ }
         else if (err instanceof LiveError && err.reason === "demo") append(t.live.demo);
         else if (err instanceof LiveError && err.reason === "signIn") { append(t.live.signIn); openAuth(t.live.signIn); }
+        else if (err instanceof LiveError && err.reason === "dailyLimit") append(t.live.dailyLimit);
         else append(err instanceof LiveError && err.reason === "rateLimited" ? t.live.rateLimited : t.live.error);
       }
       // Server status markers can arrive split across chunks, so translate them on the finished text.
@@ -131,6 +138,7 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
           <div className="pt-6 font-mono text-[13px] leading-6 text-fg-muted">
             <p><span className="text-signal">$</span> ropros assistant --help</p>
             <p className="mt-2 text-fg-subtle">{t.help}</p>
+            <p className="mt-2 text-fg-subtle">{t.privacy}</p>
             <p className="mt-4 text-fg-subtle"><span className="text-accent">↵</span> {t.keys.send} · <span className="text-accent">shift+↵</span> {t.keys.newline}{onClose && <> · <span className="text-accent">esc</span> {t.keys.close}</>}</p>
           </div>
         )}

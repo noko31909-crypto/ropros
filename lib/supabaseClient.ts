@@ -1,6 +1,6 @@
 import { createBrowserClient, createServerClient, type CookieOptions } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { supabasePublicConfig } from "@/lib/supabase/public-config";
+import { AUTH_COOKIE_OPTIONS, supabasePublicConfig } from "@/lib/supabase/public-config";
 
 /**
  * Shared Supabase client factories. Both use the public anon key only; every query is limited by RLS.
@@ -16,7 +16,7 @@ let browserClient: SupabaseClient | undefined;
 export function getSupabaseBrowserClient(): SupabaseClient {
   if (!browserClient) {
     const { url, anon } = env();
-    browserClient = createBrowserClient(url, anon);
+    browserClient = createBrowserClient(url, anon, { cookieOptions: AUTH_COOKIE_OPTIONS });
   }
   return browserClient;
 }
@@ -33,6 +33,7 @@ export type CookieAdapter = {
 export function createSupabaseServerClientFromCookies(store: CookieAdapter): SupabaseClient {
   const { url, anon } = env();
   return createServerClient(url, anon, {
+    cookieOptions: AUTH_COOKIE_OPTIONS,
     cookies: {
       getAll: () => store.getAll(),
       setAll: (list) => {

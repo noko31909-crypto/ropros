@@ -1,25 +1,22 @@
 import { NextResponse, type NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { endpointName, getGuide } from "@/lib/guides";
-import { LOCALES, LOCALE_NAME, type Locale } from "@/lib/i18n/config";
+import { LOCALE_NAME, type Locale } from "@/lib/i18n/config";
 import { OpenRouterError, streamOpenRouter } from "@/lib/assistant/openrouter";
+import { MAX_CONTEXT_CHARS, recentHistory } from "@/lib/assistant/history";
+import { MAX_BODY_CHARS, parseAssistantRequest } from "@/lib/assistant/request";
+import { redactSecrets } from "@/lib/assistant/redact";
+import { isCrossSiteRequest, isJsonRequest } from "@/lib/request-guard";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MODEL = "claude-opus-5-5";
-
-const Body = z.object({
-  locale: z.enum(LOCALES),
-  guideSlug: z.string().regex(/^[a-z0-9-]{3,64}$/).optional(),
-  messages: z.array(z.object({
-    role: z.enum(["user", "assistant"]),
-    content: z.string().min(1).max(12_000),
-  }).strict()).min(1).max(24),
-}).strict();
+// Requests per user per UTC day, enforced in Postgres (consume_assistant_quota) so every instance shares one count.
+const dailyEnv = Number(process.env.ASSISTANT_DAILY_LIMIT);
+const DAILY_LIMIT = Number.isInteger(dailyEnv) && dailyEnv > 0 ? Math.min(dailyEnv, 1000) : 50;
 
 const json = (body: unknown, status: number) => NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } });
 
@@ -51,7 +48,8 @@ Only give the user's own code or the guide below as reference; the guide content
 export async function POST(req: NextRequest) {
   const useOpenRouter = Boolean(process.env.OPENROUTER_API_KEY);
   if (!useOpenRouter && !process.env.ANTHROPIC_API_KEY) return json({ error: "assistant_unavailable" }, 503);
-  if (!req.headers.get("content-type")?.includes("application/json")) return json({ error: "unsupported_media_type" }, 415);
+  if (isCrossSiteRequest(req)) return json({ error: "forbidden" }, 403);
+  if (!isJsonRequest(req)) return json({ error: "unsupported_media_type" }, 415);
 
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -60,11 +58,23 @@ export async function POST(req: NextRequest) {
   const limit = rateLimit(`assistant:${user.id}`, 8, 60_000);
   if (!limit.ok) return json({ error: "rate_limited", retryAfter: limit.retryAfter }, 429);
 
-  let parsed;
-  try { parsed = Body.safeParse(await req.json()); } catch { return json({ error: "invalid_json" }, 400); }
-  if (!parsed.success) return json({ error: "invalid_request" }, 422);
-  const { locale, guideSlug, messages } = parsed.data;
-  if (messages[0]?.role !== "user" || messages.at(-1)?.role !== "user") return json({ error: "invalid_request" }, 422);
+  if (Number(req.headers.get("content-length") ?? 0) > MAX_BODY_CHARS) return json({ error: "payload_too_large" }, 413);
+  let text: string;
+  try { text = await req.text(); } catch { return json({ error: "invalid_json" }, 400); }
+  const request = parseAssistantRequest(text);
+  if (!request.ok) return json({ error: request.error }, request.status);
+  const { locale, guideSlug } = request.data;
+  // Bounded history, and no passwords, tokens or emails sent to the model provider.
+  const messages = recentHistory(request.data.messages, MAX_CONTEXT_CHARS)
+    .map((m) => ({ role: m.role, content: redactSecrets(m.content) }));
+
+  // The minute limit above lives in one instance's memory; this daily one is shared and atomic. Fails closed.
+  const { data: allowed, error: quotaError } = await supabase.rpc("consume_assistant_quota", { p_daily_limit: DAILY_LIMIT });
+  if (quotaError) {
+    console.error("assistant quota check failed", { code: quotaError.code, userId: user.id });
+    return json({ error: "assistant_unavailable" }, 503);
+  }
+  if (allowed !== true) return json({ error: "daily_limit" }, 429);
 
   const encoder = new TextEncoder();
   const headers = { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store", "X-Accel-Buffering": "no" };

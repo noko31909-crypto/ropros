@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { rateLimit } from "@/lib/rate-limit";
+import { isCrossSiteRequest, isJsonRequest } from "@/lib/request-guard";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,7 +20,8 @@ const json = (body: unknown, status = 200) => NextResponse.json(body, { status, 
  * never from the request body, and the database function enforces the rest.
  */
 export async function POST(req: NextRequest) {
-  if (!req.headers.get("content-type")?.includes("application/json")) return json({ error: "unsupported_media_type" }, 415);
+  if (isCrossSiteRequest(req)) return json({ error: "forbidden" }, 403);
+  if (!isJsonRequest(req)) return json({ error: "unsupported_media_type" }, 415);
 
   const supabase = await createSupabaseServerClient();
   // getUser() validates the JWT with Supabase Auth (getSession() alone only reads the cookie).

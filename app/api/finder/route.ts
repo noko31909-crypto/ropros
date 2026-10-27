@@ -3,6 +3,7 @@ import { FinderRequestSchema } from "@/lib/finder/schema";
 import { matchProjects } from "@/lib/finder/match";
 import { PROJECTS } from "@/lib/finder/projects-data";
 import { rateLimit } from "@/lib/rate-limit";
+import { isJsonRequest } from "@/lib/request-guard";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
   const limit = rateLimit(`finder:${clientKey(req)}`);
   if (!limit.ok) return json({ error: "rate_limited", message: "Too many requests. Try again shortly." }, 429, { "Retry-After": String(limit.retryAfter) });
 
-  if (!req.headers.get("content-type")?.includes("application/json")) {
+  if (!isJsonRequest(req)) {
     return json({ error: "unsupported_media_type", message: "Send JSON with Content-Type: application/json." }, 415);
   }
   const declared = Number(req.headers.get("content-length") ?? 0);
