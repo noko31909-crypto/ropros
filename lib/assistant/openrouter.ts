@@ -56,7 +56,32 @@ export async function* streamOpenRouter(messages: ChatMessage[], signal: AbortSi
   yield* readStream(res.body);
 }
 
-function request(model: string, messages: ChatMessage[], signal: AbortSignal): Promise<Response> {
+/**
+ * One non-streaming completion, for callers that need the whole reply before using it (the project generator).
+ * Same model order and fallback rules as streamOpenRouter; an empty reply also moves on to the next model.
+ */
+export async function completeOpenRouter(messages: ChatMessage[], signal: AbortSignal, maxTokens: number): Promise<{ text: string; truncated: boolean }> {
+  const configured = configuredModels(process.env.OPENROUTER_MODEL);
+  const candidates = configured.length ? configured : await cheapestModels();
+  let status = 502;
+  for (const model of candidates) {
+    const res = await request(model, messages, signal, { stream: false, maxTokens });
+    status = res.status;
+    if (!res.ok) {
+      if (res.status === 404) cached = undefined;
+      console.error("openrouter completion failed", { model, status: res.status, detail: (await res.text()).slice(0, 200) });
+      if ([400, 404, 429, 500, 502, 503].includes(res.status)) continue;
+      break;
+    }
+    const body = (await res.json().catch(() => ({}))) as { choices?: { message?: { content?: string | null }; finish_reason?: string | null }[] };
+    const text = body.choices?.[0]?.message?.content ?? "";
+    if (text.trim()) return { text, truncated: body.choices?.[0]?.finish_reason === "length" };
+    console.error("openrouter completion empty", { model });
+  }
+  throw new OpenRouterError(status);
+}
+
+function request(model: string, messages: ChatMessage[], signal: AbortSignal, opts: { stream: boolean; maxTokens: number } = { stream: true, maxTokens: 4000 }): Promise<Response> {
   return fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     signal,
@@ -69,8 +94,8 @@ function request(model: string, messages: ChatMessage[], signal: AbortSignal): P
     body: JSON.stringify({
       model,
       messages,
-      max_tokens: 4000,
-      stream: true,
+      max_tokens: opts.maxTokens,
+      stream: opts.stream,
     }),
   });
 }
