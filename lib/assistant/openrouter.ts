@@ -60,8 +60,8 @@ export async function* streamOpenRouter(messages: ChatMessage[], signal: AbortSi
  * One non-streaming completion, for callers that need the whole reply before using it (the project generator).
  * Same model order and fallback rules as streamOpenRouter; an empty reply also moves on to the next model.
  */
-export async function completeOpenRouter(messages: ChatMessage[], signal: AbortSignal, maxTokens: number): Promise<{ text: string; truncated: boolean }> {
-  const configured = configuredModels(process.env.OPENROUTER_MODEL);
+export async function completeOpenRouter(messages: ChatMessage[], signal: AbortSignal, maxTokens: number, models = process.env.OPENROUTER_MODEL): Promise<{ text: string; truncated: boolean }> {
+  const configured = configuredModels(models);
   const candidates = configured.length ? configured : await cheapestModels();
   let status = 502;
   for (const model of candidates) {
