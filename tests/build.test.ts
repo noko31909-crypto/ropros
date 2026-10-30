@@ -141,21 +141,37 @@ test("generator: a messy but usable reply is tidied instead of rejected", async 
   assert.equal(r.project.connections.length, 3);
   assert.equal(r.project.code[0]!.language, "cpp");
   assert.ok(!r.project.code[0]!.source.includes("```"));
-  assert.deepEqual(r.project.cad.parts[0]!.shapes?.[1], { type: "cylinder", r: 1.6, h: 10, at: [10, 10, 0], subtract: true });
+  assert.equal(r.project.cad.parts[0]!.name, "Enclosure", "the 3D model is built from the parts, whatever the reply had");
 });
 
-test("wheels: TT motors without wheels get one on the outer shaft end, plus a caster", async () => {
-  const { addMissingWheels } = await import("../lib/build/enrich.ts");
-  const robot = { ...blink, cad: { parts: [
-    { name: "Plate", color: "#dddddd", printed: true, step: 1, shapes: [{ type: "box" as const, size: [160, 110, 3] as [number, number, number], at: [0, 0, 30] as [number, number, number] }] },
-    { name: "Left motor", color: "#f2c200", printed: false, step: 2, component: "dc-motor" as const, at: [-10, 38, 10] as [number, number, number] },
-    { name: "Right motor", color: "#f2c200", printed: false, step: 2, component: "dc-motor" as const, at: [-10, -38, 10] as [number, number, number] },
-  ] } };
-  const out = addMissingWheels(robot).cad.parts;
-  const wheels = out.filter((p) => p.name.startsWith("Wheel"));
-  assert.equal(wheels.length, 2);
-  assert.ok(wheels[0]!.shapes![0]!.at[1] > 38 && wheels[1]!.shapes![0]!.at[1] < -38, "wheels sit outside the motors");
-  assert.ok(out.some((p) => p.name === "Ball caster"));
-  const again = addMissingWheels({ ...robot, cad: { parts: out } }).cad.parts;
-  assert.equal(again.length, out.length, "no second set of wheels");
+test("auto 3D: a rover gets a plate, motors, a wheel per motor and a caster; an enclosure gets a case, lid and USB cut-out", async () => {
+  const { autoCad } = await import("../lib/build/layout.ts");
+  const { ProjectSchema } = await import("../lib/build/schema.ts");
+  const { cad: _cad, ...input } = blink;
+  const rover = autoCad({ ...input, parts: [...input.parts, { component: "dc-motor", name: "TT motor", qty: 2, spec: "3-6 V" }, { component: "hc-sr04", name: "HC-SR04", qty: 1, spec: "5 V" }] }, "ru");
+  assert.equal(rover.parts.filter((p) => p.component === "dc-motor").length, 2);
+  assert.equal(rover.parts.filter((p) => p.name.startsWith("Колесо")).length, 2);
+  assert.ok(rover.parts.some((p) => p.name === "Шаровая опора"));
+  assert.ok(rover.parts.find((p) => p.component === "hc-sr04")!.at![0] > 60, "sensor at the front");
+  const box = autoCad(input, "en");
+  assert.equal(box.parts[0]!.name, "Enclosure");
+  assert.ok(box.parts[0]!.shapes!.filter((s) => s.subtract).length >= 2, "cavity and USB cut-out");
+  assert.ok(box.parts.some((p) => p.name === "Lid"));
+  assert.equal(ProjectSchema.safeParse({ ...input, cad: rover }).success, true);
+  assert.equal(ProjectSchema.safeParse({ ...input, cad: box }).success, true);
+});
+
+test("auto 3D: every component, alone or crowded, gives a valid model on each board", async () => {
+  const { autoCad } = await import("../lib/build/layout.ts");
+  const { CadSchema } = await import("../lib/build/schema.ts");
+  const { cad: _cad, ...input } = blink;
+  for (const board of ["arduino-uno", "esp32-devkit", "raspberry-pi-4"] as const) {
+    for (const id of COMPONENT_IDS) {
+      const cad = autoCad({ ...input, board, parts: [{ component: board, name: board, qty: 1, spec: "-" }, { component: id, name: id, qty: 3, spec: "-" }] }, "en");
+      const r = CadSchema.safeParse(cad);
+      assert.ok(r.success, `${board} + ${id}: ${r.success ? "" : r.error.issues[0]?.message}`);
+    }
+    const crowded = autoCad({ ...input, board, parts: COMPONENT_IDS.map((id) => ({ component: id, name: id, qty: 2, spec: "-" })) }, "kk");
+    assert.ok(CadSchema.safeParse(crowded).success, `${board} crowded`);
+  }
 });

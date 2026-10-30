@@ -28,12 +28,6 @@ function num(v: unknown): number | undefined {
 }
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
 
-function vec3(v: unknown, lo: number, hi: number, fallback?: number): [number, number, number] | undefined {
-  const a = arr(v).map(num);
-  if (a.length !== 3 || a.some((x) => x === undefined)) return fallback === undefined ? undefined : [fallback, fallback, fallback];
-  return a.map((x) => clamp(x!, lo, hi)) as [number, number, number];
-}
-
 const lower = (v: unknown) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 
 function platform(v: unknown, board: string): string {
@@ -62,25 +56,6 @@ function language(v: unknown, filename: string): "cpp" | "python" | "bash" {
 
 const WIRES = new Set<string>(WIRE_COLORS);
 const component = (v: unknown) => { const s = lower(v); return isComponentId(s) ? s : undefined; };
-
-function shape(s: Obj): Obj | undefined {
-  const at = vec3(s.at ?? s.position ?? s.center, -500, 500, 0)!;
-  const rotate = vec3(s.rotate ?? s.rotation, -360, 360);
-  const extra = { at, ...(rotate && rotate.some((d) => d !== 0) ? { rotate } : {}), ...(s.subtract === true || s.hole === true ? { subtract: true } : {}) };
-  const type = lower(s.type);
-  if (type === "box" || type === "cube") {
-    const size = vec3(s.size ?? s.dimensions, 0.2, 400);
-    const radius = num(s.radius ?? s.r);
-    return size ? { type: "box", size, ...extra, ...(radius && radius > 0 ? { radius: clamp(radius, 0, 100) } : {}) } : undefined;
-  }
-  if (type === "cylinder" || type === "hole") {
-    const r = num(s.r ?? s.radius) ?? (num(s.d ?? s.diameter) ?? NaN) / 2;
-    const h = num(s.h ?? s.height);
-    if (!Number.isFinite(r) || h === undefined) return undefined;
-    return { type: "cylinder", r: clamp(r, 0.2, 200), h: clamp(h, 0.2, 400), ...extra, ...(type === "hole" ? { subtract: true } : {}) };
-  }
-  return undefined;
-}
 
 export function normalizeProject(raw: unknown): unknown {
   if (!isObj(raw)) return raw;
@@ -133,22 +108,6 @@ export function normalizeProject(raw: unknown): unknown {
     return [{ filename, language: lang, source, libraries }];
   }).slice(0, 4);
 
-  const cadRaw = isObj(p.cad) ? p.cad : {};
-  const cadParts = objs(cadRaw.parts).flatMap((cp, i): Obj[] => {
-    const color = typeof cp.color === "string" && /^#[0-9a-fA-F]{6}$/.test(cp.color.trim()) ? cp.color.trim() : ["#FF7A1A", "#2EE6C9", "#8B95A5", "#3A7BD5"][i % 4]!;
-    const stepNo = num(cp.step);
-    const common = { color, ...(stepNo !== undefined ? { step: Math.round(clamp(stepNo, 1, 16)) } : {}) };
-    const comp = component(cp.component);
-    if (comp) {
-      const rotate = vec3(cp.rotate ?? cp.rotation, -360, 360);
-      return [{ name: str(cp.name, 60) ?? comp, printed: false, component: comp, at: vec3(cp.at ?? cp.position, -500, 500, 0)!,
-        ...(rotate && rotate.some((d) => d !== 0) ? { rotate } : {}), ...common }];
-    }
-    const shapes = objs(cp.shapes).map(shape).filter((s): s is Obj => Boolean(s)).slice(0, 40);
-    if (!shapes.length) return [];
-    return [{ name: str(cp.name, 60) ?? `Part ${i + 1}`, printed: cp.printed !== false, shapes, ...common }];
-  }).slice(0, 16);
-
   return {
     title: str(p.title ?? p.name, 90),
     summary: str(p.summary ?? p.description, 400),
@@ -158,11 +117,6 @@ export function normalizeProject(raw: unknown): unknown {
     hours: clamp(num(p.hours ?? p.buildHours) ?? 3, 0.5, 80),
     costUsd: clamp(num(p.costUsd ?? p.cost) ?? 20, 1, 1000),
     parts, plan, instances, connections, assembly, code,
-    // No usable CAD at all: a plain base plate with M3 corner holes, so the rest of the project is not lost.
-    cad: { parts: cadParts.length ? cadParts : [{ name: "Base plate", color: "#FF7A1A", printed: true, shapes: [
-      { type: "box", size: [100, 70, 3], at: [0, 0, 1.5] },
-      ...[[-44, -29], [44, -29], [-44, 29], [44, 29]].map(([x, y]) => ({ type: "cylinder", r: 1.6, h: 8, at: [x, y, 1.5], subtract: true })),
-    ] }] },
     safety: arr(p.safety).map((s) => str(s, 300)).filter((s): s is string => Boolean(s)).slice(0, 6),
   };
 }
