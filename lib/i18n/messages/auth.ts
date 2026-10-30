@@ -7,7 +7,11 @@ export const authMessages = defineMessages({
     submitSignIn: "Sign in", submitRegister: "Create account", wait: "Please wait…",
     confirm: "Check your inbox to confirm your email, then sign in.",
     captchaWait: "One moment: checking that you're human.",
-    captchaError: "The human check didn't load. Reload the page and try again.",
+    captchaError: (reason: string) => reason === "blocked"
+      ? "The human check couldn't load: an ad blocker, privacy extension or network is blocking challenges.cloudflare.com. Allow it and reload."
+      : reason.startsWith("1102")
+        ? `The human check isn't set up for this address (error ${reason}). Open the site at its main address, or add this domain in Cloudflare Turnstile.`
+        : `The human check failed (error ${reason}). Reload the page and try again.`,
     perks: "Save progress, earn XP and share your builds.",
     welcomeToast: (n: string) => `Welcome, @${n}`, signedOut: "Signed out",
     needAuth: "Sign in to save progress and earn XP",
@@ -18,7 +22,11 @@ export const authMessages = defineMessages({
     submitSignIn: "Войти", submitRegister: "Создать аккаунт", wait: "Подождите…",
     confirm: "Проверьте почту и подтвердите адрес, затем войдите.",
     captchaWait: "Секунду: проверяем, что вы человек.",
-    captchaError: "Проверка не загрузилась. Обновите страницу и попробуйте снова.",
+    captchaError: (reason: string) => reason === "blocked"
+      ? "Проверка не загрузилась: блокировщик рекламы, расширение приватности или сеть блокирует challenges.cloudflare.com. Разрешите его и обновите страницу."
+      : reason.startsWith("1102")
+        ? `Проверка не настроена для этого адреса (ошибка ${reason}). Откройте сайт по основному адресу или добавьте домен в Cloudflare Turnstile.`
+        : `Проверка не прошла (ошибка ${reason}). Обновите страницу и попробуйте снова.`,
     perks: "Сохраняйте прогресс, получайте XP и делитесь сборками.",
     welcomeToast: (n: string) => `Добро пожаловать, @${n}`, signedOut: "Вы вышли",
     needAuth: "Войдите, чтобы сохранять прогресс и получать XP",
@@ -29,7 +37,11 @@ export const authMessages = defineMessages({
     submitSignIn: "Кіру", submitRegister: "Аккаунт құру", wait: "Күте тұрыңыз…",
     confirm: "Поштаңызды тексеріп, мекенжайды растаңыз, содан кейін кіріңіз.",
     captchaWait: "Бір сәт: адам екеніңізді тексеріп жатырмыз.",
-    captchaError: "Тексеру жүктелмеді. Бетті жаңартып, қайталап көріңіз.",
+    captchaError: (reason: string) => reason === "blocked"
+      ? "Тексеру жүктелмеді: жарнама блоктаушы, құпиялық кеңейтімі немесе желі challenges.cloudflare.com-ды бұғаттап тұр. Рұқсат етіп, бетті жаңартыңыз."
+      : reason.startsWith("1102")
+        ? `Тексеру бұл мекенжай үшін бапталмаған (қате ${reason}). Сайтты негізгі мекенжайы бойынша ашыңыз немесе доменді Cloudflare Turnstile-ға қосыңыз.`
+        : `Тексеру өтпеді (қате ${reason}). Бетті жаңартып, қайталап көріңіз.`,
     perks: "Прогресті сақтаңыз, XP жинаңыз және құрастыруларыңызбен бөлісіңіз.",
     welcomeToast: (n: string) => `Қош келдіңіз, @${n}`, signedOut: "Сіз шықтыңыз",
     needAuth: "Прогресті сақтап, XP алу үшін кіріңіз",
