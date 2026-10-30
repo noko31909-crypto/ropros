@@ -13,19 +13,33 @@ const vec3 = (min: number, max: number) => z.tuple([mm(min, max), mm(min, max), 
 
 const Rotation = vec3(-360, 360);
 const Shape = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("box"), size: vec3(0.2, 400), at: vec3(-500, 500), rotate: Rotation.optional(), subtract: z.boolean().optional() }).strict(),
+  z.object({
+    type: z.literal("box"), size: vec3(0.2, 400), at: vec3(-500, 500), rotate: Rotation.optional(), subtract: z.boolean().optional(),
+    /** Rounds the four vertical edges (enclosure corners). */
+    radius: mm(0, 100).optional(),
+  }).strict(),
   z.object({ type: z.literal("cylinder"), r: mm(0.2, 200), h: mm(0.2, 400), at: vec3(-500, 500), rotate: Rotation.optional(), subtract: z.boolean().optional() }).strict(),
 ]);
 export type CadShape = z.infer<typeof Shape>;
 
+const CadPart = z.object({
+  name: text(60),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  printed: z.boolean(),
+  /** Printed or custom parts: primitives in world coordinates. */
+  shapes: z.array(Shape).min(1).max(40).optional(),
+  /** Bought parts: a registry component drawn from its built-in model, its bottom-face centre placed at `at`. */
+  component: z.enum(COMPONENT_IDS).optional(),
+  at: vec3(-500, 500).optional(),
+  rotate: Rotation.optional(),
+  /** Assembly step (1-based) in which this part goes in; drives the assembly animation. */
+  step: z.number().int().min(1).max(16).optional(),
+}).strict().refine((p) => Boolean(p.shapes?.length) || Boolean(p.component), { message: "a part needs shapes or a component" });
+export type CadPart = z.infer<typeof CadPart>;
+
 export const CadSchema = z.object({
   /** Each part is one printable or bought piece: shapes are unioned, then `subtract` shapes are cut out. Millimetres, Z up. */
-  parts: z.array(z.object({
-    name: text(60),
-    color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
-    printed: z.boolean(),
-    shapes: z.array(Shape).min(1).max(40),
-  }).strict()).min(1).max(10),
+  parts: z.array(CadPart).min(1).max(16),
 }).strict();
 export type Cad = z.infer<typeof CadSchema>;
 

@@ -1,7 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { BuildRequestSchema, extractJson, ProjectSchema, type Project } from "../lib/build/schema.ts";
-import { cadBounds, cadTriangles, scadModuleName, toOpenScad, toStl } from "../lib/build/cad.ts";
+import { scadModuleName, toOpenScad } from "../lib/build/cad.ts";
+import { modelSizes, partModel } from "../lib/build/models.ts";
+import { COMPONENT_IDS } from "../lib/hardware/ids.ts";
 import { generateProject, type ChatMessage } from "../lib/build/generate.ts";
 import { buildSystemPrompt } from "../lib/build/prompt.ts";
 
@@ -61,15 +63,26 @@ test("OpenSCAD export: one module per part, holes subtracted, names sanitised", 
   assert.equal(scadModuleName("Крышка", 2), "part_3");
 });
 
-test("mesh: a box has 12 triangles, bounds ignore holes, STL leaves holes out", () => {
-  const tris = cadTriangles(blink.cad);
-  assert.equal(tris.filter((t) => !t.subtract).length, 12);
-  const { min, max } = cadBounds(tris);
-  assert.deepEqual(min, [-40, -30, 0]);
-  assert.deepEqual(max, [40, 30, 3]);
-  const stl = toStl(blink.cad);
-  assert.equal(stl.match(/facet normal/g)?.length, 12);
-  assert.match(stl, /^solid ropros\n/);
+test("OpenSCAD export: rounded boxes become hulls, bought parts are see-through references", () => {
+  const cad = { parts: [
+    { name: "Case", color: "#ff7a1a", printed: true, step: 1, shapes: [{ type: "box" as const, size: [80, 60, 30] as [number, number, number], at: [0, 0, 15] as [number, number, number], radius: 4 }] },
+    { name: "Uno", color: "#00878f", printed: false, step: 2, component: "arduino-uno" as const, at: [0, 0, 3] as [number, number, number], rotate: [0, 0, 90] as [number, number, number] },
+  ] };
+  const scad = toOpenScad(cad, "Case");
+  assert.match(scad, /hull\(\) \{ translate\(\[36, 26, 0\]\) cylinder\(r = 4/);
+  assert.match(scad, /translate\(\[0, 0, 3\]\) rotate\(\[0, 0, 90\]\) \{/);
+  assert.match(scad, /^% part_2_uno\(\);$/m);
+});
+
+test("every component has a 3D model with a positive size, sitting on z = 0", () => {
+  for (const id of COMPONENT_IDS) {
+    const m = partModel(id);
+    assert.ok(m.size.every((v) => v > 0), id);
+    assert.ok(m.prims.length > 0, id);
+    const bottom = Math.min(...m.prims.map((p) => p.at[2] - (p.type === "box" ? p.size[2] / 2 : p.type === "cylinder" && !("rotate" in p && p.rotate) ? p.h / 2 : p.type === "sphere" ? 0 : p.r)));
+    assert.ok(bottom > -0.5, `${id} starts below the plate (${bottom})`);
+  }
+  assert.match(modelSizes(), /arduino-uno 68\.6x53\.4x/);
 });
 
 test("generator: a valid first reply is used as is; the idea stays out of the system prompt", async () => {
@@ -128,5 +141,5 @@ test("generator: a messy but usable reply is tidied instead of rejected", async 
   assert.equal(r.project.connections.length, 3);
   assert.equal(r.project.code[0]!.language, "cpp");
   assert.ok(!r.project.code[0]!.source.includes("```"));
-  assert.deepEqual(r.project.cad.parts[0]!.shapes[1], { type: "cylinder", r: 1.6, h: 10, at: [10, 10, 0], subtract: true });
+  assert.deepEqual(r.project.cad.parts[0]!.shapes?.[1], { type: "cylinder", r: 1.6, h: 10, at: [10, 10, 0], subtract: true });
 });

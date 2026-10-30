@@ -70,7 +70,8 @@ function shape(s: Obj): Obj | undefined {
   const type = lower(s.type);
   if (type === "box" || type === "cube") {
     const size = vec3(s.size ?? s.dimensions, 0.2, 400);
-    return size ? { type: "box", size, ...extra } : undefined;
+    const radius = num(s.radius ?? s.r);
+    return size ? { type: "box", size, ...extra, ...(radius && radius > 0 ? { radius: clamp(radius, 0, 100) } : {}) } : undefined;
   }
   if (type === "cylinder" || type === "hole") {
     const r = num(s.r ?? s.radius) ?? (num(s.d ?? s.diameter) ?? NaN) / 2;
@@ -133,12 +134,20 @@ export function normalizeProject(raw: unknown): unknown {
   }).slice(0, 4);
 
   const cadRaw = isObj(p.cad) ? p.cad : {};
-  const cadParts = objs(cadRaw.parts).flatMap((cp, i) => {
+  const cadParts = objs(cadRaw.parts).flatMap((cp, i): Obj[] => {
+    const color = typeof cp.color === "string" && /^#[0-9a-fA-F]{6}$/.test(cp.color.trim()) ? cp.color.trim() : ["#FF7A1A", "#2EE6C9", "#8B95A5", "#3A7BD5"][i % 4]!;
+    const stepNo = num(cp.step);
+    const common = { color, ...(stepNo !== undefined ? { step: Math.round(clamp(stepNo, 1, 16)) } : {}) };
+    const comp = component(cp.component);
+    if (comp) {
+      const rotate = vec3(cp.rotate ?? cp.rotation, -360, 360);
+      return [{ name: str(cp.name, 60) ?? comp, printed: false, component: comp, at: vec3(cp.at ?? cp.position, -500, 500, 0)!,
+        ...(rotate && rotate.some((d) => d !== 0) ? { rotate } : {}), ...common }];
+    }
     const shapes = objs(cp.shapes).map(shape).filter((s): s is Obj => Boolean(s)).slice(0, 40);
     if (!shapes.length) return [];
-    const color = typeof cp.color === "string" && /^#[0-9a-fA-F]{6}$/.test(cp.color.trim()) ? cp.color.trim() : ["#FF7A1A", "#2EE6C9", "#8B95A5", "#3A7BD5"][i % 4]!;
-    return [{ name: str(cp.name, 60) ?? `Part ${i + 1}`, color, printed: cp.printed !== false, shapes }];
-  }).slice(0, 10);
+    return [{ name: str(cp.name, 60) ?? `Part ${i + 1}`, printed: cp.printed !== false, shapes, ...common }];
+  }).slice(0, 16);
 
   return {
     title: str(p.title ?? p.name, 90),

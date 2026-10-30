@@ -153,7 +153,7 @@ function ProjectView({ result: p, onNew }: { result: Project; onNew: () => void 
 
   const tabs: { id: TabId; label: string; icon: typeof Package; content: ReactNode }[] = [
     { id: "plan", label: t.tabs.plan, icon: ListChecks, content: <PlanTab p={p} /> },
-    { id: "cad", label: t.tabs.cad, icon: Box, content: <CadViewer cad={p.cad} title={p.title} /> },
+    { id: "cad", label: t.tabs.cad, icon: Box, content: <CadViewer cad={p.cad} title={p.title} steps={p.assembly} /> },
     { id: "wiring", label: t.tabs.wiring, icon: CircuitBoard, content: <WiringTab p={p} layout={layout} errors={errors} warnings={warnings} /> },
     { id: "assembly", label: t.tabs.assembly, icon: Package, content: (
       <ol className="space-y-3">
