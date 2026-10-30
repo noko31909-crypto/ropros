@@ -143,3 +143,19 @@ test("generator: a messy but usable reply is tidied instead of rejected", async 
   assert.ok(!r.project.code[0]!.source.includes("```"));
   assert.deepEqual(r.project.cad.parts[0]!.shapes?.[1], { type: "cylinder", r: 1.6, h: 10, at: [10, 10, 0], subtract: true });
 });
+
+test("wheels: TT motors without wheels get one on the outer shaft end, plus a caster", async () => {
+  const { addMissingWheels } = await import("../lib/build/enrich.ts");
+  const robot = { ...blink, cad: { parts: [
+    { name: "Plate", color: "#dddddd", printed: true, step: 1, shapes: [{ type: "box" as const, size: [160, 110, 3] as [number, number, number], at: [0, 0, 30] as [number, number, number] }] },
+    { name: "Left motor", color: "#f2c200", printed: false, step: 2, component: "dc-motor" as const, at: [-10, 38, 10] as [number, number, number] },
+    { name: "Right motor", color: "#f2c200", printed: false, step: 2, component: "dc-motor" as const, at: [-10, -38, 10] as [number, number, number] },
+  ] } };
+  const out = addMissingWheels(robot).cad.parts;
+  const wheels = out.filter((p) => p.name.startsWith("Wheel"));
+  assert.equal(wheels.length, 2);
+  assert.ok(wheels[0]!.shapes![0]!.at[1] > 38 && wheels[1]!.shapes![0]!.at[1] < -38, "wheels sit outside the motors");
+  assert.ok(out.some((p) => p.name === "Ball caster"));
+  const again = addMissingWheels({ ...robot, cad: { parts: out } }).cad.parts;
+  assert.equal(again.length, out.length, "no second set of wheels");
+});

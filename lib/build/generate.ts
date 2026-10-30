@@ -2,6 +2,7 @@ import type { Issue } from "../hardware/check.ts";
 import type { Locale } from "../i18n/config.ts";
 import { checkProject } from "./circuit.ts";
 import { normalizeProject } from "./normalize.ts";
+import { addMissingWheels } from "./enrich.ts";
 import { buildSystemPrompt, repairPrompt } from "./prompt.ts";
 import { describeIssues, extractJson, ProjectSchema, type Project } from "./schema.ts";
 
@@ -22,7 +23,7 @@ function evaluate(reply: string, truncated: boolean): Attempt {
   if (raw === undefined) return { problems: ["The reply is not a valid JSON object."], issues: [] };
   const parsed = ProjectSchema.safeParse(normalizeProject(raw));
   if (!parsed.success) return { problems: describeIssues(parsed.error), issues: [] };
-  const project = parsed.data;
+  const project = addMissingWheels(parsed.data);
   const issues = checkProject(project);
   const errors = issues.filter((i) => i.level === "error").map((i) => `circuit ${i.code}${i.at ? ` at ${i.at}` : ""}: ${i.message}`);
   return { project, problems: errors, issues };

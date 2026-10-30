@@ -56,6 +56,9 @@ Rules
   * Bought parts (the board, sensors, servos, motors, batteries, wheels, displays): one entry each with "component" and "at" =
     the centre of the part's bottom face. They lie flat, top side up (+Z); turn them with "rotate" (e.g. [90, 0, 0] stands a board
     upright facing -Y, so an HC-SR04 looks forward). Put them where they really go: on standoffs, inside the enclosure, on the mounts.
+  * Make it physically complete: things that move need their mechanics. A wheeled robot needs a chassis plate, motors under it,
+    wheels on the motor shafts (black cylinders r 33, h 26, rotate [90, 0, 0], or use robot-chassis-2wd which includes wheels),
+    a caster, and the board on standoffs on top. Sensors sit on mounts facing where they look; nothing floats in the air.
   * "step" = the number of the assembly step that installs the part (1-based, matching "assembly"); parts in the same step share it.
   * Built-in model sizes (W x D x H mm): ${modelSizes()}.
 - Be honest: if the idea is unsafe (mains voltage, weapons, anything that harms people) or impossible with these parts, design the closest

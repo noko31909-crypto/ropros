@@ -116,6 +116,7 @@ export type View = {
 
 type Slot = { index: number; object: THREE.Object3D; home: THREE.Vector3; offset: THREE.Vector3; step: number };
 const FLY = 1.1, GAP = 0.35, HOLD = 2.6;
+const VIEW_DIR = new THREE.Vector3(1.55, -2.1, 1.6).normalize();
 const easeOut = (t: number) => 1 - (1 - t) ** 3;
 
 /**
@@ -153,8 +154,9 @@ export function createView(canvas: HTMLCanvasElement, cad: Cad, mode: ViewMode, 
   const order = [...slots].sort((a, b) => a.step - b.step || a.index - b.index);
 
   // Light, floor, grid
-  scene.add(new THREE.HemisphereLight(0xdfe9f5, 0x1a2230, 1.4));
-  const sun = new THREE.DirectionalLight(0xffffff, 2.4);
+  scene.add(new THREE.HemisphereLight(0xe8f0fa, 0x2a3442, 2.1));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+  const sun = new THREE.DirectionalLight(0xffffff, 2.8);
   sun.position.copy(center).add(new THREE.Vector3(-radius * 1.4, -radius * 1.8, radius * 2.6));
   sun.target.position.copy(center);
   sun.castShadow = true;
@@ -164,7 +166,7 @@ export function createView(canvas: HTMLCanvasElement, cad: Cad, mode: ViewMode, 
   sun.shadow.bias = -0.0015;
   sun.shadow.normalBias = radius * 0.006;
   scene.add(sun, sun.target);
-  const fill = new THREE.DirectionalLight(0x9fd8ff, 0.6);
+  const fill = new THREE.DirectionalLight(0x9fd8ff, 0.9);
   fill.position.copy(center).add(new THREE.Vector3(radius * 2, radius, radius));
   scene.add(fill);
   const floorZ = bounds.min.z - 0.05;
@@ -173,7 +175,7 @@ export function createView(canvas: HTMLCanvasElement, cad: Cad, mode: ViewMode, 
   floor.receiveShadow = true;
   scene.add(floor);
   const step = Math.pow(10, Math.floor(Math.log10(radius))) || 10;
-  const grid = new THREE.GridHelper(Math.ceil((radius * 6) / step) * step, Math.ceil((radius * 6) / step), 0x2a3a4a, 0x1a2633);
+  const grid = new THREE.GridHelper(Math.ceil((radius * 6) / step) * step, Math.ceil((radius * 6) / step), 0x3a5068, 0x24364a);
   grid.rotation.x = Math.PI / 2;
   grid.position.set(center.x, center.y, floorZ - 0.02);
   (grid.material as THREE.Material).transparent = true;
@@ -183,8 +185,9 @@ export function createView(canvas: HTMLCanvasElement, cad: Cad, mode: ViewMode, 
   const camera = new THREE.PerspectiveCamera(35, 1, radius / 50, radius * 40);
   camera.up.set(0, 0, 1);
   const home = () => {
-    const k = mode === "assembly" ? 1.5 : 1.3;
-    camera.position.copy(center).add(new THREE.Vector3(radius * 1.55 * k, -radius * 2.1 * k, radius * 1.45 * k));
+    // Frame the bounding sphere: flat builds are well inside it, so a little closer than a full fit reads best.
+    const fit = radius / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * (mode === "assembly" ? 1.05 : 0.92);
+    camera.position.copy(center).addScaledVector(VIEW_DIR, fit);
     controls.target.copy(center);
     controls.update();
   };
