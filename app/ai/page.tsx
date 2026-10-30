@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Terminal } from "lucide-react";
+import { ArrowRight, Box, Sparkles, Terminal } from "lucide-react";
 import { Container, PageHeader } from "@/components/ui/container";
 import { getLocale } from "@/lib/i18n/server";
 import { finder } from "@/lib/i18n/messages/finder";
@@ -14,11 +14,12 @@ export default async function AiPage() {
   const tools = [
     { href: "/ai/finder", title: t.finderTitle, body: t.finderBody, icon: Sparkles, sample: ["Arduino Uno", "HC-SR04", "SG90 Servo"] },
     { href: "/ai/assistant", title: t.assistantTitle, body: t.assistantBody, icon: Terminal, sample: ["$ ropros assistant --help"] },
+    { href: "/ai/build", title: t.generatorTitle, body: t.generatorBody, icon: Box, sample: ["CAD", "Wiring", "Code"] },
   ];
   return (
     <>
       <PageHeader eyebrowIcon={<Sparkles className="h-5 w-5 text-signal" aria-hidden />} title={t.title} description={t.description} />
-      <Container className="grid gap-6 py-12 md:grid-cols-2">
+      <Container className="grid gap-6 py-12 md:grid-cols-2 xl:grid-cols-3">
         {tools.map(({ href, title, body, icon: Icon, sample }) => (
           <Link key={href} href={href} className="group relative overflow-hidden rounded-[28px] border border-line bg-ink-850 p-8 transition-colors hover:border-signal/40">
             <div className="flex items-center justify-between">

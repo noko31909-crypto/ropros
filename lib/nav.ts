@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Bot, Boxes, CircuitBoard, Cpu, Layers, MessagesSquare, Radio, Sparkles, Users } from "lucide-react";
+import { Bot, Boxes, Box, CircuitBoard, Cpu, Layers, MessagesSquare, Radio, Sparkles, Users } from "lucide-react";
 import type { common } from "@/lib/i18n/messages/common";
 
 type T = (typeof common)["en"];
@@ -21,6 +21,7 @@ export function buildNav(t: T): NavItem[] {
     { key: "ai", label: t.nav.ai, icon: Sparkles, children: [
       { label: t.nav.finder, href: "/ai/finder", description: t.nav.finderDesc, icon: Sparkles },
       { label: t.nav.assistant, href: "/ai/assistant", description: t.nav.assistantDesc, icon: MessagesSquare },
+      { label: t.nav.generator, href: "/ai/build", description: t.nav.generatorDesc, icon: Box },
     ]},
     { key: "community", label: t.nav.community, href: "/community", icon: Users, badge: t.nav.new },
   ];
@@ -36,6 +37,7 @@ export function buildFooter(t: T): { title: string; links: NavLink[] }[] {
     { title: t.footer.aiTools, links: [
       { label: t.nav.finder, href: "/ai/finder" },
       { label: t.nav.assistant, href: "/ai/assistant" },
+      { label: t.nav.generator, href: "/ai/build" },
     ]},
     { title: t.footer.community, links: [
       { label: t.footer.buildLogs, href: "/community" },
