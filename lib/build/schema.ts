@@ -39,7 +39,7 @@ export type CadPart = z.infer<typeof CadPart>;
 
 export const CadSchema = z.object({
   /** Each part is one printable or bought piece: shapes are unioned, then `subtract` shapes are cut out. Millimetres, Z up. */
-  parts: z.array(CadPart).min(1).max(16),
+  parts: z.array(CadPart).min(1).max(32),
 }).strict();
 export type Cad = z.infer<typeof CadSchema>;
 
@@ -75,6 +75,9 @@ export const ProjectSchema = z.object({
   safety: z.array(text(300)).max(6),
 }).strict();
 export type Project = z.infer<typeof ProjectSchema>;
+/** What the language model writes: everything but the 3D model, which lib/build/layout.ts builds from the parts. */
+export const ProjectInputSchema = ProjectSchema.omit({ cad: true });
+export type ProjectInput = z.infer<typeof ProjectInputSchema>;
 
 /** POST /api/build body. The idea is short free text; a longer body is not from our UI. */
 export const MAX_IDEA_CHARS = 600;
