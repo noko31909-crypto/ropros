@@ -29,7 +29,8 @@ function loadTurnstile(): Promise<TurnstileApi> {
 type Props = {
   /** Receives a fresh one-time token, or null when it expires or the check fails. */
   onToken: (token: string | null) => void;
-  onError: () => void;
+  /** "blocked" when Cloudflare's script could not load, otherwise Turnstile's error code (e.g. "110200"). */
+  onError: (reason: string) => void;
   /** Change it after every submit: a token is single-use, so the widget issues a new one. */
   resetKey: number;
 };
@@ -51,9 +52,9 @@ export function Turnstile({ onToken, onError, resetKey }: Props) {
         size: "flexible",
         callback: (token: string) => handlers.current.onToken(token),
         "expired-callback": () => handlers.current.onToken(null),
-        "error-callback": () => { handlers.current.onToken(null); handlers.current.onError(); },
+        "error-callback": (code?: string) => { handlers.current.onToken(null); handlers.current.onError(String(code ?? "unknown")); },
       });
-    }).catch(() => { if (!cancelled) handlers.current.onError(); });
+    }).catch(() => { if (!cancelled) handlers.current.onError("blocked"); });
     return () => {
       cancelled = true;
       if (widget.current) window.turnstile?.remove(widget.current);

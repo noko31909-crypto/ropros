@@ -150,7 +150,7 @@ function AuthModal({ reason, onClose }: { reason?: string; onClose: () => void }
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t.email} autoComplete="email" className={field} />
           <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t.password}
             autoComplete={mode === "signin" ? "current-password" : "new-password"} className={field} />
-          <Turnstile resetKey={captchaReset} onToken={setCaptcha} onError={() => setMessage({ tone: "error", text: t.captchaError })} />
+          <Turnstile resetKey={captchaReset} onToken={setCaptcha} onError={(reason) => setMessage({ tone: "error", text: t.captchaError(reason) })} />
           {message && <p className={clsx("text-sm", message.tone === "error" ? "text-accent" : "text-signal")}>{message.text}</p>}
           <button type="submit" disabled={busy || !captcha} className="h-11 w-full rounded-xl bg-accent text-sm font-semibold text-ink-950 shadow-glow hover:bg-accent-hover disabled:opacity-60">
             {busy ? t.wait : mode === "signin" ? t.submitSignIn : t.submitRegister}
