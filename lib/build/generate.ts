@@ -1,6 +1,7 @@
 import type { Issue } from "../hardware/check.ts";
 import type { Locale } from "../i18n/config.ts";
 import { checkProject } from "./circuit.ts";
+import { normalizeProject } from "./normalize.ts";
 import { buildSystemPrompt, repairPrompt } from "./prompt.ts";
 import { describeIssues, extractJson, ProjectSchema, type Project } from "./schema.ts";
 
@@ -19,7 +20,7 @@ function evaluate(reply: string, truncated: boolean): Attempt {
   if (truncated) return { problems: ["The reply was cut off by the length limit. Make text shorter and the code more compact."], issues: [] };
   const raw = extractJson(reply.slice(0, MAX_REPLY_CHARS));
   if (raw === undefined) return { problems: ["The reply is not a valid JSON object."], issues: [] };
-  const parsed = ProjectSchema.safeParse(raw);
+  const parsed = ProjectSchema.safeParse(normalizeProject(raw));
   if (!parsed.success) return { problems: describeIssues(parsed.error), issues: [] };
   const project = parsed.data;
   const issues = checkProject(project);

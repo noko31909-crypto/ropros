@@ -101,3 +101,32 @@ test("system prompt lists registry pins and asks for the user's language", () =>
   assert.match(p, /hc-sr04 \[[^\]]+\] \([^)]*\): VCC TRIG ECHO GND/);
   assert.match(p, /Қазақша/);
 });
+
+test("generator: a messy but usable reply is tidied instead of rejected", async () => {
+  const messy = {
+    project: {
+      ...blink,
+      extraField: "models add these",
+      platform: "Arduino Uno",
+      difficulty: "Easy",
+      hours: "2",
+      summary: "x".repeat(900),
+      instances: [{ id: "LED1", component: "LED" }, { id: "r1", component: "resistor", label: "220 Ω" }],
+      connections: [...blink.connections.map((c) => ({ ...c, from: c.from.replace("led1", "LED1"), to: c.to.replace("led1", "LED1") })), { from: "nowhere", to: "board.D2", color: "neon" }],
+      code: [{ filename: "blink sketch.ino", language: "C++", source: "```cpp\n" + blink.code[0]!.source + "\n```", libraries: [] }],
+      cad: { parts: [{ name: "Plate", color: "orange", shapes: [{ type: "cube", size: ["80", 60, 3], position: [0, 0, 1.5] }, { type: "hole", diameter: 3.2, height: 10, at: [10, 10, 0] }] }] },
+    },
+  };
+  const r = await generateProject("blink an led", "en", async () => ({ text: JSON.stringify(messy), truncated: false }));
+  assert.equal(r.ok, true);
+  if (!r.ok) return;
+  assert.equal(r.project.platform, "arduino");
+  assert.equal(r.project.difficulty, "beginner");
+  assert.equal(r.project.hours, 2);
+  assert.ok(r.project.summary.length <= 400);
+  assert.equal(r.project.instances[0]!.id, "led1");
+  assert.equal(r.project.connections.length, 3);
+  assert.equal(r.project.code[0]!.language, "cpp");
+  assert.ok(!r.project.code[0]!.source.includes("```"));
+  assert.deepEqual(r.project.cad.parts[0]!.shapes[1], { type: "cylinder", r: 1.6, h: 10, at: [10, 10, 0], subtract: true });
+});

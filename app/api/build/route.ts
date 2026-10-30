@@ -17,6 +17,9 @@ const dailyEnv = Number(process.env.ASSISTANT_DAILY_LIMIT);
 const DAILY_LIMIT = Number.isInteger(dailyEnv) && dailyEnv > 0 ? Math.min(dailyEnv, 1000) : 50;
 const MAX_BODY_CHARS = MAX_IDEA_CHARS * 4 + 200;
 const MAX_TOKENS = 14_000;
+// A whole project is one long structured reply; small free models often fail it. OPENROUTER_BUILD_MODEL lets the
+// generator use a stronger model list than the chat assistant; without it the assistant's list is used.
+const BUILD_MODELS = process.env.OPENROUTER_BUILD_MODEL || process.env.OPENROUTER_MODEL;
 
 const json = (body: unknown, status: number) => NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } });
 
@@ -58,7 +61,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const result = await generateProject(redactSecrets(body.data.idea), body.data.locale,
-      (messages) => completeOpenRouter(messages, req.signal, MAX_TOKENS));
+      (messages) => completeOpenRouter(messages, req.signal, MAX_TOKENS, BUILD_MODELS));
     if (!result.ok) {
       console.error("build output invalid", { userId: user.id, problems: result.problems.slice(0, 5) });
       return json({ error: "invalid_output" }, 502);
