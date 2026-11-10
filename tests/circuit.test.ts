@@ -82,7 +82,7 @@ test("(8) analog sensor AO on Uno D7 is missing_capability; on A0 it is fine", (
 test("(9) typo board.D99 is unknown_pin with a suggestion", () => {
   const g = guide("arduino-uno", [{ id: "led1", component: "led" }], [["led1.A", "board.D99"], ["led1.K", "board.GND"]], "void setup(){} void loop(){}");
   const e = run(g).find((i) => i.code === "unknown_pin");
-  assert.ok(e && e.level === "error" && /board\.D9/.test(e.message), e?.message);
+  assert.ok(e && e.level === "error" && /board\.D9/.test(e.message), e?.message ?? "no unknown_pin issue");
   const e2 = run(guide("arduino-uno", [{ id: "led1", component: "led" }], [["led1.a", "board.GND"]], "void setup(){} void loop(){}"))
     .find((i) => i.code === "unknown_pin");
   assert.ok(e2 && /led1\.A/.test(e2.message));
