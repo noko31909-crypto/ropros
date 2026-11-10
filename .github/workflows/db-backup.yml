@@ -20,16 +20,28 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Without both secrets the backup is not set up yet: say so and finish green instead of failing every night.
+      - name: Check that backups are set up
+        id: setup
+        env:
+          HAS_DB_URL: ${{ secrets.SUPABASE_DB_URL != '' }}
+          HAS_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE != '' }}
+        run: |
+          if [ "$HAS_DB_URL" = true ] && [ "$HAS_PASSPHRASE" = true ]; then echo "ready=true" >> "$GITHUB_OUTPUT"
+          else echo "::notice::Backups are off: add SUPABASE_DB_URL and BACKUP_PASSPHRASE (see supabase/backup/README.md)."; fi
+      - if: steps.setup.outputs.ready == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Dump and encrypt the database
+      - if: steps.setup.outputs.ready == 'true'
+        name: Dump and encrypt the database
         env:
           DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
           PG_DUMP: docker run --rm postgres:17 pg_dump
         run: mkdir -p backup && supabase/backup/backup.sh backup
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      - if: steps.setup.outputs.ready == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ropros-db-${{ github.run_id }}
           path: backup/*.gpg
