@@ -27,14 +27,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: guide.title[locale], description: guide.summary[locale] };
 }
 
-/** DB id of the published project for this slug; null if Supabase is unreachable or the row is missing. */
+/** How long the guide waits for the database before rendering without the progress buttons' project id. */
+const PROJECT_ID_TIMEOUT_MS = 2000;
+
+/**
+ * DB id of the published project for this slug; null if Supabase is unreachable, slow or the row is missing.
+ * The guide itself is static content, so a sleeping or slow database must never hold the page back.
+ */
 async function projectIdFor(slug: string): Promise<string | null> {
+  const lookup = (async () => {
+    try {
+      const supabase = await createSupabaseServerClient();
+      const { data } = await supabase.from("projects").select("id").eq("slug", slug).eq("is_published", true).maybeSingle<{ id: string }>();
+      return data?.id ?? null;
+    } catch {
+      return null;
+    }
+  })();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<null>((resolve) => { timer = setTimeout(() => resolve(null), PROJECT_ID_TIMEOUT_MS); });
   try {
-    const supabase = await createSupabaseServerClient();
-    const { data } = await supabase.from("projects").select("id").eq("slug", slug).eq("is_published", true).maybeSingle<{ id: string }>();
-    return data?.id ?? null;
-  } catch {
-    return null;
+    return await Promise.race([lookup, timeout]);
+  } finally {
+    clearTimeout(timer);
   }
 }
 
