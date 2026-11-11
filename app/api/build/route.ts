@@ -5,7 +5,7 @@ import { completeOpenRouter, OpenRouterError } from "@/lib/assistant/openrouter"
 import { redactSecrets } from "@/lib/assistant/redact";
 import { isCrossSiteRequest, isJsonRequest } from "@/lib/request-guard";
 import { generateProject } from "@/lib/build/generate";
-import { BuildRequestSchema, MAX_IDEA_CHARS } from "@/lib/build/schema";
+import { BuildRequestSchema, MAX_ANSWERS, MAX_IDEA_CHARS } from "@/lib/build/schema";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,7 +15,8 @@ export const maxDuration = 180;
 // Each generation counts against the same per-user daily assistant quota in Postgres (consume_assistant_quota).
 const dailyEnv = Number(process.env.ASSISTANT_DAILY_LIMIT);
 const DAILY_LIMIT = Number.isInteger(dailyEnv) && dailyEnv > 0 ? Math.min(dailyEnv, 1000) : 50;
-const MAX_BODY_CHARS = MAX_IDEA_CHARS * 4 + 200;
+// Idea plus up to MAX_ANSWERS short question/answer pairs (multi-byte text counted generously).
+const MAX_BODY_CHARS = MAX_IDEA_CHARS * 4 + MAX_ANSWERS * 1500 + 400;
 const MAX_TOKENS = 14_000;
 // A whole project is one long structured reply; small free models often fail it. OPENROUTER_BUILD_MODEL lets the
 // generator use a stronger model list than the chat assistant; without it the assistant's list is used.
@@ -49,6 +50,9 @@ export async function POST(req: NextRequest) {
   } catch {
     return json({ error: "invalid_json" }, 400);
   }
+  if (Array.isArray((raw as { answers?: unknown })?.answers) && (raw as { answers: unknown[] }).answers.length > MAX_ANSWERS) {
+    return json({ error: "invalid_request" }, 422); // checked before zod walks the array
+  }
   const body = BuildRequestSchema.safeParse(raw);
   if (!body.success) return json({ error: "invalid_request" }, 422);
 
@@ -60,8 +64,9 @@ export async function POST(req: NextRequest) {
   if (allowed !== true) return json({ error: "daily_limit" }, 429);
 
   try {
+    const answers = body.data.answers?.map((a) => ({ question: a.question, answer: redactSecrets(a.answer) }));
     const result = await generateProject(redactSecrets(body.data.idea), body.data.locale,
-      (messages) => completeOpenRouter(messages, req.signal, MAX_TOKENS, BUILD_MODELS));
+      (messages) => completeOpenRouter(messages, req.signal, MAX_TOKENS, BUILD_MODELS), { answers, shape: body.data.shape });
     if (!result.ok) {
       console.error("build output invalid", { userId: user.id, problems: result.problems.slice(0, 5) });
       return json({ error: "invalid_output" }, 502);

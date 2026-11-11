@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import { clsx } from "clsx";
-import { AlertTriangle, Box, CheckCircle2, CircuitBoard, Code2, ListChecks, Loader2, Package, RotateCcw, ShieldAlert, Sparkles, Wand2 } from "lucide-react";
+import { AlertTriangle, ArrowRight, Box, CheckCircle2, CircuitBoard, Code2, ListChecks, Loader2, Package, RotateCcw, ShieldAlert, Sparkles, Wand2 } from "lucide-react";
 import { useLocale, useMessages } from "@/components/i18n/locale-provider";
 import { useAuth } from "@/components/auth/auth-provider";
 import { PlatformPill } from "@/components/cards/project-card";
@@ -12,7 +12,7 @@ import { layoutCircuit, type Layout } from "@/lib/hardware/layout";
 import { getComponent } from "@/lib/hardware/components";
 import { isComponentId } from "@/lib/hardware/ids";
 import type { Issue as CheckIssue } from "@/lib/hardware/check";
-import { MAX_IDEA_CHARS, ProjectSchema, type Project } from "@/lib/build/schema";
+import { MAX_IDEA_CHARS, ProjectSchema, type Project, type Shape } from "@/lib/build/schema";
 import { checkProject } from "@/lib/build/circuit";
 import { build } from "@/lib/i18n/messages/build";
 import { CadViewer } from "./cad-viewer";
@@ -33,95 +33,164 @@ function loadSaved(): Project | null {
   }
 }
 
-async function requestProject(idea: string, locale: string, signal: AbortSignal): Promise<Project> {
-  const res = await fetch("/api/build", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ locale, idea }), signal });
-  if (res.ok) {
-    const project = ProjectSchema.safeParse(((await res.json()) as { project?: unknown }).project);
-    if (!project.success) throw new BuildError("invalid");
-    return project.data;
-  }
+type Question = { id: string; text: string; options: string[] };
+type Answers = Record<string, string>;
+
+async function failure(res: Response): Promise<BuildError> {
   const { error } = (await res.json().catch(() => ({}))) as { error?: string };
-  if (res.status === 401) throw new BuildError("signIn");
-  if (res.status === 503) throw new BuildError("unavailable");
-  if (error === "daily_limit") throw new BuildError("dailyLimit");
-  if (error === "busy") throw new BuildError("busy");
-  if (res.status === 429) throw new BuildError("rateLimited");
-  if (error === "invalid_output") throw new BuildError("invalid");
-  throw new BuildError("error");
+  if (res.status === 401) return new BuildError("signIn");
+  if (res.status === 503) return new BuildError("unavailable");
+  if (error === "daily_limit") return new BuildError("dailyLimit");
+  if (error === "busy") return new BuildError("busy");
+  if (res.status === 429) return new BuildError("rateLimited");
+  if (error === "invalid_output") return new BuildError("invalid");
+  return new BuildError("error");
+}
+
+async function requestQuestions(idea: string, locale: string, signal: AbortSignal): Promise<Question[]> {
+  const res = await fetch("/api/build/questions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ locale, idea }), signal });
+  if (!res.ok) throw await failure(res);
+  const body = (await res.json()) as { questions?: unknown };
+  return Array.isArray(body.questions)
+    ? (body.questions as Question[]).filter((q) => typeof q?.id === "string" && typeof q.text === "string" && Array.isArray(q.options)).slice(0, 4)
+    : [];
+}
+
+async function requestProject(body: { idea: string; locale: string; answers: { question: string; answer: string }[]; shape: Shape }, signal: AbortSignal): Promise<Project> {
+  const res = await fetch("/api/build", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal });
+  if (!res.ok) throw await failure(res);
+  const project = ProjectSchema.safeParse(((await res.json()) as { project?: unknown }).project);
+  if (!project.success) throw new BuildError("invalid");
+  return project.data;
 }
 class BuildError extends Error { constructor(public key: ErrorKey) { super(key); } }
+
+type Phase = "idea" | "asking" | "questions" | "generating";
 
 export function ProjectBuilder() {
   const t = useMessages(build);
   const { locale } = useLocale();
   const { openAuth } = useAuth();
   const [idea, setIdea] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [phase, setPhase] = useState<Phase>("idea");
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [answers, setAnswers] = useState<Answers>({});
+  const [shape, setShape] = useState<Shape>("auto");
   const [stage, setStage] = useState(0);
   const [error, setError] = useState<ErrorKey | null>(null);
   const [result, setResult] = useState<Project | null>(null);
   const abort = useRef<AbortController | null>(null);
+  const busy = phase === "asking" || phase === "generating";
 
   useEffect(() => { setResult(loadSaved()); return () => abort.current?.abort(); }, []);
   useEffect(() => {
-    if (!busy) return;
+    if (phase !== "generating") return;
     setStage(0);
     const id = setInterval(() => setStage((s) => Math.min(s + 1, t.stages.length - 1)), 9000);
     return () => clearInterval(id);
-  }, [busy, t.stages.length]);
+  }, [phase, t.stages.length]);
 
-  const submit = async (e?: FormEvent) => {
-    e?.preventDefault();
-    const text = idea.trim();
-    if (text.length < 8 || busy) return;
+  const run = async <T,>(next: Phase, back: Phase, job: (signal: AbortSignal) => Promise<T>): Promise<T | undefined> => {
     abort.current?.abort();
     const ctrl = new AbortController();
     abort.current = ctrl;
-    setBusy(true); setError(null);
+    setPhase(next); setError(null);
     try {
-      const r = await requestProject(text, locale, ctrl.signal);
-      setResult(r);
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); } catch { /* storage full or blocked: keep it in memory only */ }
+      return await job(ctrl.signal);
     } catch (err) {
-      if (ctrl.signal.aborted) return;
+      if (ctrl.signal.aborted) return undefined;
       const key = err instanceof BuildError ? err.key : "error";
       setError(key);
       if (key === "signIn") openAuth(t.errors.signIn);
-    } finally {
-      if (abort.current === ctrl) setBusy(false);
+      setPhase(back);
+      return undefined;
     }
   };
 
-  const reset = () => { setResult(null); setError(null); try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ } };
+  /** Step 1 → 2: ask the model which details matter for this idea. */
+  const ask = async (e?: FormEvent) => {
+    e?.preventDefault();
+    if (idea.trim().length < 8 || busy) return;
+    const qs = await run("asking", "idea", (signal) => requestQuestions(idea.trim(), locale, signal));
+    if (!qs) return;
+    setQuestions(qs); setAnswers({}); setShape("auto"); setPhase("questions");
+  };
 
-  if (result && !busy) return <ProjectView result={result} onNew={reset} />;
+  /** Step 2 → result: generate with the answers (or none, when skipped). */
+  const generate = async (withAnswers: boolean) => {
+    const list = withAnswers
+      ? questions.flatMap((q) => (answers[q.id]?.trim() ? [{ question: q.text.slice(0, 160), answer: answers[q.id]!.trim().slice(0, 200) }] : []))
+      : [];
+    const r = await run("generating", "questions", (signal) => requestProject({ idea: idea.trim(), locale, answers: list, shape: withAnswers ? shape : "auto" }, signal));
+    if (!r) return;
+    setResult(r); setPhase("idea");
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); } catch { /* storage full or blocked: keep it in memory only */ }
+  };
+
+  const reset = () => { setResult(null); setError(null); setPhase("idea"); try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ } };
+
+  if (result && phase === "idea") return <ProjectView result={result} onNew={reset} />;
+
+  const errorBox = error && <p role="alert" className="mt-4 flex items-start gap-2 rounded-xl border border-accent/40 bg-accent/10 p-3 text-sm text-fg"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden />{t.errors[error]}</p>;
 
   return (
     <div className="mx-auto max-w-3xl">
-      <form onSubmit={submit} className="rounded-[28px] border border-line bg-ink-850 p-5 sm:p-7">
-        <label htmlFor="build-idea" className="text-sm font-semibold text-fg">{t.ideaLabel}</label>
-        <textarea id="build-idea" value={idea} onChange={(e) => setIdea(e.target.value.slice(0, MAX_IDEA_CHARS))} disabled={busy}
-          onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) void submit(); }}
-          rows={4} maxLength={MAX_IDEA_CHARS} placeholder={t.placeholder}
-          className="mt-3 w-full resize-y rounded-2xl border border-line bg-ink-900 p-4 text-[15px] leading-relaxed text-fg placeholder:text-fg-subtle focus:border-accent focus:outline-none disabled:opacity-60" />
-        <div className="mt-2 flex justify-end font-mono text-[11px] text-fg-subtle">{t.chars(idea.length, MAX_IDEA_CHARS)}</div>
-        <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-fg-subtle">{t.examplesLabel}</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {t.examples.map((ex) => (
-            <button key={ex} type="button" disabled={busy} onClick={() => setIdea(ex)}
-              className="rounded-xl border border-line bg-ink-900 px-3 py-1.5 text-left text-xs text-fg-muted transition-colors hover:border-signal/50 hover:text-fg disabled:opacity-50">{ex}</button>
-          ))}
-        </div>
-        <button type="submit" disabled={busy || idea.trim().length < 8}
-          className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-accent px-6 text-[15px] font-semibold text-ink-950 transition-colors hover:bg-accent-hover disabled:bg-ink-800 disabled:text-fg-subtle">
-          {busy ? <Loader2 className="h-5 w-5 animate-spin motion-reduce:animate-none" aria-hidden /> : <Wand2 className="h-5 w-5" aria-hidden />}
-          {busy ? t.generating : t.generate}
-        </button>
-        {error && <p role="alert" className="mt-4 flex items-start gap-2 rounded-xl border border-accent/40 bg-accent/10 p-3 text-sm text-fg"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden />{t.errors[error]}</p>}
-      </form>
+      {(phase === "idea" || phase === "asking") && (
+        <form onSubmit={ask} className="rounded-[28px] border border-line bg-ink-850 p-5 sm:p-7">
+          <label htmlFor="build-idea" className="text-sm font-semibold text-fg">{t.ideaLabel}</label>
+          <textarea id="build-idea" value={idea} onChange={(e) => setIdea(e.target.value.slice(0, MAX_IDEA_CHARS))} disabled={busy}
+            onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) void ask(); }}
+            rows={4} maxLength={MAX_IDEA_CHARS} placeholder={t.placeholder}
+            className="mt-3 w-full resize-y rounded-2xl border border-line bg-ink-900 p-4 text-[15px] leading-relaxed text-fg placeholder:text-fg-subtle focus:border-accent focus:outline-none disabled:opacity-60" />
+          <div className="mt-2 flex justify-end font-mono text-[11px] text-fg-subtle">{t.chars(idea.length, MAX_IDEA_CHARS)}</div>
+          <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-fg-subtle">{t.examplesLabel}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {t.examples.map((ex) => (
+              <button key={ex} type="button" disabled={busy} onClick={() => setIdea(ex)}
+                className="rounded-xl border border-line bg-ink-900 px-3 py-1.5 text-left text-xs text-fg-muted transition-colors hover:border-signal/50 hover:text-fg disabled:opacity-50">{ex}</button>
+            ))}
+          </div>
+          <button type="submit" disabled={busy || idea.trim().length < 8}
+            className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-accent px-6 text-[15px] font-semibold text-ink-950 transition-colors hover:bg-accent-hover disabled:bg-ink-800 disabled:text-fg-subtle">
+            {busy ? <Loader2 className="h-5 w-5 animate-spin motion-reduce:animate-none" aria-hidden /> : <ArrowRight className="h-5 w-5" aria-hidden />}
+            {busy ? t.asking : t.next}
+          </button>
+          {errorBox}
+        </form>
+      )}
 
-      {busy && (
-        <div className="mt-6 rounded-[28px] border border-signal/30 bg-signal-soft p-6" aria-live="polite">
+      {phase === "questions" && (
+        <div className="rounded-[28px] border border-line bg-ink-850 p-5 sm:p-7">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-signal"><Sparkles className="h-3.5 w-3.5" aria-hidden />{t.questions.eyebrow}</p>
+              <h2 className="mt-2 text-xl font-semibold text-fg">{t.questions.title}</h2>
+              <p className="mt-1 line-clamp-2 text-sm text-fg-subtle">{idea}</p>
+            </div>
+            <button type="button" onClick={() => setPhase("idea")} className="shrink-0 rounded-lg px-2 py-1 text-xs text-fg-subtle hover:text-fg">{t.questions.edit}</button>
+          </div>
+          <div className="mt-6 space-y-6">
+            <QuestionBlock id="shape" text={t.questions.shape} options={SHAPE_OPTIONS.map((v) => ({ value: v, label: t.questions.shapes[v] }))}
+              value={shape} onChange={(v) => setShape(v as Shape)} />
+            {questions.map((q) => (
+              <QuestionBlock key={q.id} id={q.id} text={q.text} options={q.options.map((o) => ({ value: o, label: o }))} other={t.questions.other}
+                value={answers[q.id] ?? ""} onChange={(v) => setAnswers((a) => ({ ...a, [q.id]: v }))} />
+            ))}
+          </div>
+          <div className="mt-8 flex flex-col gap-2 sm:flex-row">
+            <button type="button" onClick={() => void generate(true)}
+              className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-accent px-6 text-[15px] font-semibold text-ink-950 hover:bg-accent-hover">
+              <Wand2 className="h-5 w-5" aria-hidden />{t.generate}
+            </button>
+            <button type="button" onClick={() => void generate(false)}
+              className="inline-flex h-12 items-center justify-center rounded-2xl border border-line px-5 text-sm text-fg-muted hover:border-fg-subtle hover:text-fg">{t.questions.skip}</button>
+          </div>
+          {errorBox}
+        </div>
+      )}
+
+      {phase === "generating" && (
+        <div className="rounded-[28px] border border-signal/30 bg-signal-soft p-6" aria-live="polite">
           <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-signal">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-signal motion-reduce:animate-none" />{t.generating}
           </p>
@@ -137,6 +206,33 @@ export function ProjectBuilder() {
         </div>
       )}
     </div>
+  );
+}
+
+const SHAPE_OPTIONS: Shape[] = ["auto", "enclosure", "rover", "open"];
+
+/** One question: tap an option, or type your own answer. */
+function QuestionBlock({ id, text, options, value, onChange, other }: {
+  id: string; text: string; options: { value: string; label: string }[]; value: string; onChange: (v: string) => void; other?: string;
+}) {
+  const custom = other !== undefined && value !== "" && !options.some((o) => o.value === value);
+  return (
+    <fieldset>
+      <legend className="text-sm font-semibold text-fg">{text}</legend>
+      <div className="mt-2.5 flex flex-wrap gap-2" role="radiogroup" aria-label={text}>
+        {options.map((o) => (
+          <button key={o.value} type="button" role="radio" aria-checked={value === o.value} onClick={() => onChange(value === o.value && other !== undefined ? "" : o.value)}
+            className={clsx("rounded-xl border px-3 py-2 text-left text-sm transition-colors",
+              value === o.value ? "border-accent bg-accent/15 text-fg" : "border-line bg-ink-900 text-fg-muted hover:border-fg-subtle hover:text-fg")}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+      {other !== undefined && (
+        <input id={`q-${id}`} type="text" maxLength={200} placeholder={other} value={custom ? value : ""} onChange={(e) => onChange(e.target.value)}
+          className="mt-2 h-10 w-full rounded-xl border border-line bg-ink-900 px-3 text-sm text-fg placeholder:text-fg-subtle focus:border-accent focus:outline-none" />
+      )}
+    </fieldset>
   );
 }
 
