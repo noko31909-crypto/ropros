@@ -211,3 +211,44 @@ test("answers: bounded in the request, passed to the model as data, and the chos
   const withMotors = { ...input, parts: [...input.parts, { component: "dc-motor" as const, name: "Motor", qty: 2, spec: "-" }] };
   assert.equal(autoCad(withMotors, "en", "enclosure").parts[0]!.name, "Enclosure", "the maker's choice beats the parts");
 });
+
+test("precision: no two bought parts overlap, every part fits inside the case, and standoffs sit on the real mounting holes", async () => {
+  const { autoCad } = await import("../lib/build/layout.ts");
+  const { collisions, partBox, printedSize } = await import("../lib/build/fit.ts");
+  const { MOUNTS } = await import("../lib/build/models.ts");
+  const { cad: _cad, ...input } = blink;
+  const kits: Record<string, Project["parts"]> = {
+    plant: ["arduino-uno", "soil-moisture-capacitive", "relay-module", "water-pump", "lcd-1602-i2c", "push-button"].map((c) => ({ component: c, name: c, qty: 1, spec: "-" })) as Project["parts"],
+    clock: ["esp32-devkit", "rtc-ds3231", "oled-ssd1306", "buzzer-active", "push-button", "led"].map((c) => ({ component: c, name: c, qty: 1, spec: "-" })) as Project["parts"],
+    robot: ["arduino-uno", "l298n", "dc-motor", "hc-sr04", "servo-sg90", "battery-18650"].map((c) => ({ component: c, name: c, qty: c === "dc-motor" ? 2 : 1, spec: "-" })) as Project["parts"],
+  };
+  for (const [name, parts] of Object.entries(kits)) {
+    const clean = parts.filter((p) => COMPONENT_IDS.includes(p.component as never));
+    for (const shape of ["enclosure", "rover", "open"] as const) {
+      const cad = autoCad({ ...input, board: clean[0]!.component as Project["board"], parts: clean }, "en", shape);
+      assert.deepEqual(collisions(cad), [], `${name}/${shape}: parts overlap`);
+      assert.ok(printedSize(cad), `${name}/${shape}: has printed parts`);
+    }
+    const box = autoCad({ ...input, board: clean[0]!.component as Project["board"], parts: clean }, "en", "enclosure");
+    const [w, d] = printedSize(box)!;
+    for (const p of box.parts) {
+      const b = partBox(p);
+      if (!b || p.step === box.parts.at(-1)!.step && b.min[0] > w / 2) continue; // external parts beside the box
+      if (b.min[0] > w / 2 - 1) continue;
+      const poke = p.rotate ? 15 : 0; // front sensors look out through their holes in the wall
+      assert.ok(b.min[1] >= -d / 2 - poke - 0.01 && b.max[1] <= d / 2 + 0.01, `${name}: ${p.name} sticks out of the case (${b.min[1]}..${b.max[1]} vs ±${d / 2})`);
+    }
+  }
+  const robot = autoCad({ ...input, parts: kits.robot! }, "en", "enclosure");
+  const sonar = robot.parts.find((p) => p.component === "hc-sr04")!;
+  const holes = robot.parts[0]!.shapes!.filter((s) => s.subtract && s.type === "cylinder" && s.rotate?.[0] === 90);
+  assert.equal(holes.length, 2, "two round holes for the HC-SR04 transducers");
+  for (const h of holes) assert.ok(Math.abs(Math.abs(h.at[0] - sonar.at![0]) - 13) < 0.6, "holes centred on the transducers");
+  // Uno standoffs: one pilot hole exactly under each datasheet hole.
+  const uno = autoCad(input, "en", "enclosure");
+  const board = uno.parts.find((p) => p.component === "arduino-uno")!;
+  const pilots = uno.parts[0]!.shapes!.filter((s) => s.subtract && s.type === "cylinder" && s.r < 1.5);
+  for (const [hx, hy] of MOUNTS["arduino-uno"]!.holes) {
+    assert.ok(pilots.some((s) => Math.abs(s.at[0] - board.at![0] - hx) < 0.05 && Math.abs(s.at[1] - board.at![1] - hy) < 0.05), `pilot under ${hx},${hy}`);
+  }
+});

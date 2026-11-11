@@ -27,7 +27,7 @@ const CadPart = z.object({
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
   printed: z.boolean(),
   /** Printed or custom parts: primitives in world coordinates. */
-  shapes: z.array(Shape).min(1).max(40).optional(),
+  shapes: z.array(Shape).min(1).max(80).optional(),
   /** Bought parts: a registry component drawn from its built-in model, its bottom-face centre placed at `at`. */
   component: z.enum(COMPONENT_IDS).optional(),
   at: vec3(-500, 500).optional(),

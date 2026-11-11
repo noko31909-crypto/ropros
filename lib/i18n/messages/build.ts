@@ -45,6 +45,7 @@ export const build = defineMessages({
     plan: { phases: "Build plan", parts: "Parts", qty: "Qty", part: "Part", spec: "Spec", safety: "Safety" },
     cad: {
       hint: "Drag to rotate, scroll to zoom.",
+      size: "Printed size:", mm: "mm", tolerance: "Standoffs on the boards' real mounting holes, 0.4 mm clearance on every cut-out, M3 screws for the lid.",
       loading: "Loading 3D view",
       webglError: "3D view is not available in this browser.",
       assemblyLabel: "Assembly animation",
@@ -122,6 +123,7 @@ export const build = defineMessages({
     plan: { phases: "План сборки", parts: "Детали", qty: "Кол-во", part: "Деталь", spec: "Характеристики", safety: "Безопасность" },
     cad: {
       hint: "Тяните, чтобы вращать, колёсиком — приблизить.",
+      size: "Размер печати:", mm: "мм", tolerance: "Стойки на реальных крепёжных отверстиях плат, зазор 0,4 мм на каждом вырезе, крышка на винтах M3.",
       loading: "Загружаю 3D",
       webglError: "3D-просмотр недоступен в этом браузере.",
       assemblyLabel: "Анимация сборки",
@@ -199,6 +201,7 @@ export const build = defineMessages({
     plan: { phases: "Құрастыру жоспары", parts: "Бөлшектер", qty: "Саны", part: "Бөлшек", spec: "Сипаттама", safety: "Қауіпсіздік" },
     cad: {
       hint: "Айналдыру үшін тартыңыз, жақындату үшін дөңгелекті айналдырыңыз.",
+      size: "Басып шығару өлшемі:", mm: "мм", tolerance: "Тіреулер платалардың нақты бекіту тесіктерінде, әр ойықта 0,4 мм саңылау, қақпақ M3 бұрандалармен.",
       loading: "3D жүктелуде",
       webglError: "Бұл браузерде 3D көрініс қолжетімсіз.",
       assemblyLabel: "Құрастыру анимациясы",
