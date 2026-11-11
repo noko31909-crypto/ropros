@@ -1,7 +1,7 @@
 import type { ComponentId } from "../hardware/ids.ts";
 import type { Locale } from "../i18n/config.ts";
 import { partModel } from "./models.ts";
-import type { Cad, CadPart, CadShape, ProjectInput as Project } from "./schema.ts";
+import type { Cad, CadPart, CadShape, ProjectInput as Project, Shape } from "./schema.ts";
 
 /**
  * Builds the 3D model of a generated project from its parts list, by rules instead of by the language model,
@@ -246,15 +246,52 @@ function rover(p: Project, list: Item[], n: Record<string, string>): Cad {
   return { parts: parts.slice(0, 32) };
 }
 
-export function autoCad(p: Project, locale: Locale): Cad {
+export function autoCad(p: Project, locale: Locale, shape: Shape = "auto"): Cad {
   const list = items(p);
   const n = NAMES[locale];
-  const isRover = list.some((i) => i.role === "motor") || p.parts.some((x) => x.component === "robot-chassis-2wd" || x.component === "robot-chassis-4wd");
+  const wantsRover = list.some((i) => i.role === "motor") || p.parts.some((x) => x.component === "robot-chassis-2wd" || x.component === "robot-chassis-4wd");
+  if (shape === "open") return finish(open(p, list, n));
+  if (shape === "enclosure") return finish(enclosure(p, list, n));
+  const isRover = shape === "rover" || wantsRover;
   if (isRover && !list.some((i) => i.role === "motor")) {
     list.push({ id: "dc-motor", name: "TT motor 1", role: "motor" }, { id: "dc-motor", name: "TT motor 2", role: "motor" });
   }
-  const cad = isRover ? rover(p, list, n) : enclosure(p, list, n);
-  // Bought parts keep their real colours from the built-in models; give the legend a matching swatch.
+  return finish(isRover ? rover(p, list, n) : enclosure(p, list, n));
+}
+
+/** Bought parts keep their real colours from the built-in models; give the legend a matching swatch. */
+function finish(cad: Cad): Cad {
   for (const part of cad.parts) if (part.component) part.color = partModel(part.component).prims[0]!.color;
   return cad;
+}
+
+/** Open build: every part laid out on a printed base plate, the board on standoffs, sensors at the front edge. */
+function open(p: Project, list: Item[], n: Record<string, string>): Cad {
+  const step = stepper(p.assembly.length, 3);
+  const board = list.find((i) => i.role === "board")!;
+  const flat = [board, ...list.filter((i) => i !== board && i.role !== "front")];
+  const front = list.filter((i) => i.role === "front");
+  const fp = flat.map((i) => ({ w: sizeOf(i.id)[0], d: sizeOf(i.id)[1] }));
+  const packed = pack(fp, Math.max(fp[0]!.w + 10, Math.sqrt(fp.reduce((s, f) => s + (f.w + GAP) * (f.d + GAP), 0)) * 1.3, 120));
+  const frontW = front.reduce((s, i) => s + sizeOf(i.id)[0] + GAP, 0);
+  const frontD = front.length ? Math.max(...front.map((i) => sizeOf(i.id)[2])) + GAP : 0;
+  const L = Math.max(packed.w, frontW) + 2 * GAP + 10, W = packed.d + frontD + 2 * GAP + 10;
+  const parts: CadPart[] = [{ name: n.plate!, color: "#D9DDE3", printed: true, step: step(0), shapes: [
+    { type: "box" as const, size: v(L, W, 3), at: v(0, 0, 1.5), radius: 6 },
+    ...[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sy]) => ({ type: "cylinder" as const, r: 1.6, h: 8, at: v(sx! * (L / 2 - 6), sy! * (W / 2 - 6), 1.5), subtract: true })),
+  ] }];
+  const x0 = -L / 2 + GAP + 5, y0 = -W / 2 + frontD + GAP + 5;
+  flat.forEach((it, k) => {
+    const [px, py] = packed.at[k]!;
+    const cx = x0 + px, cy = y0 + py, isBoard = it === board;
+    parts.push(bought(it, v(cx, cy, 3 + (isBoard ? STANDOFF : 0)), undefined, step(isBoard ? 1 : 1)));
+    if (isBoard) parts.push({ name: n.standoffs!, color: "#C9A227", printed: false, step: step(1), shapes: standoffs(cx, cy, fp[k]!.w, fp[k]!.d, 3) });
+  });
+  let fx = -frontW / 2;
+  for (const it of front) {
+    const [w, d, h] = sizeOf(it.id);
+    parts.push(bought(it, v(fx + w / 2, -W / 2 + h + 2, 3 + d / 2), [90, 0, 0], step(2)));
+    fx += w + GAP;
+  }
+  return { parts: parts.slice(0, 32) };
 }

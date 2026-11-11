@@ -175,3 +175,39 @@ test("auto 3D: every component, alone or crowded, gives a valid model on each bo
     assert.ok(CadSchema.safeParse(crowded).success, `${board} crowded`);
   }
 });
+
+test("questions: valid ones are kept, junk and duplicates dropped, at most 4; defaults exist in every language", async () => {
+  const { parseQuestions, DEFAULT_QUESTIONS, MAX_QUESTIONS } = await import("../lib/build/questions.ts");
+  const reply = "```json\n" + JSON.stringify({ questions: [
+    { id: "power", text: "How is it powered?", options: ["USB", "18650", "USB"] },
+    { id: "power", text: "dup", options: ["a", "b"] },
+    { id: "Bad Id", text: "x", options: ["a", "b"] },
+    { id: "screen", text: "Need a screen?", options: ["Yes"] },
+    { id: "a1", text: "q1", options: ["a", "b"] }, { id: "a2", text: "q2", options: ["a", "b"] }, { id: "a3", text: "q3", options: ["a", "b"] },
+  ] }) + "\n```";
+  const qs = parseQuestions(reply);
+  assert.equal(qs.length, MAX_QUESTIONS);
+  assert.deepEqual(qs[0], { id: "power", text: "How is it powered?", options: ["USB", "18650"] });
+  assert.ok(!qs.some((q) => q.id === "screen"), "a single option is not a question");
+  assert.deepEqual(parseQuestions("no idea"), []);
+  for (const l of ["en", "ru", "kk"] as const) assert.ok(DEFAULT_QUESTIONS[l].length >= 3);
+});
+
+test("answers: bounded in the request, passed to the model as data, and the chosen form drives the 3D layout", async () => {
+  const { BuildRequestSchema } = await import("../lib/build/schema.ts");
+  const { ideaMessage } = await import("../lib/build/generate.ts");
+  const { autoCad } = await import("../lib/build/layout.ts");
+  const ok = { locale: "en", idea: "a plant watering station", answers: [{ question: "Power?", answer: "USB" }], shape: "open" };
+  assert.equal(BuildRequestSchema.safeParse(ok).success, true);
+  assert.equal(BuildRequestSchema.safeParse({ ...ok, shape: "spaceship" }).success, false);
+  assert.equal(BuildRequestSchema.safeParse({ ...ok, answers: Array.from({ length: 7 }, () => ok.answers[0]) }).success, false);
+  const msg = ideaMessage("a plant watering station", { answers: ok.answers, shape: "rover" });
+  assert.match(msg, /<answers>\n- Power\?: USB\n- Form: .*robot on wheels/);
+  assert.equal(ideaMessage("x y z idea"), "Project idea:\n<idea>\nx y z idea\n</idea>");
+  const { cad: _c, ...input } = blink;
+  assert.ok(autoCad(input, "en", "rover").parts.some((p) => p.component === "dc-motor"), "rover adds motors");
+  assert.equal(autoCad(input, "en", "open").parts[0]!.name, "Chassis plate");
+  assert.ok(!autoCad(input, "en", "open").parts.some((p) => p.name === "Lid"));
+  const withMotors = { ...input, parts: [...input.parts, { component: "dc-motor" as const, name: "Motor", qty: 2, spec: "-" }] };
+  assert.equal(autoCad(withMotors, "en", "enclosure").parts[0]!.name, "Enclosure", "the maker's choice beats the parts");
+});

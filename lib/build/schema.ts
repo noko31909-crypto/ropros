@@ -81,7 +81,23 @@ export type ProjectInput = z.infer<typeof ProjectInputSchema>;
 
 /** POST /api/build body. The idea is short free text; a longer body is not from our UI. */
 export const MAX_IDEA_CHARS = 600;
+/** Overall form of the build; picks the 3D layout. "auto" lets the parts decide (motors → rover, else enclosure). */
+export const SHAPES = ["auto", "enclosure", "rover", "open"] as const;
+export type Shape = (typeof SHAPES)[number];
+export const MAX_ANSWERS = 6;
+/** One clarifying question and the user's answer to it, sent back with the idea. */
+const Answer = z.object({ question: z.string().trim().min(1).max(160), answer: z.string().trim().min(1).max(200) }).strict();
+export type BuildAnswer = z.infer<typeof Answer>;
+
 export const BuildRequestSchema = z.object({
+  locale: z.enum(["en", "ru", "kk"]),
+  idea: z.string().trim().min(8).max(MAX_IDEA_CHARS),
+  answers: z.array(Answer).max(MAX_ANSWERS).optional(),
+  shape: z.enum(SHAPES).optional(),
+}).strict();
+
+/** POST /api/build/questions body. */
+export const QuestionsRequestSchema = z.object({
   locale: z.enum(["en", "ru", "kk"]),
   idea: z.string().trim().min(8).max(MAX_IDEA_CHARS),
 }).strict();
