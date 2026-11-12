@@ -12,7 +12,9 @@ import { layoutCircuit, type Layout } from "@/lib/hardware/layout";
 import { getComponent } from "@/lib/hardware/components";
 import { isComponentId } from "@/lib/hardware/ids";
 import type { Issue as CheckIssue } from "@/lib/hardware/check";
-import { MAX_IDEA_CHARS, ProjectSchema, type Project, type Shape } from "@/lib/build/schema";
+import { MAX_IDEA_CHARS, ProjectSchema, SHAPES, type Project, type Shape } from "@/lib/build/schema";
+import { autoCad } from "@/lib/build/layout";
+import type { Locale } from "@/lib/i18n/config";
 import { checkProject } from "@/lib/build/circuit";
 import { build } from "@/lib/i18n/messages/build";
 import { CadViewer } from "./cad-viewer";
@@ -23,11 +25,19 @@ type TabId = "plan" | "cad" | "wiring" | "assembly" | "code";
 const STORAGE_KEY = "ropros:last-build";
 const lookup = (id: string) => { if (!isComponentId(id)) throw new Error(`Unknown component "${id}"`); return getComponent(id); };
 
-/** The last project is restored from localStorage, which anyone with this browser can edit: validate it again. */
-function loadSaved(): Project | null {
+const SHAPE_KEY = "ropros:last-build-shape";
+
+/**
+ * The last project is restored from localStorage, which anyone with this browser can edit: validate it again.
+ * Its 3D model is rebuilt with the current layout engine, so a project saved before an update never shows a stale model.
+ */
+function loadSaved(locale: Locale): Project | null {
   try {
     const project = ProjectSchema.safeParse(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null"));
-    return project.success ? project.data : null;
+    if (!project.success) return null;
+    const saved = localStorage.getItem(SHAPE_KEY);
+    const shape: Shape = SHAPES.find((s) => s === saved) ?? "auto";
+    return { ...project.data, cad: autoCad(project.data, locale, shape) };
   } catch {
     return null;
   }
@@ -82,7 +92,8 @@ export function ProjectBuilder() {
   const abort = useRef<AbortController | null>(null);
   const busy = phase === "asking" || phase === "generating";
 
-  useEffect(() => { setResult(loadSaved()); return () => abort.current?.abort(); }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- restore once on mount, in the language of that moment
+  useEffect(() => { setResult(loadSaved(locale)); return () => abort.current?.abort(); }, []);
   useEffect(() => {
     if (phase !== "generating") return;
     setStage(0);
@@ -124,10 +135,10 @@ export function ProjectBuilder() {
     const r = await run("generating", "questions", (signal) => requestProject({ idea: idea.trim(), locale, answers: list, shape: withAnswers ? shape : "auto" }, signal));
     if (!r) return;
     setResult(r); setPhase("idea");
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); } catch { /* storage full or blocked: keep it in memory only */ }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); localStorage.setItem(SHAPE_KEY, withAnswers ? shape : "auto"); } catch { /* storage full or blocked: keep it in memory only */ }
   };
 
-  const reset = () => { setResult(null); setError(null); setPhase("idea"); try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ } };
+  const reset = () => { setResult(null); setError(null); setPhase("idea"); try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(SHAPE_KEY); } catch { /* ignore */ } };
 
   if (result && phase === "idea") return <ProjectView result={result} onNew={reset} />;
 
@@ -249,7 +260,7 @@ function ProjectView({ result: p, onNew }: { result: Project; onNew: () => void 
 
   const tabs: { id: TabId; label: string; icon: typeof Package; content: ReactNode }[] = [
     { id: "plan", label: t.tabs.plan, icon: ListChecks, content: <PlanTab p={p} /> },
-    { id: "cad", label: t.tabs.cad, icon: Box, content: <CadViewer cad={p.cad} title={p.title} steps={p.assembly} /> },
+    { id: "cad", label: t.tabs.cad, icon: Box, content: <CadViewer cad={p.cad} title={p.title} /> },
     { id: "wiring", label: t.tabs.wiring, icon: CircuitBoard, content: <WiringTab p={p} layout={layout} errors={errors} warnings={warnings} /> },
     { id: "assembly", label: t.tabs.assembly, icon: Package, content: (
       <ol className="space-y-3">
