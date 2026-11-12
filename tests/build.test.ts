@@ -252,3 +252,25 @@ test("precision: no two bought parts overlap, every part fits inside the case, a
     assert.ok(pilots.some((s) => Math.abs(s.at[0] - board.at![0] - hx) < 0.05 && Math.abs(s.at[1] - board.at![1] - hy) < 0.05), `pilot under ${hx},${hy}`);
   }
 });
+
+test("a bought chassis kit is the base: no second chassis, wheels or motors, and the electronics sit on its deck", async () => {
+  const { autoCad } = await import("../lib/build/layout.ts");
+  const { collisions, partBox } = await import("../lib/build/fit.ts");
+  const { cad: _cad, ...input } = blink;
+  for (const kit of ["robot-chassis-2wd", "robot-chassis-4wd"] as const) {
+    const parts = ([["arduino-uno", 1], [kit, 1], ["dc-motor", 2], ["l298n", 1], ["battery-18650", 2], ["hc-sr04", 1]] as const)
+      .map(([c, q]) => ({ component: c, name: c, qty: q, spec: "-" }));
+    const cad = autoCad({ ...input, board: "arduino-uno", parts }, "en", "auto");
+    assert.equal(cad.parts.filter((p) => p.component === kit).length, 1);
+    assert.ok(!cad.parts.some((p) => p.component === "dc-motor" || p.name.startsWith("Wheel") || p.name === "Ball caster"), `${kit}: the kit has its own`);
+    assert.deepEqual(collisions(cad), []);
+    const half: [number, number] = kit === "robot-chassis-2wd" ? [100, 65] : [125, 75];
+    for (const p of cad.parts) {
+      const b = partBox(p);
+      if (!b || p.component === kit || p.component === "hc-sr04") continue;
+      assert.ok(b.min[0] >= -half[0] && b.max[0] <= half[0] && b.min[1] >= -half[1] && b.max[1] <= half[1], `${kit}: ${p.name} is off the deck`);
+      assert.ok(b.min[2] >= 37.5, `${kit}: ${p.name} sits on the deck`);
+    }
+    assert.ok(!autoCad({ ...input, board: "arduino-uno", parts }, "en", "open").parts.some((p) => p.component === kit), "open build leaves the kit out");
+  }
+});

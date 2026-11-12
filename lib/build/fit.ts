@@ -52,7 +52,8 @@ const overlap = (a: Box, b: Box, tol: number) => [0, 1, 2].every((k) => Math.min
 
 /** Pairs of bought parts that occupy the same space (more than `tol` mm on every axis). */
 export function collisions(cad: Cad, tol = 0.5): [string, string][] {
-  const placed = cad.parts.flatMap((p) => { const b = partBox(p); return b ? [{ name: p.name, b }] : []; });
+  // A chassis kit is a frame the other parts sit on and in, not a solid block: leave it out.
+  const placed = cad.parts.flatMap((p) => { const b = p.component?.startsWith("robot-chassis") ? undefined : partBox(p); return b ? [{ name: p.name, b }] : []; });
   const out: [string, string][] = [];
   for (let i = 0; i < placed.length; i++) for (let j = i + 1; j < placed.length; j++) {
     if (overlap(placed[i]!.b, placed[j]!.b, tol)) out.push([placed[i]!.name, placed[j]!.name]);

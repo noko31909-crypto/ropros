@@ -15,7 +15,7 @@ import type { Cad, CadPart, CadShape, ProjectInput as Project, Shape } from "./s
  */
 
 type V3 = [number, number, number];
-type Role = "board" | "inside" | "power" | "front" | "top" | "servo" | "motor" | "outside" | "skip";
+type Role = "board" | "chassis" | "inside" | "power" | "front" | "top" | "servo" | "motor" | "outside" | "skip";
 
 const ROLE: Partial<Record<ComponentId, Role>> = {
   "breadboard": "skip", "jumper-wires": "skip", "enclosure": "skip", "resistor": "skip", "capacitor": "skip", "diode": "skip",
@@ -27,7 +27,7 @@ const ROLE: Partial<Record<ComponentId, Role>> = {
   "tft-st7735": "top", "e-paper-2in9": "top", "ws2812b-ring": "top", "push-button": "top", "potentiometer": "top", "joystick": "top",
   "rotary-encoder": "top", "keypad-4x4": "top", "touch-ttp223": "top", "led": "top", "rgb-led": "top", "buzzer-active": "top", "buzzer-passive": "top",
   "ldr": "top", "sound-sensor": "top", "microphone-max9814": "top", "speaker-8ohm": "top", "rc522-rfid": "top", "fan-5v": "top",
-  "servo-sg90": "servo", "servo-mg996r": "servo", "dc-motor": "motor",
+  "servo-sg90": "servo", "servo-mg996r": "servo", "dc-motor": "motor", "robot-chassis-2wd": "chassis", "robot-chassis-4wd": "chassis",
   "water-pump": "outside", "soil-moisture-capacitive": "outside", "rain-sensor": "outside", "water-level": "outside", "solenoid-lock": "outside",
   "stepper-nema17": "outside", "stepper-28byj48": "outside", "ws2812b-strip": "outside", "line-sensor-array": "outside", "tcrt5000": "outside",
   "hx711-load-cell": "outside", "ds18b20": "outside", "vibration-motor": "inside",
@@ -138,12 +138,12 @@ function items(p: Project): Item[] {
   add(p.board, 1);
   for (const part of p.parts) {
     if (!part.component || part.component === p.board) continue;
-    const cap = ROLE[part.component] === "motor" ? 4 : ROLE[part.component] === "top" ? 3 : 2;
+    const cap = ROLE[part.component] === "motor" ? 4 : ROLE[part.component] === "top" ? 3 : ROLE[part.component] === "chassis" ? 1 : 2;
     add(part.component, Math.min(part.qty, cap));
   }
   for (const inst of p.instances) if (!out.some((i) => i.id === inst.component)) add(inst.component, 1);
   // A readable model has a couple of dozen parts at most: keep the board, motors and what faces the user first.
-  const rank: Record<Role, number> = { board: 0, motor: 1, front: 2, servo: 3, top: 4, power: 5, inside: 6, outside: 7, skip: 8 };
+  const rank: Record<Role, number> = { board: 0, chassis: 0, motor: 1, front: 2, servo: 3, top: 4, power: 5, inside: 6, outside: 7, skip: 8 };
   return out.map((it, i) => ({ it, i })).sort((a, b) => rank[a.it.role] - rank[b.it.role] || a.i - b.i).slice(0, 20).map((x) => x.it);
 }
 
@@ -286,24 +286,34 @@ function enclosure(p: Project, list: Item[], n: Record<string, string>): Cad {
   ].slice(0, 32) };
 }
 
+/** Deck size (length along X, width) and top height of the bought chassis kits, matching their models. */
+const KIT_DECK = { "robot-chassis-2wd": { l: 200, w: 130, top: 37.5 }, "robot-chassis-4wd": { l: 250, w: 150, top: 37.5 } } as const;
+
 function rover(p: Project, list: Item[], n: Record<string, string>): Cad {
   const step = stepper(p.assembly.length, 5);
   const board = list.find((i) => i.role === "board")!;
-  const motors = list.filter((i) => i.role === "motor").slice(0, 4);
+  // A bought chassis kit (deck, motors and wheels) replaces the printed chassis: the electronics go on a printed
+  // mounting plate screwed onto its deck, and its own motors are part of the kit.
+  const kit = list.find((i) => i.role === "chassis");
+  const kitDeck = kit ? KIT_DECK[kit.id as keyof typeof KIT_DECK] : undefined;
+  const motors = kit ? [] : list.filter((i) => i.role === "motor").slice(0, 4);
   const front = list.filter((i) => i.role === "front");
   const deck = [board, ...list.filter((i) => ["inside", "power", "top", "servo"].includes(i.role) && i.role !== "board")];
   const fp = deck.map((i) => ({ w: foot(i.id).w, d: foot(i.id).d }));
-  const packed = pack(fp, 150);
-  const L = Math.max(170, packed.w + 60), W = Math.max(115, Math.min(170, packed.d + 20));
+  const area = fp.reduce((s, f) => s + (f.w + GAP) * (f.d + GAP), 0);
+  const packed = pack(fp, kitDeck ? kitDeck.l - 30 : Math.max(150, Math.sqrt(area) * 1.4));
+  const L = kitDeck ? Math.max(packed.w + 20, 60) : Math.max(170, packed.w + 60);
+  const W = kitDeck ? Math.max(packed.d + 16, 40) : Math.max(115, packed.d + 20);
 
   // TT motors under the plate; wheels (r 33) touch the floor, so the motor body sits 23.6 mm up.
-  const motorZ = 33 - 9.4, plateZ = motorZ + 18.8 + 1.5;
+  const motorZ = 33 - 9.4, plateZ = kitDeck ? kitDeck.top + 1.5 : motorZ + 18.8 + 1.5;
   const deckZ = plateZ + 1.5;
   const plate: CadShape[] = [
     { type: "box", size: v(L, W, 3), at: v(0, 0, plateZ), radius: 10 },
     ...[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sy]) => ({ type: "cylinder" as const, r: 1.6, h: 8, at: v(sx! * (L / 2 - 8), sy! * (W / 2 - 8), plateZ), subtract: true })),
   ];
   const parts: CadPart[] = [];
+  if (kit) parts.push(bought(kit, v(0, 0, 0), undefined, step(0)));
   const axles = motors.length >= 4 ? [-L / 2 + 40, L / 2 - 70] : [-L / 2 + 40];
   motors.forEach((m, i) => {
     const ax = axles[Math.floor(i / 2) % axles.length]!;
@@ -316,12 +326,12 @@ function rover(p: Project, list: Item[], n: Record<string, string>): Cad {
       { type: "cylinder", r: 33, h: 26, at: v(ax, my + side * (11.25 + 2 + 13), 33), rotate: [90, 0, 0] },
     ] });
   });
-  if (motors.length < 4) parts.push({ name: n.caster!, color: "#C9CDD2", printed: false, step: step(1), shapes: [
+  if (!kit && motors.length < 4) parts.push({ name: n.caster!, color: "#C9CDD2", printed: false, step: step(1), shapes: [
     { type: "cylinder", r: 6, h: plateZ - 1.5, at: v(L / 2 - 25, 0, (plateZ - 1.5) / 2) },
     { type: "cylinder", r: 10, h: 6, at: v(L / 2 - 25, 0, plateZ - 4.5) },
   ] });
 
-  const ox = -L / 2 + 15, oy = -packed.d / 2;
+  const ox = -packed.w / 2 - (kitDeck ? 0 : L / 2 - packed.w / 2 - 15), oy = -packed.d / 2;
   deck.forEach((it, k) => {
     const [px, py] = packed.at[k]!;
     const f = foot(it.id);
@@ -374,7 +384,7 @@ function finish(cad: Cad): Cad {
 function open(p: Project, list: Item[], n: Record<string, string>): Cad {
   const step = stepper(p.assembly.length, 3);
   const board = list.find((i) => i.role === "board")!;
-  const flat = [board, ...list.filter((i) => i !== board && i.role !== "front")];
+  const flat = [board, ...list.filter((i) => i !== board && i.role !== "front" && i.role !== "chassis")];
   const front = list.filter((i) => i.role === "front");
   const fp = flat.map((i) => ({ w: foot(i.id).w, d: foot(i.id).d }));
   const packed = pack(fp, Math.max(fp[0]!.w + 10, Math.sqrt(fp.reduce((s, f) => s + (f.w + GAP) * (f.d + GAP), 0)) * 1.3, 120));
