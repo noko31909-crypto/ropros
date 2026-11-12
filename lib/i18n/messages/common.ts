@@ -13,7 +13,8 @@ export const common = defineMessages({
       community: "Community", new: "new", main: "Main navigation", menu: "Menu", close: "Close menu",
       search: "Search builds, parts…", searchShort: "Search", saved: "Saved builds", savedToast: "Saved builds live in your profile",
     },
-    tabs: { home: "Home", projects: "Projects", finder: "Finder", community: "Community", profile: "Profile", signIn: "Sign in" },
+    notFound: { title: "Page not found", body: "This page doesn’t exist or has moved. The guides, parts and AI tools are one tap away.", home: "Home", hub: "Browse guides" },
+    tabs: { home: "Home", projects: "Projects", finder: "AI tools", community: "Community", profile: "Profile", signIn: "Sign in" },
     footer: {
       tagline: "A repository of hardware builds for engineers and makers: wiring, code and guides for Arduino, ESP32 and Raspberry Pi.",
       build: "Builds", aiTools: "AI tools", community: "Community", buildLogs: "Build logs", guides: "Guides",
@@ -36,7 +37,8 @@ export const common = defineMessages({
       community: "Сообщество", new: "new", main: "Основная навигация", menu: "Меню", close: "Закрыть меню",
       search: "Поиск сборок, деталей…", searchShort: "Поиск", saved: "Сохранённые сборки", savedToast: "Сохранённые сборки — в профиле",
     },
-    tabs: { home: "Главная", projects: "Проекты", finder: "Finder", community: "Сообщество", profile: "Профиль", signIn: "Войти" },
+    notFound: { title: "Страница не найдена", body: "Такой страницы нет или она переехала. Гайды, детали и AI-инструменты — в одном нажатии.", home: "На главную", hub: "Открыть гайды" },
+    tabs: { home: "Главная", projects: "Проекты", finder: "AI", community: "Сообщество", profile: "Профиль", signIn: "Войти" },
     footer: {
       tagline: "Репозиторий аппаратных сборок для инженеров и мейкеров: схемы, код и гайды для Arduino, ESP32 и Raspberry Pi.",
       build: "Сборки", aiTools: "AI-инструменты", community: "Сообщество", buildLogs: "Журналы сборок", guides: "Гайды",
@@ -45,7 +47,7 @@ export const common = defineMessages({
     auth: { signIn: "Войти", register: "Регистрация", signOut: "Выйти", profile: "Профиль", level: "Уровень" },
     levels: ["Новичок-сборщик", "Ученик схемотехника", "Разведчик датчиков", "IoT-рыцарь", "Архитектор роботов", "Мастер-мейкер"],
     difficulty: { beginner: "Начальный", intermediate: "Средний", advanced: "Продвинутый" },
-    hours: (h: number) => `${h} ч`,
+    hours: (h: number) => `${h.toLocaleString("ru-RU")} ч`,
     skip: "Перейти к содержимому",
   },
   kk: {
@@ -59,7 +61,8 @@ export const common = defineMessages({
       community: "Қауымдастық", new: "жаңа", main: "Негізгі навигация", menu: "Мәзір", close: "Мәзірді жабу",
       search: "Құрастыру, бөлшек іздеу…", searchShort: "Іздеу", saved: "Сақталған құрастырулар", savedToast: "Сақталған құрастырулар — профильде",
     },
-    tabs: { home: "Басты", projects: "Жобалар", finder: "Finder", community: "Қауымдастық", profile: "Профиль", signIn: "Кіру" },
+    notFound: { title: "Бет табылмады", body: "Мұндай бет жоқ немесе басқа жерге көшкен. Нұсқаулықтар, бөлшектер және AI-құралдар бір басуда.", home: "Басты бет", hub: "Нұсқаулықтарды ашу" },
+    tabs: { home: "Басты", projects: "Жобалар", finder: "AI", community: "Қауымдастық", profile: "Профиль", signIn: "Кіру" },
     footer: {
       tagline: "Инженерлер мен мейкерлерге арналған аппараттық құрастырулар қоры: Arduino, ESP32 және Raspberry Pi үшін схемалар, код және нұсқаулықтар.",
       build: "Құрастырулар", aiTools: "AI құралдары", community: "Қауымдастық", buildLogs: "Құрастыру журналдары", guides: "Нұсқаулықтар",
@@ -68,7 +71,7 @@ export const common = defineMessages({
     auth: { signIn: "Кіру", register: "Тіркелу", signOut: "Шығу", profile: "Профиль", level: "Деңгей" },
     levels: ["Жаңа құрастырушы", "Схема шәкірті", "Датчик барлаушысы", "IoT рыцары", "Робот сәулетшісі", "Шебер мейкер"],
     difficulty: { beginner: "Бастапқы", intermediate: "Орташа", advanced: "Жоғары" },
-    hours: (h: number) => `${h} сағ`,
+    hours: (h: number) => `${h.toLocaleString("kk-KZ")} сағ`,
     skip: "Мазмұнға өту",
   },
 });

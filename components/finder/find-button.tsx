@@ -27,7 +27,7 @@ export function FindButton({ loading, disabled, onClick }: { loading: boolean; d
       className={clsx(
         "group relative isolate inline-flex h-14 min-w-[17rem] items-center justify-center gap-3 overflow-hidden rounded-2xl px-7 text-base font-semibold transition-all duration-300",
         disabled && !loading
-          ? "cursor-not-allowed bg-ink-800 text-fg-subtle"
+          ? "cursor-not-allowed bg-accent/35 text-ink-950/70"
           : "bg-accent text-ink-950 shadow-[0_0_0_1px_rgba(255,122,26,.5),0_18px_50px_-12px_rgba(255,122,26,.7)] hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(255,148,70,.8),0_24px_60px_-10px_rgba(255,122,26,.85)] active:translate-y-0 motion-reduce:hover:translate-y-0",
         loading && "cursor-wait",
       )}

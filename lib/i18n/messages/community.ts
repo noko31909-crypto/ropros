@@ -1,4 +1,4 @@
-import { defineMessages } from "../config";
+import { defineMessages, ruPlural } from "../config";
 
 /** Community showcase: feed, filters, share modal. */
 export const community = defineMessages({
@@ -15,7 +15,7 @@ export const community = defineMessages({
     signedOutNote: "Sign in to share your builds, like posts and unlock achievements.",
     signedInNote: "Every post earns XP: +100, or +250 when it's 100% working (up to 3 rewarded posts a day).",
     empty: "No builds here yet.",
-    emptyCta: "Be the first to share one.",
+    emptyCta: "Be the first to share one.", emptyBody: "Built something from a guide? A photo and two lines about what you changed help the next maker.", emptyGuides: "Pick a guide to build", signIn: "Sign in",
     status: { working: "100% Working", debugging: "Debugging code…" },
     like: "Like", unlike: "Remove like",
     you: "Your build",
@@ -40,10 +40,10 @@ export const community = defineMessages({
   },
   ru: {
     metaTitle: "Сообщество",
-    title: "Community Showcase",
+    title: "Витрина сообщества",
     lead: "Собранные роботы, рабочие и ещё в отладке. Делитесь своими сборками — успехи и баги одинаково полезны.",
     share: "Поделиться сборкой",
-    filters: { all: "Все", working: "100% Working", debugging: "В отладке" },
+    filters: { all: "Все", working: "Работает на 100%", debugging: "В отладке" },
     sort: { label: "Сортировка", newest: "Новые", popular: "Популярные" },
     count: (n: number) => `${n} ${ruPlural(n, "публикация", "публикации", "публикаций")}`,
     loading: "Загрузка…",
@@ -51,8 +51,8 @@ export const community = defineMessages({
     signedOutNote: "Войдите, чтобы делиться своими сборками, ставить лайки и получать ачивки.",
     signedInNote: "Каждая публикация даёт XP: +100, или +250, если сборка 100% работает (до 3 награждаемых публикаций в день).",
     empty: "Здесь пока пусто.",
-    emptyCta: "Станьте первым, кто поделится сборкой.",
-    status: { working: "100% Working", debugging: "Debugging code…" },
+    emptyCta: "Станьте первым, кто поделится сборкой.", emptyBody: "Собрали что-то по гайду? Фото и пара строк о том, что вы изменили, помогут следующему мейкеру.", emptyGuides: "Выбрать гайд для сборки", signIn: "Войти",
+    status: { working: "Работает на 100%", debugging: "В отладке…" },
     like: "Поставить лайк", unlike: "Убрать лайк",
     you: "Ваша сборка",
     del: { action: (t: string) => `Удалить пост: ${t}`, confirm: "Удалить? Заработанный XP останется.", yes: "Да, удалить", cancel: "Отмена", done: "Пост удалён", error: "Не удалось удалить пост. Попробуйте ещё раз." },
@@ -76,10 +76,10 @@ export const community = defineMessages({
   },
   kk: {
     metaTitle: "Қауымдастық",
-    title: "Community Showcase",
+    title: "Қауымдастық көрмесі",
     lead: "Құрастырылған роботтар: жұмыс істейтіндері және әлі жөнделіп жатқандары. Құрастыруларыңызбен бөлісіңіз — жетістіктер де, қателер де пайдалы.",
     share: "Құрастырумен бөлісу",
-    filters: { all: "Барлығы", working: "100% Working", debugging: "Жөнделуде" },
+    filters: { all: "Барлығы", working: "100% жұмыс істейді", debugging: "Жөнделуде" },
     sort: { label: "Сұрыптау", newest: "Жаңалары", popular: "Танымалдары" },
     count: (n: number) => `${n} жарияланым`,
     loading: "Жүктелуде…",
@@ -87,8 +87,8 @@ export const community = defineMessages({
     signedOutNote: "Құрастыруларыңызбен бөлісу, лайк басу және жетістіктер ашу үшін кіріңіз.",
     signedInNote: "Әр жарияланым XP береді: +100, ал құрастыру 100% жұмыс істесе +250 (күніне 3 марапатталатын жарияланымға дейін).",
     empty: "Мұнда әзірге бос.",
-    emptyCta: "Құрастыруымен бірінші болып бөлісіңіз.",
-    status: { working: "100% Working", debugging: "Debugging code…" },
+    emptyCta: "Құрастыруымен бірінші болып бөлісіңіз.", emptyBody: "Нұсқаулық бойынша бірдеңе құрастырдыңыз ба? Фото мен не өзгерткеніңіз туралы екі жол келесі мейкерге көмектеседі.", emptyGuides: "Құрастыру үшін нұсқаулық таңдау", signIn: "Кіру",
+    status: { working: "100% жұмыс істейді", debugging: "Жөнделуде…" },
     like: "Лайк басу", unlike: "Лайкты алып тастау",
     you: "Сіздің құрастыруыңыз",
     del: { action: (t: string) => `Жазбаны жою: ${t}`, confirm: "Жою керек пе? Жинаған XP сақталады.", yes: "Иә, жою", cancel: "Бас тарту", done: "Жазба жойылды", error: "Жазбаны жою мүмкін болмады. Қайталап көріңіз." },
@@ -111,10 +111,3 @@ export const community = defineMessages({
     xpCapped: "Жарияланды · күндік XP шегіне жеттіңіз (күніне 3 марапатталатын жарияланым)",
   },
 });
-
-function ruPlural(n: number, one: string, few: string, many: string) {
-  const m10 = n % 10, m100 = n % 100;
-  if (m10 === 1 && m100 !== 11) return one;
-  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
-  return many;
-}

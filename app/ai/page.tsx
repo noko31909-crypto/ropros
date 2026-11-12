@@ -14,7 +14,7 @@ export default async function AiPage() {
   const tools = [
     { href: "/ai/finder", title: t.finderTitle, body: t.finderBody, icon: Sparkles, sample: ["Arduino Uno", "HC-SR04", "SG90 Servo"] },
     { href: "/ai/assistant", title: t.assistantTitle, body: t.assistantBody, icon: Terminal, sample: ["$ ropros assistant --help"] },
-    { href: "/ai/build", title: t.generatorTitle, body: t.generatorBody, icon: Box, sample: ["CAD", "Wiring", "Code"] },
+    { href: "/ai/build", title: t.generatorTitle, body: t.generatorBody, icon: Box, sample: t.generatorSample },
   ];
   return (
     <>

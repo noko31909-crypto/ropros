@@ -3,6 +3,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { STLExporter } from "three/examples/jsm/exporters/STLExporter.js";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import type { Cad, CadPart, CadShape } from "@/lib/build/schema";
 import { partModel, type Finish, type Prim } from "@/lib/build/models";
@@ -85,17 +88,87 @@ function printedMesh(part: CadPart): THREE.Object3D {
   return group;
 }
 
+/** Real parts have softened edges that catch the light; a hard-edged box reads as a placeholder. */
+function softBox(size: readonly [number, number, number]): THREE.BufferGeometry {
+  const r = Math.min(0.8, Math.min(...size) * 0.18);
+  return r < 0.15 ? new THREE.BoxGeometry(...size) : new RoundedBoxGeometry(size[0], size[1], size[2], 2, r);
+}
+
 function primMesh(p: Prim): THREE.Mesh {
-  const g = p.type === "box" ? new THREE.BoxGeometry(...p.size) : p.type === "cylinder" ? cylinder(p.r, p.h, 32) : new THREE.SphereGeometry(p.r, 24, 16);
+  const g = p.type === "box" ? softBox(p.size) : p.type === "cylinder" ? cylinder(p.r, p.h, 40) : new THREE.SphereGeometry(p.r, 32, 20);
   const mesh = new THREE.Mesh(g, material(p.color, p.finish));
   mesh.position.set(...p.at);
   if (p.type !== "sphere" && p.rotate) mesh.rotation.copy(euler(p.rotate));
   return mesh;
 }
 
+/** A bought custom part (a wheel): each shape in its own colour, no holes to cut. */
+function customMesh(part: CadPart): THREE.Object3D {
+  const group = new THREE.Group();
+  for (const sh of part.shapes ?? []) {
+    const g = sh.type === "box" ? softBox(sh.size) : cylinder(sh.r, sh.h, 48);
+    const mesh = new THREE.Mesh(g, material(sh.color ?? part.color, sh.color && /^#(1|2)/.test(sh.color) ? "rubber" : "glossy"));
+    mesh.position.set(...sh.at);
+    if (sh.rotate) mesh.rotation.copy(euler(sh.rotate));
+    group.add(mesh);
+  }
+  return group;
+}
+
+/** Jumper wires: a soft tube along each route, with the black Dupont housings at both ends. */
+function wireMeshes(wires: NonNullable<Cad["wires"]>): THREE.Object3D {
+  const group = new THREE.Group();
+  const housing = new RoundedBoxGeometry(2.5, 2.5, 7, 2, 0.4);
+  const black = material("#141518", "glossy");
+  for (const w of wires) {
+    const pts = w.points.map((p) => new THREE.Vector3(...p));
+    const curve = new THREE.CatmullRomCurve3(pts, false, "centripetal");
+    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 48, 0.65, 8, false), material(w.color, "glossy")));
+    for (const end of [pts[0]!, pts[pts.length - 1]!]) {
+      const m = new THREE.Mesh(housing, black);
+      m.position.copy(end).add(new THREE.Vector3(0, 0, 3.5));
+      group.add(m);
+    }
+  }
+  return group;
+}
+
+/**
+ * A part model as one mesh per material: a board with sixty header pins is a handful of draw calls, not sixty.
+ * Falls back to one mesh per primitive if the geometries cannot be merged.
+ */
+function modelMeshes(prims: readonly Prim[]): THREE.Object3D[] {
+  const groups = new Map<string, { color: string; finish?: Finish; geoms: THREE.BufferGeometry[] }>();
+  for (const p of prims) {
+    const mesh = primMesh(p);
+    mesh.updateMatrix();
+    const g = mesh.geometry.clone().applyMatrix4(mesh.matrix);
+    mesh.geometry.dispose();
+    (mesh.material as THREE.Material).dispose();
+    const flat = g.index ? g.toNonIndexed() : g;
+    if (flat !== g) g.dispose();
+    flat.deleteAttribute("uv");
+    const key = `${p.color}|${p.finish ?? ""}`;
+    const entry = groups.get(key) ?? { color: p.color, finish: p.finish, geoms: [] };
+    entry.geoms.push(flat);
+    groups.set(key, entry);
+  }
+  const out: THREE.Object3D[] = [];
+  for (const { color, finish, geoms } of groups.values()) {
+    const merged = geoms.length > 1 ? mergeGeometries(geoms, false) : geoms[0]!;
+    if (merged) {
+      if (merged !== geoms[0]) geoms.forEach((g) => g.dispose());
+      out.push(new THREE.Mesh(merged, material(color, finish)));
+    } else {
+      geoms.forEach((g) => out.push(new THREE.Mesh(g, material(color, finish))));
+    }
+  }
+  return out;
+}
+
 function boughtMesh(part: CadPart): THREE.Object3D {
   const inner = new THREE.Group();
-  for (const p of partModel(part.component!).prims) inner.add(primMesh(p));
+  for (const m of modelMeshes(partModel(part.component!).prims)) inner.add(m);
   const outer = new THREE.Group();
   outer.add(inner);
   outer.position.set(...(part.at ?? [0, 0, 0]));
@@ -133,11 +206,20 @@ export function createView(canvas: HTMLCanvasElement, cad: Cad, mode: ViewMode, 
 
   const scene = new THREE.Scene();
   const slots: Slot[] = cad.parts.map((part, index) => {
-    const object = part.component ? boughtMesh(part) : printedMesh(part);
+    const object = part.component ? boughtMesh(part) : !part.printed && !part.shapes?.some((x) => x.subtract) ? customMesh(part) : printedMesh(part);
     object.traverse((o) => { if (o instanceof THREE.Mesh) { o.castShadow = true; o.receiveShadow = true; } });
     scene.add(object);
     return { index, object, home: object.position.clone(), offset: new THREE.Vector3(), step: part.step ?? index + 1 };
   });
+
+  // Wires are part of the finished look, not of the assembly order: in the animation they appear with the last part.
+  const wires = cad.wires?.length ? wireMeshes(cad.wires) : undefined;
+  if (wires) { wires.traverse((o) => { if (o instanceof THREE.Mesh) o.castShadow = true; }); scene.add(wires); }
+  // Soft studio reflections, so metal, glossy plastic and acrylic look like the materials they are.
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.55;
+  pmrem.dispose();
 
   const bounds = new THREE.Box3().setFromObject(scene);
   const size = bounds.getSize(new THREE.Vector3());
@@ -275,6 +357,7 @@ export function createView(canvas: HTMLCanvasElement, cad: Cad, mode: ViewMode, 
           for (const m of Array.isArray(o.material) ? o.material : [o.material]) m.dispose();
         }
       });
+      scene.environment?.dispose();
       renderer.dispose();
     },
   };

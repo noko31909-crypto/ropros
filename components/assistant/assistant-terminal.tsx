@@ -139,7 +139,7 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
             <p><span className="text-signal">$</span> ropros assistant --help</p>
             <p className="mt-2 text-fg-subtle">{t.help}</p>
             <p className="mt-2 text-fg-subtle">{t.privacy}</p>
-            <p className="mt-4 text-fg-subtle"><span className="text-accent">↵</span> {t.keys.send} · <span className="text-accent">shift+↵</span> {t.keys.newline}{onClose && <> · <span className="text-accent">esc</span> {t.keys.close}</>}</p>
+            <p className="mt-4 text-fg-subtle [@media(hover:none)]:hidden"><span className="text-accent">↵</span> {t.keys.send} · <span className="text-accent">shift+↵</span> {t.keys.newline}{onClose && <> · <span className="text-accent">esc</span> {t.keys.close}</>}</p>
           </div>
         )}
         {messages.map((m, i) => {
@@ -191,7 +191,7 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
           <div className="mb-2">
             <label htmlFor="assistant-attach" className="mb-1 block font-mono text-[11px] text-fg-subtle">{t.attachLabel}</label>
             <textarea id="assistant-attach" value={attachment} onChange={(e) => setAttachment(e.target.value)} rows={4} maxLength={MAX_ATTACHMENT}
-              className="w-full resize-y rounded-xl border border-line bg-[#05080b] p-2.5 font-mono text-xs text-fg placeholder:text-fg-subtle focus:border-accent focus:outline-none"
+              className="w-full resize-y rounded-xl border border-line bg-[#05080b] p-2.5 font-mono text-base sm:text-xs text-fg placeholder:text-fg-subtle focus:border-accent focus:outline-none"
               placeholder="avrdude: stk500_recv(): programmer is not responding…" />
             {attachment.trim() && <div className="mt-1"><CodePreview lang="preview" code={attachment} /></div>}
           </div>
@@ -201,7 +201,7 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
           <label htmlFor="assistant-input" className="sr-only">{t.message}</label>
           <textarea id="assistant-input" ref={taRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={onKeyDown}
             rows={1} maxLength={MAX_PROMPT} placeholder={t.placeholder}
-            className="max-h-32 min-h-[36px] flex-1 resize-none bg-transparent py-2 font-mono text-[13px] text-fg placeholder:text-fg-subtle focus:outline-none" />
+            className="max-h-32 min-h-[36px] flex-1 resize-none bg-transparent py-2 font-mono text-base sm:text-[13px] text-fg placeholder:text-fg-subtle focus:outline-none" />
           <button type="button" onClick={() => setShowAttach((v) => !v)} aria-pressed={showAttach} aria-label={t.attach}
             className={clsx("inline-flex h-9 w-9 items-center justify-center rounded-lg", showAttach ? "bg-accent-soft text-accent" : "text-fg-subtle hover:bg-ink-800 hover:text-fg")}>
             {showAttach ? <Code2 className="h-4 w-4" aria-hidden /> : <Paperclip className="h-4 w-4" aria-hidden />}
@@ -214,8 +214,7 @@ export function AssistantTerminal({ context, onClose, inputRef, className }: Pro
               className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-ink-950 transition-colors hover:bg-accent-hover disabled:bg-ink-800 disabled:text-fg-subtle"><CornerDownLeft className="h-4 w-4" aria-hidden /></button>
           )}
         </div>
-        <p className="mt-2 px-1 font-mono text-[10px] text-fg-subtle">{t.disclaimer}</p>
-        <p className="mt-1 px-1 font-mono text-[10px] text-fg-subtle">{t.training}</p>
+        <p className="mt-2 px-1 text-[11px] leading-snug text-fg-subtle">{t.disclaimer} {t.training}</p>
       </form>
     </div>
   );

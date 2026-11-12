@@ -1,4 +1,4 @@
-import { defineMessages } from "../config";
+import { defineMessages, ruPlural } from "../config";
 
 export type ReplyKey = "loop" | "pinout" | "esp32" | "jitter";
 
@@ -89,14 +89,14 @@ export const assistant = defineMessages({
     attachLabel: "вставьте код или лог Serial",
     attach: "Прикрепить код",
     message: "Сообщение",
-    placeholder: "спросите о проводке, коде, ошибках…",
+    placeholder: "вопрос о проводке или коде…",
     stop: "Остановить",
     send: "Отправить",
     attached: "(прикреплённый код)",
     disclaimer: "Ответы могут быть неточными. Сверяйте проводку с даташитами перед подачей питания.",
     training: "Сообщения обрабатывают сторонние AI-провайдеры и могут использовать их для улучшения своих моделей. Не пишите личные данные.",
     mockNote: "Превью: ответы — заготовленные демо, пока не подключён серверный маршрут.",
-    code: { lines: (n: number) => `${n} стр.`, copy: "копировать", copied: "скопировано", collapse: "свернуть", showAll: (n: number) => `показать все ${n} строк` },
+    code: { lines: (n: number) => `${n} стр.`, copy: "копировать", copied: "скопировано", collapse: "свернуть", showAll: (n: number) => `показать ${ruPlural(n, "всю", "все", "все")} ${n} ${ruPlural(n, "строку", "строки", "строк")}` },
     suggestions: [
       { key: "pinout", label: "Объясни распиновку", prompt: "Объясни распиновку: что делает каждый провод и почему выбраны эти пины." },
       { key: "loop", label: "Оптимизируй loop", prompt: "Оптимизируй главный loop: убери блокирующие задержки." },
@@ -140,7 +140,7 @@ export const assistant = defineMessages({
     attachLabel: "кодты немесе Serial логын қойыңыз",
     attach: "Код тіркеу",
     message: "Хабарлама",
-    placeholder: "сымдар, код, қателер туралы сұраңыз…",
+    placeholder: "сым не код туралы сұрақ…",
     stop: "Тоқтату",
     send: "Жіберу",
     attached: "(тіркелген код)",

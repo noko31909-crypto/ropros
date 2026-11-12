@@ -47,7 +47,8 @@ export function matchProjects(projects: readonly ProjectRecord[], ownedNames: re
     if (miss.length === 0) ready.push(result);
     else if (miss.length <= MAX_MISSING && miss.every((r) => !MAJOR.has(r.category))) close.push(result);
   }
+  // Most relevant first: builds that use more of the parts you listed, then the fewest missing, then the best coverage.
   const byFit = (a: MatchResult, b: MatchResult) =>
-    a.missing.length - b.missing.length || b.coverage - a.coverage || b.required_count - a.required_count || a.title.localeCompare(b.title);
+    b.owned.length - a.owned.length || a.missing.length - b.missing.length || b.coverage - a.coverage || b.required_count - a.required_count || a.title.localeCompare(b.title);
   return { ready: ready.sort(byFit), close_matches: close.sort(byFit), unrecognized };
 }

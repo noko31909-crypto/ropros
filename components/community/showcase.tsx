@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { clsx } from "clsx";
-import { Plus, Sparkles, Users } from "lucide-react";
+import Link from "next/link";
+import { Camera, Info, Plus, Users } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useToast } from "@/components/ui/toast";
@@ -96,40 +97,52 @@ export function CommunityShowcase() {
     <>
       <header className="relative overflow-hidden border-b border-line bg-ink-900/40">
         <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
-        <Container className="relative flex flex-col gap-8 py-14 sm:py-20 lg:flex-row lg:items-end lg:justify-between">
+        <Container className="relative flex flex-col gap-6 py-8 sm:gap-8 sm:py-20 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-ink-850 text-accent"><Users className="h-5 w-5" aria-hidden /></div>
-            <h1 className="text-[2.1rem] font-semibold leading-tight tracking-tight text-fg sm:text-5xl">{t.title}</h1>
-            <p className="mt-4 max-w-xl text-lg text-fg-muted">{t.lead}</p>
+            <div className="mb-5 hidden h-10 w-10 items-center justify-center rounded-xl border border-line bg-ink-850 text-fg-muted sm:inline-flex"><Users className="h-5 w-5" aria-hidden /></div>
+            <h1 className="text-[2rem] font-semibold leading-tight tracking-tight text-fg sm:text-5xl">{t.title}</h1>
+            <p className="mt-3 max-w-xl text-base text-fg-muted sm:mt-4 sm:text-lg">{t.lead}</p>
           </div>
           <button type="button" onClick={() => (userId ? setOpen(true) : openAuth(t.authShare))}
-            className="group relative isolate inline-flex h-14 items-center gap-3 self-start overflow-hidden rounded-2xl bg-accent px-7 text-base font-semibold text-ink-950 shadow-glow transition-all hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 lg:self-auto">
+            className="group relative isolate inline-flex h-12 w-full items-center justify-center gap-3 overflow-hidden rounded-xl bg-accent px-6 text-base font-semibold text-ink-950 shadow-glow transition-all hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 sm:w-auto sm:self-start lg:self-auto">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-ink-950/15 transition-transform group-hover:rotate-90 motion-reduce:group-hover:rotate-0"><Plus className="h-4 w-4" /></span>
             {t.share}
           </button>
         </Container>
       </header>
-      <Container className="py-10">
-        <div className="-mx-5 mb-6 flex items-center gap-2 overflow-x-auto px-5 sm:mx-0 sm:mb-8 sm:flex-wrap sm:px-0">
+      <Container className="py-8 sm:py-10">
+        {/* Filters only make sense once there is something to filter. */}
+        <div className={clsx("-mx-5 mb-6 flex items-center gap-2 overflow-x-auto px-5 sm:mx-0 sm:mb-8 sm:flex-wrap sm:px-0", !posts?.length && "hidden")}>
           {(["all", "working", "debugging"] as const).map(chip)}
           <label className="ml-2 flex shrink-0 items-center gap-2 text-sm text-fg-subtle">
             <span className="sr-only sm:not-sr-only">{t.sort.label}</span>
             <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}
-              className="h-9 rounded-full border border-line bg-ink-900 px-3 text-sm text-fg focus:border-accent focus:outline-none">
+              className="h-9 rounded-full border border-line bg-ink-900 px-3 text-base sm:text-sm text-fg focus:border-accent focus:outline-none">
               <option value="newest">{t.sort.newest}</option>
               <option value="popular">{t.sort.popular}</option>
             </select>
           </label>
           <span className="ml-auto shrink-0 text-sm text-fg-subtle">{posts ? t.count(list.length) : t.loading}</span>
         </div>
-        <p className="mb-6 flex items-start gap-2 rounded-xl border border-line bg-ink-900 px-4 py-3 text-sm text-fg-muted">
-          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-signal" aria-hidden />{userId ? t.signedInNote : t.signedOutNote}
-        </p>
+        <div className="mb-6 flex items-center gap-3 rounded-xl border border-line bg-ink-900 px-4 py-3 text-sm text-fg-muted">
+          <Info className="h-4 w-4 shrink-0 text-fg-subtle" aria-hidden />
+          <p className="flex-1">{userId ? t.signedInNote : t.signedOutNote}</p>
+          {!userId && <button type="button" onClick={() => openAuth()} className="inline-flex h-9 shrink-0 items-center rounded-lg border border-line px-3 text-sm font-semibold text-fg hover:border-fg-subtle">{t.signIn}</button>}
+        </div>
         {error && <p className="mb-6 text-sm text-accent" role="alert">{t.loadError}</p>}
-        {posts && list.length === 0 && !error ? (
-          <div className="rounded-[28px] border border-dashed border-ink-700 p-16 text-center">
-            <p className="text-fg-muted">{t.empty}</p>
-            <button type="button" onClick={() => (userId ? setOpen(true) : openAuth(t.authShare))} className="mt-3 text-sm font-semibold text-accent hover:underline">{t.emptyCta}</button>
+        {/* While the feed loads, hold the empty state's space so nothing below jumps when it arrives. */}
+        {posts === null && !error ? (
+          <div aria-busy="true" aria-label={t.loading} className="h-[340px] animate-pulse rounded-[28px] border border-line bg-ink-900 motion-reduce:animate-none" />
+        ) : posts && list.length === 0 && !error ? (
+          <div className="rounded-[28px] border border-line bg-gradient-to-b from-ink-850 to-ink-900 px-6 py-12 text-center sm:py-16">
+            <span className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-line bg-ink-900 text-fg-muted"><Camera className="h-6 w-6" aria-hidden /></span>
+            <h2 className="mt-5 text-xl font-semibold text-fg">{t.empty} {t.emptyCta}</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-fg-muted">{t.emptyBody}</p>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+              <button type="button" onClick={() => (userId ? setOpen(true) : openAuth(t.authShare))}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-accent px-5 text-sm font-semibold text-ink-950 hover:bg-accent-hover"><Plus className="h-4 w-4" aria-hidden />{t.share}</button>
+              <Link href="/projects" className="inline-flex h-11 items-center justify-center rounded-xl border border-ink-700 bg-ink-850 px-5 text-sm font-semibold text-fg hover:border-fg-subtle">{t.emptyGuides}</Link>
+            </div>
           </div>
         ) : (
           <div className="columns-2 gap-3 sm:gap-6 lg:columns-3 2xl:columns-4">

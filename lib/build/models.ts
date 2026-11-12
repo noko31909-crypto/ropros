@@ -7,31 +7,53 @@ import type { ComponentId } from "../hardware/ids.ts";
  * centre of its bottom face, so a part placed at [x, y, 0] sits on the build plate.
  * Sizes follow common datasheets; small details (pins, labels) are left out.
  */
-export type Prim =
-  | { type: "box"; size: [number, number, number]; at: [number, number, number]; color: string; finish?: Finish; rotate?: [number, number, number] }
-  | { type: "cylinder"; r: number; h: number; at: [number, number, number]; color: string; finish?: Finish; rotate?: [number, number, number] }
-  | { type: "sphere"; r: number; at: [number, number, number]; color: string; finish?: Finish };
-export type Finish = "metal" | "glass" | "glossy" | "rubber";
-export type PartModel = { size: [number, number, number]; prims: Prim[] };
+import { BLACK, GOLD, PCB_T, SILVER, WHITE, board, box, cyl, on, primBox, type Box, type Finish, type PartModel, type Prim } from "./prims.ts";
+import { DETAILED_MODELS } from "./part-models.ts";
 
-const PCB_T = 1.6;
-const BLACK = "#16181c", SILVER = "#c9cdd2", GOLD = "#d4a93c", WHITE = "#eef0f2";
+export type { Box, Finish, PartModel, Prim } from "./prims.ts";
+export { primBox } from "./prims.ts";
 
-const box = (size: [number, number, number], at: [number, number, number], color: string, finish?: Finish): Prim => ({ type: "box", size, at, color, ...(finish ? { finish } : {}) });
-const cyl = (r: number, h: number, at: [number, number, number], color: string, finish?: Finish, rotate?: [number, number, number]): Prim => ({ type: "cylinder", r, h, at, color, ...(finish ? { finish } : {}), ...(rotate ? { rotate } : {}) });
-/** A board: the PCB plus parts on top. `on(z)` gives the centre height of something `z` tall sitting on the PCB. */
-const pcb = (w: number, d: number, color: string): Prim => box([w, d, PCB_T], [0, 0, PCB_T / 2], color, "glossy");
-const on = (h: number) => PCB_T + h / 2;
 const header = (len: number, x: number, y: number, alongY = false): Prim =>
   box(alongY ? [2.5, len, 8.5] : [len, 2.5, 8.5], [x, y, on(8.5)], BLACK);
 const chip = (w: number, d: number, x: number, y: number): Prim => box([w, d, 1.2], [x, y, on(1.2)], "#222428");
 
-function board(w: number, d: number, color: string, extra: Prim[]): PartModel {
-  const top = Math.max(PCB_T, ...extra.map((p) => p.at[2] + (p.type === "box" ? p.size[2] / 2 : p.type === "cylinder" ? p.h / 2 : p.r)));
-  return { size: [w, d, Math.round(top * 10) / 10], prims: [pcb(w, d, color), ...extra] };
+/**
+ * TT gear motor (the yellow one in every robot kit): gearbox along X, the motor can behind it, the output shaft
+ * across it along Y at x + 22. Origin: centre of the bottom face of the gearbox+can footprint, as the model.
+ * `side` turns the shaft stub towards the wheel (+1 = +Y).
+ */
+function ttMotor(x: number, y: number, z: number, side = 1): Prim[] {
+  return [
+    box([37, 22.5, 18.8], [x + 16, y, z + 9.4], "#F2C200", "glossy"), box([6, 22.6, 4], [x + 30, y, z + 16.9], "#e3b400", "glossy"),
+    cyl(9.4, 22, [x - 12.5, y, z + 9.4], SILVER, "metal", [0, 90, 0]), cyl(6, 3, [x - 25, y, z + 9.4], "#d8dade", "metal", [0, 90, 0]),
+    box([1.2, 2.5, 5], [x - 26.8, y + 4, z + 9.4], "#c8873a", "metal"), box([1.2, 2.5, 5], [x - 26.8, y - 4, z + 9.4], "#c8873a", "metal"),
+    cyl(2.7, 37, [x + 22, y + side * 2, z + 9.4], WHITE, undefined, [90, 0, 0]),
+  ];
 }
 
-const MODELS: Partial<Record<ComponentId, () => PartModel>> = {
+/** Robot wheel for a TT motor: rubber tyre with tread ribs, yellow spoked rim, white hub; axis along Y. */
+export function wheel(x: number, y: number, side = 1, z = 33): Prim[] {
+  const ax: [number, number, number] = [90, 0, 0];
+  return [
+    cyl(32.4, 26, [x, y, z], "#1b1d21", "rubber", ax),
+    ...[-9, -3, 3, 9].map((dy) => cyl(33, 2.6, [x, y + dy, z], "#232529", "rubber", ax)),
+    cyl(23, 27, [x, y, z], "#F2C200", "glossy", ax),
+    ...[0, 60, 120].map((a) => box([42, 4, 4], [x, y + side * 13.6, z], "#e3b400", "glossy")).map((p, i) => ({ ...p, rotate: [0, [0, 60, 120][i]!, 0] as [number, number, number] })),
+    cyl(6, 29, [x, y, z], WHITE, undefined, ax),
+  ];
+}
+
+/** Clear acrylic deck of a robot kit, with its slots, 44.5 mm up (its top at 46). */
+function deck(l: number, w: number): Prim[] {
+  return [
+    box([l, w, 3], [0, 0, 44.5], "#cfe8ff", "glass"),
+    ...[-1, 1].map((sy) => box([30, 6, 3.1], [0, sy * (w / 2 - 20), 44.5], "#9ab8d4", "glass")),
+    ...[[-l / 2 + 12, -w / 2 + 12], [-l / 2 + 12, w / 2 - 12], [l / 2 - 12, -w / 2 + 12], [l / 2 - 12, w / 2 - 12]].map(([px, py]) => cyl(1.6, 3.2, [px!, py!, 44.5], "#3c4652", "glossy")),
+  ];
+}
+export const KIT_AXLE_2WD = 30;
+
+const BASE_MODELS: Partial<Record<ComponentId, () => PartModel>> = {
   "arduino-uno": () => board(68.6, 53.4, "#00878F", [
     box([16, 12, 11], [-29, 9, on(11)], SILVER, "metal"), box([14, 9, 11], [-28.5, -18, on(11)], BLACK),
     header(48, 8, 24.4), header(40, 10, -24.4), box([35, 8, 4], [10, -8, on(4)], "#222428"), cyl(2, 3, [-14, -5, on(3)], SILVER, "metal"),
@@ -60,9 +82,7 @@ const MODELS: Partial<Record<ComponentId, () => PartModel>> = {
   "servo-mg996r": () => ({ size: [54, 20, 44], prims: [
     box([40.7, 19.7, 37], [0, 0, 18.5], BLACK), box([54, 19.7, 2.5], [0, 0, 28], BLACK), cyl(7, 4, [10, 0, 39], BLACK), cyl(3, 4, [10, 0, 42], GOLD, "metal"), box([30, 7, 2], [10, 0, 44], SILVER, "metal"),
   ] }),
-  "dc-motor": () => ({ size: [70, 22.5, 18.8], prims: [
-    box([37, 22.5, 18.8], [16, 0, 9.4], "#F2C200", "glossy"), cyl(9.4, 25, [-14, 0, 9.4], SILVER, "metal", [0, 90, 0]), cyl(2.7, 37, [22, 0, 9.4], WHITE, undefined, [90, 0, 0]),
-  ] }),
+  "dc-motor": () => ({ size: [70, 22.5, 18.8], prims: ttMotor(0, 0, 0) }),
   "l298n": () => board(43, 43, "#C62828", [
     box([23, 16, 25], [0, 8, on(25)], BLACK, "metal"), ...[-9, -4.5, 0, 4.5, 9].map((x) => box([1.5, 16, 6], [x, 8, on(25) + 15], BLACK, "metal")),
     box([8, 10, 10], [-17, -13, on(10)], "#1E5AA8"), box([8, 10, 10], [17, -13, on(10)], "#1E5AA8"), box([15, 8, 10], [0, -17, on(10)], "#1E5AA8"),
@@ -71,7 +91,10 @@ const MODELS: Partial<Record<ComponentId, () => PartModel>> = {
   "drv8833": () => board(18.5, 16, "#1565C0", [chip(5, 4, 0, 0), header(15, 0, 6.8), header(15, 0, -6.8)]),
   "l9110s": () => board(29, 23, "#C62828", [chip(4, 5, -4, 4), chip(4, 5, -4, -4), box([8, 16, 9], [9, 0, on(9)], "#1E5AA8")]),
   "relay-module": () => board(50, 26, "#1565C0", [box([19, 15.5, 15], [2, 0, on(15)], "#2a5bd7", "glossy"), box([10, 16, 10], [19, 0, on(10)], "#1E5AA8"), header(8, -22, 0, true)]),
-  "battery-18650": () => ({ size: [65, 18.6, 18.6], prims: [cyl(9.3, 62, [0, 0, 9.3], "#2b6cb0", "glossy", [0, 90, 0]), cyl(9.3, 3, [31.5, 0, 9.3], SILVER, "metal", [0, 90, 0]), cyl(3, 1.5, [33.5, 0, 9.3], SILVER, "metal", [0, 90, 0])] }),
+  "battery-18650": () => ({ size: [65, 18.6, 18.6], prims: [
+    cyl(9.3, 60, [0, 0, 9.3], "#2b6cb0", "glossy", [0, 90, 0]), cyl(9.35, 4, [-24, 0, 9.3], "#e8eef5", "glossy", [0, 90, 0]),
+    cyl(9.0, 2.2, [31.1, 0, 9.3], SILVER, "metal", [0, 90, 0]), cyl(3.2, 1.2, [32.6, 0, 9.3], SILVER, "metal", [0, 90, 0]), cyl(9.0, 1.4, [-30.7, 0, 9.3], SILVER, "metal", [0, 90, 0]),
+  ] }),
   "battery-2s-lipo": () => ({ size: [70, 35, 18], prims: [box([70, 35, 18], [0, 0, 9], "#3a3f47", "glossy"), box([20, 30, 0.5], [0, 0, 18.3], "#c62828"), box([4, 10, 4], [37, 8, 9], "#c62828"), box([4, 10, 4], [37, -8, 9], BLACK)] }),
   "battery-9v": () => ({ size: [48.5, 26.5, 17.5], prims: [box([46, 26.5, 17.5], [-1.2, 0, 8.75], BLACK, "glossy"), box([2.5, 24, 15], [23, 0, 8.75], GOLD, "metal"), cyl(4, 3, [25, 6.5, 8.75], SILVER, "metal", [0, 90, 0]), cyl(4, 3, [25, -6.5, 8.75], SILVER, "metal", [0, 90, 0])] }),
   "battery-4xaa": () => ({ size: [62, 58, 16], prims: [box([62, 58, 2], [0, 0, 1], BLACK), ...[-21.75, -7.25, 7.25, 21.75].map((y) => cyl(7.25, 50, [0, y, 8.6], "#2e7d32", "glossy", [0, 90, 0]))] }),
@@ -96,12 +119,12 @@ const MODELS: Partial<Record<ComponentId, () => PartModel>> = {
   "ws2812b-ring": () => ({ size: [50, 50, 3.4], prims: [cyl(25, 1.6, [0, 0, 0.8], BLACK), cyl(16, 1.7, [0, 0, 0.8], "#0d0f12"), ...Array.from({ length: 12 }, (_, i) => box([5, 5, 1.6], [20.5 * Math.cos((i * Math.PI) / 6), 20.5 * Math.sin((i * Math.PI) / 6), 2.4], WHITE))] }),
   "ws2812b-strip": () => ({ size: [100, 10, 3], prims: [box([100, 10, 1], [0, 0, 0.5], WHITE), ...Array.from({ length: 6 }, (_, i) => box([5, 5, 1.6], [-41.5 + i * 16.6, 0, 1.8], WHITE))] }),
   "fan-5v": () => ({ size: [40, 40, 10], prims: [box([40, 40, 10], [0, 0, 5], BLACK), cyl(18, 10.2, [0, 0, 5], "#2a2a2a"), cyl(7, 10.4, [0, 0, 5], BLACK)] }),
-  "robot-chassis-2wd": () => ({ size: [200, 150, 66], prims: [
-    box([200, 130, 3], [0, 0, 36], "#cfe8ff", "glass"), cyl(33, 26, [30, 72, 33], BLACK, "rubber", [90, 0, 0]), cyl(33, 26, [30, -72, 33], BLACK, "rubber", [90, 0, 0]),
-    cyl(20, 27, [30, 72, 33], "#F2C200", undefined, [90, 0, 0]), cyl(20, 27, [30, -72, 33], "#F2C200", undefined, [90, 0, 0]), cyl(8, 10, [-80, 0, 8], SILVER, "metal", [90, 0, 0]),
+  "robot-chassis-2wd": () => ({ size: [200, 170, 66], prims: [
+    ...deck(200, 130), ...[1, -1].flatMap((side) => [...ttMotor(KIT_AXLE_2WD - 22, side * 40, 23.6, side), ...wheel(KIT_AXLE_2WD, side * 72, side)]),
+    box([12, 12, 26], [-80, 0, 30.2], BLACK), cyl(9, 4, [-80, 0, 15], SILVER, "metal"), { type: "sphere", r: 8, at: [-80, 0, 8], color: SILVER, finish: "metal" },
   ] }),
-  "robot-chassis-4wd": () => ({ size: [250, 170, 66], prims: [
-    box([250, 150, 3], [0, 0, 36], "#cfe8ff", "glass"), ...[[70, 1], [70, -1], [-70, 1], [-70, -1]].map(([x, s]) => cyl(33, 26, [x!, s! * 82, 33], BLACK, "rubber", [90, 0, 0])),
+  "robot-chassis-4wd": () => ({ size: [250, 190, 66], prims: [
+    ...deck(250, 150), ...[[70, 1], [70, -1], [-70, 1], [-70, -1]].flatMap(([x, side]) => [...ttMotor(x! - 22, side! * 50, 23.6, side!), ...wheel(x!, side! * 82, side!)]),
   ] }),
   "ir-receiver-vs1838b": () => ({ size: [6, 5, 7.5], prims: [box([6, 5, 7.5], [0, 0, 3.75], BLACK, "glossy"), { type: "sphere", r: 1.8, at: [0, -2.5, 5], color: BLACK, finish: "glossy" }] }),
   "rc522-rfid": () => board(60, 40, "#1565C0", [box([40, 30, 0.3], [5, 0, on(0.3)], GOLD, "metal"), chip(5, 5, -18, 0)]),
@@ -114,6 +137,9 @@ const MODELS: Partial<Record<ComponentId, () => PartModel>> = {
   "buck-converter-lm2596": () => board(43, 21, "#1565C0", [cyl(5, 10, [-12, 0, on(10)], BLACK), box([12, 12, 7], [6, 0, on(7)], "#333"), box([10, 5, 9], [17, 6, on(9)], "#1E5AA8")]),
   "tp4056-charger": () => board(26, 17, "#1565C0", [box([7.5, 6, 3], [-10, 0, on(3)], SILVER, "metal"), chip(4, 4, 3, 0)]),
 };
+
+/** Detailed models (lib/build/part-models.ts) replace the simple ones where both exist. */
+const MODELS: Partial<Record<ComponentId, () => PartModel>> = { ...BASE_MODELS, ...DETAILED_MODELS };
 
 /** The built-in model, or a plain board-coloured slab sized from the diagram footprint for parts without one. */
 export function partModel(id: ComponentId): PartModel {
@@ -132,46 +158,9 @@ export function modelSizes(): string {
   return (Object.keys(MODELS) as ComponentId[]).map((id) => { const s = partModel(id).size; return `${id} ${s.map((v) => Math.round(v * 10) / 10).join("x")}`; }).join(", ");
 }
 
-/**
- * Mounting holes from the boards' and modules' drawings, in the model's own coordinates (origin = footprint
- * centre), with the screw they take. Only parts whose hole pattern is published and widely used are listed;
- * anything else rests on the floor or on rails.
- */
-export type Mount = { holes: [number, number][]; screw: "M2" | "M2.5" | "M3" };
-export const MOUNTS: Partial<Record<ComponentId, Mount>> = {
-  // Arduino Uno R3: holes at (14.0, 2.5), (15.3, 50.7), (66.1, 7.6), (66.1, 35.5) mm from the lower-left corner of a 68.6 x 53.4 board.
-  "arduino-uno": { holes: [[-20.3, -24.2], [-19.0, 24.0], [31.8, -19.1], [31.8, 8.8]], screw: "M3" },
-  // Arduino Mega 2560: the Uno pattern plus (90.2, 50.7) and (96.5, 2.5) on a 101.6 x 53.3 board.
-  "arduino-mega": { holes: [[-36.8, -24.2], [-35.5, 24.0], [15.3, -19.1], [15.3, 8.8], [39.4, 24.0], [45.7, -24.2]], screw: "M3" },
-  // Raspberry Pi 4: 58 x 49 mm pattern, 3.5 mm in from the USB-C/HDMI corner of an 85 x 56 board.
-  "raspberry-pi-4": { holes: [[-39, -24.5], [19, -24.5], [-39, 24.5], [19, 24.5]], screw: "M2.5" },
-  // Raspberry Pi Pico: 47 x 11.4 mm pattern on a 51 x 21 board.
-  "raspberry-pi-pico": { holes: [[-23.5, -5.7], [-23.5, 5.7], [23.5, -5.7], [23.5, 5.7]], screw: "M2" },
-  // L298N module: 37 x 37 mm pattern on a 43 x 43 board.
-  "l298n": { holes: [[-18.5, -18.5], [18.5, -18.5], [-18.5, 18.5], [18.5, 18.5]], screw: "M3" },
-  // HC-SR04: 41 x 17 mm pattern on a 45 x 20 board.
-  "hc-sr04": { holes: [[-20.5, -8.5], [20.5, -8.5], [-20.5, 8.5], [20.5, 8.5]], screw: "M2" },
-  // 16x2 LCD: 75 x 31 mm pattern on an 80 x 36 board.
-  "lcd-1602-i2c": { holes: [[-37.5, -15.5], [37.5, -15.5], [-37.5, 15.5], [37.5, 15.5]], screw: "M3" },
-};
-/** Screw → [standoff outer radius, pilot hole radius for a self-tapping screw in PLA]. */
-export const SCREW: Record<Mount["screw"], [number, number]> = { M2: [2.2, 0.8], "M2.5": [2.6, 1.05], M3: [3, 1.25] };
+export { MOUNTS, SCREW, type Mount } from "./mounts.ts";
 
-export type Box = { min: [number, number, number]; max: [number, number, number] };
 
-/** Axis-aligned bounds of one primitive in model coordinates (cylinders turned onto X or Y are handled). */
-export function primBox(p: Prim): Box {
-  const [x, y, z] = p.at;
-  let h: [number, number, number];
-  if (p.type === "box") h = [p.size[0] / 2, p.size[1] / 2, p.size[2] / 2];
-  else if (p.type === "sphere") h = [p.r, p.r, p.r];
-  else {
-    const r = p.rotate ?? [0, 0, 0];
-    const axis = Math.abs(r[1]) % 180 === 90 ? 0 : Math.abs(r[0]) % 180 === 90 ? 1 : 2;
-    h = [p.r, p.r, p.r]; h[axis] = p.h / 2;
-  }
-  return { min: [x - h[0], y - h[1], z - h[2]], max: [x + h[0], y + h[1], z + h[2]] };
-}
 
 /** Bounds of a whole built-in model. */
 export function modelBox(id: ComponentId): Box {

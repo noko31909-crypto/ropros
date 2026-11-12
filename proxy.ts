@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { AUTH_COOKIE_OPTIONS, supabasePublicConfig } from "@/lib/supabase/public-config";
 import { TURNSTILE_ORIGIN } from "@/lib/turnstile";
+import { GUIDE_SLUG_LIST } from "@/content/guides/slugs";
 
 // Guide covers are served from this CDN (content/covers.json).
 const COVER_CDN = "https://d2ol7oe51mr4n9.cloudfront.net";
@@ -33,17 +34,26 @@ function contentSecurityPolicy(nonce: string, supabaseUrl: string): string {
  * sees a valid JWT, and sets the Content-Security-Policy. Does not make authorization decisions:
  * route handlers still call getUser().
  */
+const GUIDE_PATH = /^\/projects\/([^/]+)\/?$/;
+const KNOWN_GUIDES: ReadonlySet<string> = new Set(GUIDE_SLUG_LIST);
+
 export async function proxy(request: NextRequest) {
   const { url, anon } = supabasePublicConfig();
   const nonce = btoa(crypto.randomUUID());
   const csp = contentSecurityPolicy(nonce, url);
+
+  // A guide page that does not exist answers a real 404 (the page itself streams, which would lock in a 200).
+  const guide = GUIDE_PATH.exec(request.nextUrl.pathname)?.[1];
+  const missing = guide !== undefined && !KNOWN_GUIDES.has(guide);
 
   // Rebuilt after a session refresh so server components see the new auth cookies and the nonce.
   const forward = () => {
     const headers = new Headers(request.headers);
     headers.set("x-nonce", nonce);
     headers.set("Content-Security-Policy", csp);
-    return NextResponse.next({ request: { headers } });
+    return missing
+      ? NextResponse.rewrite(new URL("/guide-not-found", request.url), { request: { headers } })
+      : NextResponse.next({ request: { headers } });
   };
   let response = forward();
 
