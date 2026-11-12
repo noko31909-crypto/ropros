@@ -10,6 +10,7 @@ import { GuideActions } from "@/components/guide/guide-actions";
 import { ProgressActions } from "@/components/guide/progress-actions";
 import { GuideDiagram } from "@/components/guide/diagrams";
 import { allGuideSlugs, getGuide, localizeGuide } from "@/lib/guides";
+import { BOARD_LABEL, getProject } from "@/lib/projects";
 import { getLocale } from "@/lib/i18n/server";
 import { common } from "@/lib/i18n/messages/common";
 import { guideMessages } from "@/lib/i18n/messages/guide";
@@ -70,9 +71,12 @@ export default async function GuidePage({ params }: Props) {
     { icon: Clock, label: t.buildHours(guide.hours) },
     { icon: Wallet, label: `≈ $${guide.costUsd}` },
   ];
-  const category = guide.platform === "esp32"
-    ? { href: "/projects?board=esp32", label: t.iot }
-    : { href: "/projects?category=robotics", label: t.robotics };
+  // The crumb is what the guide is: robotics builds file under Robotics, everything else under its board.
+  const card = getProject(guide.slug);
+  const board = card?.board ?? (guide.platform === "raspberry_pi" ? "pi" : guide.platform);
+  const category = card?.robotics
+    ? { href: "/projects?category=robotics", label: t.robotics }
+    : { href: `/projects?board=${board}`, label: BOARD_LABEL[board] };
 
   return (
     <>
@@ -80,21 +84,21 @@ export default async function GuidePage({ params }: Props) {
         <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <Container className="relative grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
           <div className="animate-fade-up motion-reduce:animate-none">
-            <nav aria-label={t.breadcrumb} className="flex items-center gap-1.5 text-sm text-fg-subtle">
-              <Link href="/projects" className="hover:text-fg">{t.hub}</Link>
+            <nav aria-label={t.breadcrumb} className="-my-2 flex items-center gap-1 text-sm text-fg-subtle">
+              <Link href="/projects" className="inline-flex min-h-10 items-center hover:text-fg">{t.hub}</Link>
               <ChevronRight className="h-3.5 w-3.5" aria-hidden />
-              <Link href={category.href} className="hover:text-fg">{category.label}</Link>
+              <Link href={category.href} className="inline-flex min-h-10 items-center hover:text-fg">{category.label}</Link>
             </nav>
-            <h1 className="mt-5 max-w-3xl text-[2.1rem] font-semibold leading-tight tracking-[-0.03em] text-fg sm:text-5xl">{guide.title}</h1>
+            <h1 className="mt-5 max-w-3xl text-balance text-[2.1rem] font-semibold leading-tight tracking-[-0.03em] text-fg sm:text-5xl">{guide.title}</h1>
             <p className="mt-4 max-w-2xl text-lg text-fg-muted">{guide.summary}</p>
             <ul className="mt-7 flex flex-wrap gap-2">
               {meta.map(({ icon: Icon, label }) => (
                 <li key={label} className="inline-flex items-center gap-2 rounded-full border border-line bg-ink-900 px-3 py-1.5 text-sm text-fg-muted">
-                  <Icon className="h-4 w-4 text-accent" aria-hidden />{label}
+                  <Icon className="h-4 w-4 text-fg-subtle" aria-hidden />{label}
                 </li>
               ))}
-              <li className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-sm font-semibold text-accent">
-                <Sparkles className="h-4 w-4" aria-hidden />{t.xpReward(guide.xpReward)}
+              <li className="inline-flex items-center gap-2 rounded-full border border-line bg-ink-900 px-3 py-1.5 text-sm text-fg-muted">
+                <Sparkles className="h-4 w-4 text-accent" aria-hidden />{t.xpReward(guide.xpReward)}
               </li>
             </ul>
             <GuideActions slug={guide.slug} />

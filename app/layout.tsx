@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
-import { Gloock, IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
+import { Gloock, IBM_Plex_Sans, JetBrains_Mono, Noto_Serif_Display } from "next/font/google";
 import { SiteHeader } from "@/components/nav/site-header";
 import { SiteFooter } from "@/components/nav/site-footer";
 import { TabBar } from "@/components/nav/tab-bar";
@@ -15,6 +15,8 @@ import "./globals.css";
 const plex = IBM_Plex_Sans({ subsets: ["latin", "cyrillic", "cyrillic-ext"], weight: ["400", "500", "600", "700"], variable: "--font-plex-sans", display: "swap" });
 const mono = JetBrains_Mono({ subsets: ["latin", "cyrillic", "cyrillic-ext"], weight: ["400", "500"], variable: "--font-jetbrains", display: "swap" });
 const gloock = Gloock({ subsets: ["latin"], weight: "400", variable: "--font-gloock", display: "swap" });
+/** Gloock has no Cyrillic: Russian and Kazakh headlines use this display serif instead (Kazakh letters are in cyrillic-ext). */
+const serifCyr = Noto_Serif_Display({ subsets: ["latin", "cyrillic", "cyrillic-ext"], weight: "500", variable: "--font-serif-cyr", display: "swap", preload: false });
 
 export const metadata: Metadata = {
   title: { default: "ropros — hardware builds for engineers", template: "%s · ropros" },
@@ -27,7 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = await getLocale();
   const t = common[locale];
   return (
-    <html lang={LOCALE_TAG[locale]} className={`dark ${plex.variable} ${mono.variable} ${gloock.variable}`}>
+    <html lang={LOCALE_TAG[locale]} className={`dark ${plex.variable} ${mono.variable} ${gloock.variable} ${serifCyr.variable}`}>
       <body className="flex min-h-dvh flex-col">
         <LocaleProvider initial={locale}>
           <ToastProvider>

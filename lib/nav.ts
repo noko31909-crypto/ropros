@@ -41,7 +41,7 @@ export function buildFooter(t: T): { title: string; links: NavLink[] }[] {
     ]},
     { title: t.footer.community, links: [
       { label: t.footer.buildLogs, href: "/community" },
-      { label: t.footer.guides, href: "/projects/obstacle-avoiding-robot" },
+      { label: t.footer.guides, href: "/projects" },
     ]},
   ];
 }

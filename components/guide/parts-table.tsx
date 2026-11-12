@@ -17,7 +17,7 @@ export function PartsTable({ parts }: { parts: Part[] }) {
       <ul className="space-y-2 sm:hidden">
         {ordered.map((p) => (
           <li key={p.name} className="flex items-start gap-3 rounded-xl border border-line bg-ink-900 p-4">
-            <span className="mt-0.5 font-mono text-sm tabular-nums text-accent">×{p.qty}</span>
+            <span className="mt-0.5 w-9 shrink-0 text-right font-mono text-sm tabular-nums text-fg-muted">×{p.qty}</span>
             <div className="min-w-0 flex-1">
               <p className="font-medium text-fg">{p.name}{p.optional && <Opt short />}</p>
               <p className="mt-1 text-sm text-fg-muted">{p.role}</p>
@@ -41,7 +41,7 @@ export function PartsTable({ parts }: { parts: Part[] }) {
             {ordered.map((p) => (
               <tr key={p.name} className="border-t border-line transition-colors hover:bg-ink-800/60">
                 <td className="py-3.5 pl-5 pr-3 font-medium text-fg">{p.name}{p.optional && <Opt />}</td>
-                <td className="px-3 py-3.5 text-right font-mono tabular-nums text-accent">×{p.qty}</td>
+                <td className="px-3 py-3.5 text-right font-mono tabular-nums text-fg-muted">×{p.qty}</td>
                 <td className="px-3 py-3.5 font-mono text-xs text-fg-muted">{p.spec}</td>
                 <td className="py-3.5 pl-3 pr-5 text-fg-muted">{p.role}</td>
               </tr>

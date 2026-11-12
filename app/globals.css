@@ -10,7 +10,7 @@
   --color-line: #1c2430;      /* hairlines */
   --color-fg: #e9eef3;        /* primary text */
   --color-fg-muted: #8b98a9;  /* secondary text */
-  --color-fg-subtle: #5d6a7b; /* tertiary text */
+  --color-fg-subtle: #7a8798; /* tertiary text (≥4.5:1 on cards) */
 
   --color-accent: #ff7a1a;        /* neon orange: primary actions */
   --color-accent-hover: #ff9446;
@@ -24,8 +24,10 @@
   --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
   --font-display: var(--font-gloock), Georgia, serif;
+  /* Headlines: Gloock in English; a Cyrillic display serif in Russian and Kazakh (see the :lang rule below). */
+  --font-headline: var(--font-gloock), Georgia, serif;
 
-  --radius-card: 1rem;
+  --radius-card: 1.75rem;
 
   --animate-shimmer: shimmer 2.6s ease-in-out infinite;
   --animate-scan: scan 1.4s ease-in-out infinite;
@@ -47,6 +49,9 @@
     @apply bg-ink-950 font-sans text-fg antialiased;
     font-feature-settings: "ss01", "cv11";
   }
+  :root:lang(ru), :root:lang(kk) { --font-headline: var(--font-serif-cyr), Georgia, serif; }
+  h1, h2, h3 { text-wrap: balance; }
+  p, li { text-wrap: pretty; }
   ::selection { background: var(--color-accent); color: #0b0f14; }
   :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; border-radius: 6px; }
   @media (prefers-reduced-motion: reduce) {

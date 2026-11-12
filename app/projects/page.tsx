@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CircuitBoard } from "lucide-react";
 import { Container, PageHeader } from "@/components/ui/container";
 import { ProjectCard } from "@/components/cards/project-card";
+import { ButtonLink } from "@/components/ui/button";
 import { HubFilters, HubSearch } from "@/components/cards/hub-controls";
 import { getLocale } from "@/lib/i18n/server";
 import { projects as msgs } from "@/lib/i18n/messages/projects";
@@ -14,6 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 type SP = Record<string, string | string[] | undefined>;
+const PAGE = 24;
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 
 export default async function ProjectsPage({ searchParams }: { searchParams: Promise<SP> }) {
@@ -23,12 +25,17 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
   const board = one(sp.board);
   const difficulty = one(sp.difficulty);
   const q = (one(sp.q) ?? "").slice(0, 100);
-  const list = filterProjects(PROJECTS, {
+  const all = filterProjects(PROJECTS, {
     q,
     board: isBoard(board) ? board : undefined,
     difficulty: isDifficulty(difficulty) ? difficulty : undefined,
     robotics: one(sp.category) === "robotics",
   }, locale);
+  // 24 cards at a time: a link (no client JS) asks for the next batch and keeps the filters in the URL.
+  const shown = Math.min(all.length, Math.max(PAGE, Number.parseInt(one(sp.show) ?? "", 10) || PAGE));
+  const list = all.slice(0, shown);
+  const moreQuery = new URLSearchParams(Object.entries(sp).flatMap(([k, v]) => (k !== "show" && typeof v === "string" ? [[k, v]] : [])));
+  moreQuery.set("show", String(shown + PAGE));
 
   return (
     <>
@@ -39,11 +46,19 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
         <div className="grid gap-6 py-6 sm:py-12 lg:grid-cols-[260px_1fr] lg:gap-10">
           <Suspense fallback={null}><HubFilters /></Suspense>
           <div>
-            <p className="mb-6 text-sm text-fg-muted"><span className="font-semibold text-fg">{t.results(list.length)}</span></p>
+            <p className="mb-6 text-sm text-fg-muted"><span className="font-semibold text-fg">{t.results(all.length)}</span></p>
             {list.length ? (
-              <div className="columns-2 gap-3 sm:gap-6 xl:columns-3">
-                {list.map((p) => <ProjectCard key={p.slug} project={p} locale={locale} masonry />)}
-              </div>
+              <>
+                <div className="columns-2 gap-3 sm:gap-6 xl:columns-3">
+                  {list.map((p) => <ProjectCard key={p.slug} project={p} locale={locale} masonry />)}
+                </div>
+                {shown < all.length && (
+                  <div className="mt-4 flex flex-col items-center gap-3 sm:mt-6">
+                    <ButtonLink href={`/projects?${moreQuery}`} variant="secondary" className="w-full justify-center sm:w-auto">{t.more}</ButtonLink>
+                    <p className="text-xs text-fg-subtle">{t.shown(shown, all.length)}</p>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="rounded-2xl border border-dashed border-ink-700 p-10 text-center text-fg-muted">
                 <p>{t.empty}</p>

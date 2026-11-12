@@ -1,4 +1,4 @@
-import { defineMessages } from "../config";
+import { defineMessages, ruPlural } from "../config";
 
 /** Guide page (/projects/[slug]): banner, tabs, parts, diagram, steps, code, troubleshooting, progress + simulator. */
 export const guideMessages = defineMessages({
@@ -31,8 +31,8 @@ export const guideMessages = defineMessages({
   },
   ru: {
     hub: "Project Hub", robotics: "Робототехника", iot: "IoT", breadcrumb: "Хлебные крошки",
-    buildHours: (h: number) => `${h} ч сборки`, xpReward: (n: number) => `+${n} XP`,
-    welcome: "Добро пожаловать в сборку", stepsCount: (n: number) => `${n} шагов`, partsCount: (n: number) => `${n} деталей`,
+    buildHours: (h: number) => `${h.toLocaleString("ru-RU")} ч сборки`, xpReward: (n: number) => `+${n} XP`,
+    welcome: "Добро пожаловать в сборку", stepsCount: (n: number) => `${n} ${ruPlural(n, "шаг", "шага", "шагов")}`, partsCount: (n: number) => `${n} ${ruPlural(n, "деталь", "детали", "деталей")}`,
     save: "Сохранить гайд", saved: "Сохранено", savedToast: "Гайд сохранён на этом устройстве", ask: "Спросить ассистента",
     tabs: { parts: "Детали", wiring: "Схема", steps: "Шаги", code: "Код", troubleshooting: "Неполадки", label: "Разделы гайда", all: "Все разделы", showAll: "Показать всё", tabbed: "Вкладки" },
     parts: { caption: "Список деталей", part: "Деталь", qty: "Кол-во", spec: "Характеристики", role: "Назначение", optional: "опционально", optionalShort: "опц." },
@@ -58,7 +58,7 @@ export const guideMessages = defineMessages({
   },
   kk: {
     hub: "Project Hub", robotics: "Робототехника", iot: "IoT", breadcrumb: "Навигация жолы",
-    buildHours: (h: number) => `${h} сағ құрастыру`, xpReward: (n: number) => `+${n} XP`,
+    buildHours: (h: number) => `${h.toLocaleString("kk-KZ")} сағ құрастыру`, xpReward: (n: number) => `+${n} XP`,
     welcome: "Құрастыруға қош келдіңіз", stepsCount: (n: number) => `${n} қадам`, partsCount: (n: number) => `${n} бөлшек`,
     save: "Нұсқаулықты сақтау", saved: "Сақталды", savedToast: "Нұсқаулық осы құрылғыда сақталды", ask: "Ассистенттен сұрау",
     tabs: { parts: "Бөлшектер", wiring: "Схема", steps: "Қадамдар", code: "Код", troubleshooting: "Ақаулар", label: "Нұсқаулық бөлімдері", all: "Барлық бөлімдер", showAll: "Барлығын көрсету", tabbed: "Қойындылар" },

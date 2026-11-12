@@ -152,17 +152,17 @@ export function ProjectBuilder() {
           <textarea id="build-idea" value={idea} onChange={(e) => setIdea(e.target.value.slice(0, MAX_IDEA_CHARS))} disabled={busy}
             onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) void ask(); }}
             rows={4} maxLength={MAX_IDEA_CHARS} placeholder={t.placeholder}
-            className="mt-3 w-full resize-y rounded-2xl border border-line bg-ink-900 p-4 text-[15px] leading-relaxed text-fg placeholder:text-fg-subtle focus:border-accent focus:outline-none disabled:opacity-60" />
+            className="mt-3 w-full resize-y rounded-2xl border border-line bg-ink-900 p-4 text-base sm:text-[15px] leading-relaxed text-fg placeholder:text-fg-subtle focus:border-accent focus:outline-none disabled:opacity-60" />
           <div className="mt-2 flex justify-end font-mono text-[11px] text-fg-subtle">{t.chars(idea.length, MAX_IDEA_CHARS)}</div>
           <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-fg-subtle">{t.examplesLabel}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {t.examples.map((ex) => (
               <button key={ex} type="button" disabled={busy} onClick={() => setIdea(ex)}
-                className="rounded-xl border border-line bg-ink-900 px-3 py-1.5 text-left text-xs text-fg-muted transition-colors hover:border-signal/50 hover:text-fg disabled:opacity-50">{ex}</button>
+                className="min-h-10 rounded-xl border border-line bg-ink-900 px-3 py-2 text-left text-xs text-fg-muted transition-colors hover:border-signal/50 hover:text-fg disabled:opacity-50">{ex}</button>
             ))}
           </div>
           <button type="submit" disabled={busy || idea.trim().length < 8}
-            className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-accent px-6 text-[15px] font-semibold text-ink-950 transition-colors hover:bg-accent-hover disabled:bg-ink-800 disabled:text-fg-subtle">
+            className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-accent px-6 text-[15px] font-semibold text-ink-950 transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:bg-accent/35 disabled:text-ink-950/70">
             {busy ? <Loader2 className="h-5 w-5 animate-spin motion-reduce:animate-none" aria-hidden /> : <ArrowRight className="h-5 w-5" aria-hidden />}
             {busy ? t.asking : t.next}
           </button>
@@ -241,7 +241,7 @@ function QuestionBlock({ id, text, options, value, onChange, other }: {
       </div>
       {other !== undefined && (
         <input id={`q-${id}`} type="text" maxLength={200} placeholder={other} value={custom ? value : ""} onChange={(e) => onChange(e.target.value)}
-          className="mt-2 h-10 w-full rounded-xl border border-line bg-ink-900 px-3 text-sm text-fg placeholder:text-fg-subtle focus:border-accent focus:outline-none" />
+          className="mt-2 h-10 w-full rounded-xl border border-line bg-ink-900 px-3 text-base sm:text-sm text-fg placeholder:text-fg-subtle focus:border-accent focus:outline-none" />
       )}
     </fieldset>
   );

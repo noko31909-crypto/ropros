@@ -33,11 +33,11 @@ export function AssistantDrawer({ context }: { context?: AssistantContext }) {
 
   return (
     <>
-      <button ref={launcherRef} type="button" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}
-        className={clsx("fixed bottom-24 right-6 z-40 inline-flex h-12 items-center gap-2.5 rounded-2xl border border-signal/30 bg-ink-900/90 pl-3.5 pr-4 font-mono text-sm text-fg shadow-[0_18px_50px_-12px_rgba(46,230,201,.45)] backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-signal/60 motion-reduce:transition-none lg:bottom-6",
+      {/* A compact round launcher: a labelled pill covered the parts table and the page's own CTAs. ⌘J / Ctrl+J also opens it. */}
+      <button ref={launcherRef} type="button" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open} aria-label={t.launcher} title={`${t.launcher} (⌘J)`}
+        className={clsx("fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-4 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full border border-signal/30 bg-ink-900/90 text-fg shadow-[0_18px_50px_-12px_rgba(46,230,201,.45)] backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-signal/60 motion-reduce:transition-none lg:bottom-6 lg:right-6",
           open && "pointer-events-none translate-y-4 opacity-0")}>
-        <Terminal className="h-4 w-4 text-signal" aria-hidden />{t.launcher}
-        <kbd className="rounded-md border border-line bg-ink-850 px-1.5 py-0.5 text-[10px] text-fg-subtle">⌘J</kbd>
+        <Terminal className="h-5 w-5 text-signal" aria-hidden />
       </button>
 
       <div aria-hidden onClick={() => setOpen(false)}

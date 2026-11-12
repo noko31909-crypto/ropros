@@ -17,3 +17,10 @@ export const isLocale = (v: unknown): v is Locale => typeof v === "string" && (L
 export function defineMessages<T>(m: { en: T; ru: NoInfer<T>; kk: NoInfer<T> }): Record<Locale, T> {
   return m;
 }
+
+const RU_PLURAL = new Intl.PluralRules("ru");
+/** Russian noun form for a count: one (1, 21, 101), few (2–4, 22–24) or many (0, 5–20, 25…). */
+export function ruPlural(n: number, one: string, few: string, many: string): string {
+  const form = RU_PLURAL.select(n);
+  return form === "one" ? one : form === "few" ? few : many;
+}
