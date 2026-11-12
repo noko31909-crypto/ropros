@@ -12,19 +12,22 @@ const mm = (min: number, max: number) => z.number().finite().min(min).max(max);
 const vec3 = (min: number, max: number) => z.tuple([mm(min, max), mm(min, max), mm(min, max)]);
 
 const Rotation = vec3(-360, 360);
+const Hex = z.string().regex(/^#[0-9a-fA-F]{6}$/);
 const Shape = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("box"), size: vec3(0.2, 400), at: vec3(-500, 500), rotate: Rotation.optional(), subtract: z.boolean().optional(),
     /** Rounds the four vertical edges (enclosure corners). */
     radius: mm(0, 100).optional(),
+    /** Own colour, for multi-colour custom parts (a wheel: tyre and rim). Printed parts are one colour. */
+    color: Hex.optional(),
   }).strict(),
-  z.object({ type: z.literal("cylinder"), r: mm(0.2, 200), h: mm(0.2, 400), at: vec3(-500, 500), rotate: Rotation.optional(), subtract: z.boolean().optional() }).strict(),
+  z.object({ type: z.literal("cylinder"), r: mm(0.2, 200), h: mm(0.2, 400), at: vec3(-500, 500), rotate: Rotation.optional(), subtract: z.boolean().optional(), color: Hex.optional() }).strict(),
 ]);
 export type CadShape = z.infer<typeof Shape>;
 
 const CadPart = z.object({
   name: text(60),
-  color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  color: Hex,
   printed: z.boolean(),
   /** Printed or custom parts: primitives in world coordinates. */
   shapes: z.array(Shape).min(1).max(80).optional(),
@@ -40,6 +43,8 @@ export type CadPart = z.infer<typeof CadPart>;
 export const CadSchema = z.object({
   /** Each part is one printable or bought piece: shapes are unioned, then `subtract` shapes are cut out. Millimetres, Z up. */
   parts: z.array(CadPart).min(1).max(32),
+  /** Jumper wires drawn between parts: a smooth curve through the points. Display only, not exported. */
+  wires: z.array(z.object({ color: Hex, points: z.array(vec3(-500, 500)).min(2).max(8) }).strict()).max(48).optional(),
 }).strict();
 export type Cad = z.infer<typeof CadSchema>;
 

@@ -274,3 +274,20 @@ test("a bought chassis kit is the base: no second chassis, wheels or motors, and
     assert.ok(!autoCad({ ...input, board: "arduino-uno", parts }, "en", "open").parts.some((p) => p.component === kit), "open build leaves the kit out");
   }
 });
+
+test("wires: modules are wired to the board and motors to the driver; in a closed case no wire crosses the lid", async () => {
+  const { autoCad } = await import("../lib/build/layout.ts");
+  const { CadSchema } = await import("../lib/build/schema.ts");
+  const { cad: _cad, ...input } = blink;
+  const robot = autoCad({ ...input, board: "arduino-uno", parts: (["arduino-uno", "l298n", "hc-sr04", "battery-18650"] as const).map((c) => ({ component: c, name: c, qty: 1, spec: "-" })).concat([{ component: "dc-motor", name: "m", qty: 2, spec: "-" }] as never) }, "en", "rover");
+  assert.ok(CadSchema.safeParse(robot).success);
+  assert.ok((robot.wires?.length ?? 0) >= 2 + 6 + 3 + 4 + 2, "board to driver and sensor, two leads per motor, battery leads");
+  for (const kit of [["arduino-uno", "lcd-1602-i2c", "push-button", "buzzer-active", "hc-sr04"], ["esp32-devkit", "oled-ssd1306", "water-pump", "soil-moisture-capacitive"]] as const) {
+    const box = autoCad({ ...input, board: kit[0], parts: kit.map((c) => ({ component: c, name: c, qty: 1, spec: "-" })) }, "en", "enclosure");
+    const lid = box.parts.find((p) => p.name === "Lid")!;
+    const lidBottom = Math.min(...lid.shapes!.filter((s) => !s.subtract).map((s) => s.at[2] - (s.type === "box" ? s.size[2] / 2 : s.h / 2)));
+    assert.ok(box.wires?.length, `${kit[0]}: wired`);
+    // Ends sit on real pins (a button on the lid is reached through its slot); every bend stays under the lid.
+    for (const w of box.wires!) assert.ok(w.points.slice(1, -1).every((p) => p[2] < lidBottom + 0.01), `${kit[0]}: a wire runs over the lid`);
+  }
+});
