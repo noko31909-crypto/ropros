@@ -4,6 +4,7 @@ import type { CheckInput } from "./hardware/check.ts";
 import type { GuideContent, WIRE_COLORS } from "./content/schema.ts";
 import type { CoverId as CardCoverId } from "../components/cards/covers.tsx";
 import { getComponent } from "./hardware/components.ts";
+import { localPartName } from "./hardware/names.ts";
 import { CONTENT_GUIDES } from "../content/guides/index.ts";
 
 /**
@@ -531,18 +532,8 @@ const VERIFIED: L = {
   kk: "Сымдарды автоматты схема тексерісі және адам нақты құрылғыда тексерді.",
 };
 
-/** Cover art per category; robotics rotates through the robot covers so the hub doesn't repeat one image. */
-const COVERS: Record<GuideContent["category"], readonly CoverId[]> = {
-  robotics: ["obstacle", "line", "arm", "walker", "balance", "mecanum"], vehicles: ["mecanum", "camera", "obstacle"],
-  iot: ["plant", "logger"], home: ["plant", "logger"], energy: ["logger", "plant"], tools: ["logger", "radar"],
-  sensors: ["radar", "logger"], security: ["camera", "radar"], displays: ["matrix"], games: ["matrix", "radar"],
-  audio: ["matrix", "radar"], wearables: ["matrix"],
-};
-const hash = (s: string) => [...s].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7);
-export const coverFor = (c: Pick<GuideContent, "slug" | "category">): CoverId => {
-  const list = COVERS[c.category];
-  return list[hash(c.slug) % list.length] ?? "obstacle";
-};
+export { coverFor } from "./cover-art.ts";
+import { coverFor } from "./cover-art.ts";
 
 /** A content file (content/guides/<slug>.ts, validated by GuideSchema) as a Guide. Part and board names come from the registry. */
 export function fromContent(c: GuideContent): Guide {
@@ -603,7 +594,7 @@ export function localizeGuide(g: Guide, locale: Locale): LocalizedGuide {
   return {
     slug: g.slug, title: g.title[locale], summary: g.summary[locale], board: g.board, platform: g.platform, cover: g.cover,
     difficulty: g.difficulty, hours: g.hours, costUsd: g.costUsd, xpReward: g.xpReward, verification: g.verification[locale],
-    parts: g.parts.map((p) => ({ name: p.name, qty: p.qty, spec: p.spec[locale], role: p.role[locale], optional: !!p.optional })),
+    parts: g.parts.map((p) => ({ name: localPartName(p.component, p.name, locale), qty: p.qty, spec: p.spec[locale], role: p.role[locale], optional: !!p.optional })),
     steps: g.steps.map((s) => ({ title: s.title[locale], body: s.body[locale], expect: s.expect[locale], mistake: s.mistake[locale] })),
     code: g.code,
     troubleshooting: g.troubleshooting.map((t) => ({ symptom: t.symptom[locale], cause: t.cause[locale], fix: t.fix[locale] })),

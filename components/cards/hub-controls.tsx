@@ -7,7 +7,7 @@ import { ChevronDown, Search, SlidersHorizontal } from "lucide-react";
 import { useMessages } from "@/components/i18n/locale-provider";
 import { common } from "@/lib/i18n/messages/common";
 import { projects } from "@/lib/i18n/messages/projects";
-import { BOARDS, BOARD_LABEL, DIFFICULTIES } from "@/lib/projects";
+import { BOARDS, BOARD_LABEL, DIFFICULTIES } from "@/lib/project-meta";
 
 function useSetParams() {
   const router = useRouter();
