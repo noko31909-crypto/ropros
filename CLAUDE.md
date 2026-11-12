@@ -23,7 +23,11 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
   switched by `components/i18n/locale-switcher.tsx`. Every new UI string goes into all three languages.
 - `components/auth/auth-provider.tsx` — session, profile (XP/level from `public.users`), sign-in modal (`useAuth()`)
 - `lib/nav.ts` — single nav config (header, mobile, footer)
-- `lib/finder/*` — part normalization + matcher (pure, tested in `tests/finder.test.ts`); API at `app/api/finder/route.ts`
+- `content/guides/*.ts` — the guides. After adding or editing one, run `node --experimental-strip-types scripts/guides-index.ts`:
+  it regenerates `index.ts` (all guides, server only), `catalog.ts` (card fields for hub/home/profile), `finder.ts`
+  (what the parts finder searches) and `slugs.ts` (the 404 check in `proxy.ts`). Tests fail if they are stale.
+- `lib/finder/*` — part normalization + matcher (pure, tested in `tests/finder.test.ts`), searching every guide; API at `app/api/finder/route.ts`
+- `lib/build/part-models.ts` + `lib/build/prims.ts` — the detailed 3D part models and their building blocks; preview any part at `/dev/models?id=<component>` (dev only)
 - `app/api/progress/route.ts` — saves progress via the `record_progress` RPC
 - `components/guide/*` — guide tabs, parts table, diagram slot, step checklist, code block, troubleshooting, banner, progress buttons
 - `components/assistant/*` — terminal-style assistant UI; `app/api/assistant/route.ts` streams replies via OpenRouter
@@ -33,9 +37,9 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
 ## Still mocked / TODO
 1. Done: assistant server route with guide context, sign-in required, rate limited.
 2. Done on `/` (app/page.tsx): Supabase Auth sign-in/sign-up, session refresh in `proxy.ts`, XP via `/api/progress`,
-   community feed/uploads/likes. Other routes (`/projects`, `/community`, `/ai/finder`) still use placeholder data.
+   community feed/uploads/likes (`/community` too). `/projects` and `/ai/finder` are built from the guide files, not from the database.
 3. Learning paths have no table yet: module progress is local-only and awards no XP.
-4. Replace placeholder data in `lib/projects.ts`, `lib/guides.ts`, `lib/finder/projects-data.ts` with Supabase queries.
+4. Guides live in `content/guides` (static, generated indexes); move them to Supabase only if editing without a deploy is needed.
 5. Done: daily cap of 3 rewarded posts per user (`reward_post()`).
 6. Rate limiter in `lib/rate-limit.ts` is in-memory (per-instance burst control only). Daily limits that matter live in
    Postgres (0002): 10 posts, 5 photos waiting without a post, 3 completed / 5 simulated guides paying XP, assistant quota.
