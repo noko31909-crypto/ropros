@@ -1,6 +1,7 @@
 import type { ComponentId } from "../hardware/ids.ts";
 import type { Locale } from "../i18n/config.ts";
-import { MOUNTS, SCREW, modelBox, partModel, primBox, type Prim } from "./models.ts";
+import { MOUNTS, SCREW, modelBox, partModel, primBox, wheel, type Prim } from "./models.ts";
+import { partBox } from "./fit.ts";
 import type { Cad, CadPart, CadShape, ProjectInput as Project, Shape } from "./schema.ts";
 
 /**
@@ -271,7 +272,9 @@ function enclosure(p: Project, list: Item[], n: Record<string, string>): Cad {
     placed.push(bought(t.it, at, undefined, step(4)));
   }
 
-  // External parts on the table beside the box, in a row.
+  // External parts on the table beside the box, in a row; their leads leave through a cable hole in the +X wall.
+  const exit: V3 = [ow / 2, 0, r1(WALL + Math.min(ih / 2, 18))];
+  if (outside.length) caseShapes.push({ type: "cylinder", r: 4.5, h: WALL * 3, at: v(ow / 2 - WALL / 2, 0, exit[2]), rotate: [0, 90, 0], subtract: true });
   let ox = ow / 2 + 15;
   for (const it of outside) {
     const f = foot(it.id);
@@ -279,15 +282,18 @@ function enclosure(p: Project, list: Item[], n: Record<string, string>): Cad {
     ox += f.w + 10;
   }
 
-  return { parts: [
+  const cad: Cad = { parts: [
     { name: n.case!, color: "#FF7A1A", printed: true, step: step(0), shapes: caseShapes.slice(0, 80) },
     ...placed,
     { name: n.lid!, color: "#FFB15E", printed: true, step: step(4), shapes: lidShapes.slice(0, 80) },
   ].slice(0, 32) };
+  if (outside.length) EXITS.set(cad, exit);
+  CEILINGS.set(cad, oh);
+  return cad;
 }
 
 /** Deck size (length along X, width) and top height of the bought chassis kits, matching their models. */
-const KIT_DECK = { "robot-chassis-2wd": { l: 200, w: 130, top: 37.5 }, "robot-chassis-4wd": { l: 250, w: 150, top: 37.5 } } as const;
+const KIT_DECK = { "robot-chassis-2wd": { l: 200, w: 130, top: 46 }, "robot-chassis-4wd": { l: 250, w: 150, top: 46 } } as const;
 
 function rover(p: Project, list: Item[], n: Record<string, string>): Cad {
   const step = stepper(p.assembly.length, 5);
@@ -323,7 +329,7 @@ function rover(p: Project, list: Item[], n: Record<string, string>): Cad {
     // M3 holes through the plate for the motor's mounting bracket.
     for (const dx of [-8, 8]) plate.push({ type: "cylinder", r: 1.7, h: 8, at: v(ax - 22 + 16 + dx, my, plateZ), subtract: true });
     parts.push({ name: `${n.wheel} ${i + 1}`, color: "#1B1D21", printed: false, step: step(1), shapes: [
-      { type: "cylinder", r: 33, h: 26, at: v(ax, my + side * (11.25 + 2 + 13), 33), rotate: [90, 0, 0] },
+      ...wheel(ax, my + side * (11.25 + 2 + 13), side).map(primShape),
     ] });
   });
   if (!kit && motors.length < 4) parts.push({ name: n.caster!, color: "#C9CDD2", printed: false, step: step(1), shapes: [
@@ -375,9 +381,109 @@ export function autoCad(p: Project, locale: Locale, shape: Shape = "auto"): Cad 
 }
 
 /** Bought parts keep their real colours from the built-in models; give the legend a matching swatch. */
+/** A model primitive as a coloured custom-part shape (no spheres in the parts that use this). */
+function primShape(p: Prim): CadShape {
+  if (p.type === "box") return { type: "box", size: v(...p.size), at: v(...p.at), ...(p.rotate ? { rotate: p.rotate } : {}), color: p.color };
+  if (p.type === "cylinder") return { type: "cylinder", r: p.r, h: p.h, at: v(...p.at), ...(p.rotate ? { rotate: p.rotate } : {}), color: p.color };
+  return { type: "cylinder", r: p.r, h: p.r * 2, at: v(...p.at), color: p.color };
+}
+
 function finish(cad: Cad): Cad {
   for (const part of cad.parts) if (part.component) part.color = partModel(part.component).prims[0]!.color;
-  return cad;
+  const wires = jumperWires(cad);
+  return wires.length ? { ...cad, wires } : cad;
+}
+
+/** Cable hole of an enclosure (centre of its outer opening), for wires to parts outside the box. */
+const EXITS = new WeakMap<Cad, V3>();
+/** Underside of an enclosure lid: wires inside the box stay below it. */
+const CEILINGS = new WeakMap<Cad, number>();
+
+const DRIVERS = new Set<ComponentId>(["l298n", "tb6612fng", "drv8833", "l9110s"]);
+const POWER = new Set<ComponentId>(["battery-9v", "battery-2s-lipo", "battery-4xaa", "battery-18650"]);
+const RED = "#d32f2f", BLK = "#1d1f23", SIGNAL = ["#f9a825", "#2e7d32", "#1e88e5", "#ef6c00", "#e8e8e8", "#8e24aa"];
+/** Where the motor's solder tabs are, relative to its model origin (see ttMotor). */
+const MOTOR_TABS: V3 = [-26.8, 0, 9.4];
+const KIT_MOTORS: Partial<Record<ComponentId, V3[]>> = {
+  "robot-chassis-2wd": [[8, 40, 23.6], [8, -40, 23.6]],
+  "robot-chassis-4wd": [[48, 50, 23.6], [48, -50, 23.6], [-92, 50, 23.6], [-92, -50, 23.6]],
+};
+
+/**
+ * Jumper wires, so the model reads like the real build: power and a signal from the board to each module,
+ * motor leads to the driver, battery leads to the driver (or the board). Each wire leaves a pin row straight
+ * up, arcs over and drops onto the other end; parallel wires sit one pin pitch apart.
+ */
+function jumperWires(cad: Cad): NonNullable<Cad["wires"]> {
+  const placed = cad.parts.flatMap((p) => { const b = p.component ? partBox(p) : undefined; return b && p.component ? [{ p, id: p.component, b }] : []; });
+  const board = placed.find((x) => BOARD_KINDS.has(x.id));
+  if (!board) return [];
+  const driver = placed.find((x) => DRIVERS.has(x.id));
+  const out: NonNullable<Cad["wires"]> = [];
+  const centre = (b: { min: V3; max: V3 }): V3 => [(b.min[0] + b.max[0]) / 2, (b.min[1] + b.max[1]) / 2, (b.min[2] + b.max[2]) / 2];
+  const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
+  /** A pin on a part's edge facing `to`: on its top, or under it when it hangs from a lid. */
+  // `edge`: an upright part (a sensor behind a wall) is wired from just behind it, not from inside it.
+  const pinOn = (b: { min: V3; max: V3 }, to: V3, under = false, edge = false): V3 => {
+    const c = centre(b);
+    const dx = to[0] - c[0], dy = to[1] - c[1];
+    const alongX = Math.abs(dx) * (b.max[1] - b.min[1]) > Math.abs(dy) * (b.max[0] - b.min[0]);
+    const inset = edge ? -1.5 : 3;
+    const x = alongX ? (dx > 0 ? b.max[0] - inset : b.min[0] + inset) : clamp(to[0], b.min[0] + 4, b.max[0] - 4);
+    const y = alongX ? clamp(to[1], b.min[1] + 4, b.max[1] - 4) : (dy > 0 ? b.max[1] - inset : b.min[1] + inset);
+    return [r1(x), r1(y), r1(under ? b.min[2] - 0.5 : Math.min(b.max[2], b.min[2] + 12))];
+  };
+  // `under`: the far end hangs from a lid, so the wire rises to it from below and never crosses the lid.
+  const exit = EXITS.get(cad);
+  const ceiling = CEILINGS.get(cad) ?? Infinity;
+  /** Bends (not the ends, which sit on real pins) stay under the lid. */
+  const below = (pts: V3[]): V3[] => pts.map((p, i) => (i === 0 || i === pts.length - 1 ? p : [p[0], p[1], Math.min(p[2], ceiling - 1.5)]));
+  const run = (a: V3, b: V3, colors: string[], under = false) => {
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+    const nx = -(b[1] - a[1]) / len, ny = (b[0] - a[0]) / len;
+    colors.forEach((color, i) => {
+      if (out.length >= 48) return;
+      const o = (i - (colors.length - 1) / 2) * 2.54;
+      const p0: V3 = [a[0] + nx * o, a[1] + ny * o, a[2]], p3: V3 = [b[0] + nx * o, b[1] + ny * o, b[2]];
+      const lift = 8 + i * 1.2;
+      const top = under ? Math.max(p0[2] + lift, p3[2] - lift - 2) : Math.max(p0[2], p3[2]) + lift + Math.min(25, len * 0.12);
+      const mid: V3 = [(p0[0] + p3[0]) / 2, (p0[1] + p3[1]) / 2, top];
+      const up = (p: V3, d: number): V3 => [p[0], p[1], p[2] + d];
+      if (exit && b[0] > exit[0] !== a[0] > exit[0]) {
+        // One end is outside the box: through the cable hole, bundled within its radius.
+        const oy = exit[1] + (i - (colors.length - 1) / 2) * 1.4;
+        const inside: V3 = [exit[0] - 12, oy, exit[2]], outside: V3 = [exit[0] + 8, oy, exit[2]];
+        const [from, to] = a[0] < exit[0] ? [p0, p3] : [p3, p0];
+        out.push({ color, points: below([from, up(from, lift), inside, outside, up(to, lift), to]).map((p) => v(...p)) });
+        return;
+      }
+      out.push({ color, points: below([p0, up(p0, lift), mid, up(p3, under ? -lift : lift), p3]).map((p) => v(...p)) });
+    });
+  };
+  const boardTop = board.b.max[2];
+  let k = 0;
+  for (const x of placed) {
+    if (x === board || x.id === "dc-motor" || x.id.startsWith("robot-chassis") || POWER.has(x.id)) continue;
+    const c = centre(x.b);
+    const under = x.b.min[2] > boardTop + 8;
+    const signals = DRIVERS.has(x.id) ? [SIGNAL[0]!, SIGNAL[1]!, SIGNAL[2]!, SIGNAL[3]!] : [SIGNAL[k++ % SIGNAL.length]!];
+    // A part on top of the lid is wired through the slot under its centre.
+    const onLid = x.b.min[2] >= ceiling - 0.01;
+    const end: V3 = onLid ? [r1(c[0]), r1(c[1]), r1(x.b.min[2] - 0.5)] : pinOn(x.b, centre(board.b), under, Boolean(x.p.rotate));
+    run(pinOn(board.b, c), end, [RED, BLK, ...signals], under || onLid);
+  }
+  const motorEnds: V3[] = [
+    ...placed.filter((x) => x.id === "dc-motor").map((x) => { const at = x.p.at ?? [0, 0, 0]; return [at[0] + MOTOR_TABS[0], at[1], at[2] + MOTOR_TABS[2]] as V3; }),
+    ...placed.flatMap((x) => (KIT_MOTORS[x.id] ?? []).map(([mx, my, mz]) => [mx + MOTOR_TABS[0], my, mz + MOTOR_TABS[2]] as V3)),
+  ];
+  const hub = driver ?? board;
+  for (const m of motorEnds) run(pinOn(hub.b, m), m, ["#c62828", BLK]);
+  for (const x of placed.filter((y) => POWER.has(y.id))) {
+    const c = centre(x.b);
+    const end: V3 = [x.b.max[0] - 1, c[1], c[2]];
+    run(end, pinOn(hub.b, c), [RED, BLK]);
+  }
+  return out;
 }
 
 /** Open build: every part laid out on a printed base plate, mounted on its real holes, sensors at the front edge. */
