@@ -5,6 +5,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { STLExporter } from "three/examples/jsm/exporters/STLExporter.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import type { Cad, CadPart, CadShape } from "@/lib/build/schema";
 import { partModel, type Finish, type Prim } from "@/lib/build/models";
@@ -132,9 +133,42 @@ function wireMeshes(wires: NonNullable<Cad["wires"]>): THREE.Object3D {
   return group;
 }
 
+/**
+ * A part model as one mesh per material: a board with sixty header pins is a handful of draw calls, not sixty.
+ * Falls back to one mesh per primitive if the geometries cannot be merged.
+ */
+function modelMeshes(prims: readonly Prim[]): THREE.Object3D[] {
+  const groups = new Map<string, { color: string; finish?: Finish; geoms: THREE.BufferGeometry[] }>();
+  for (const p of prims) {
+    const mesh = primMesh(p);
+    mesh.updateMatrix();
+    const g = mesh.geometry.clone().applyMatrix4(mesh.matrix);
+    mesh.geometry.dispose();
+    (mesh.material as THREE.Material).dispose();
+    const flat = g.index ? g.toNonIndexed() : g;
+    if (flat !== g) g.dispose();
+    flat.deleteAttribute("uv");
+    const key = `${p.color}|${p.finish ?? ""}`;
+    const entry = groups.get(key) ?? { color: p.color, finish: p.finish, geoms: [] };
+    entry.geoms.push(flat);
+    groups.set(key, entry);
+  }
+  const out: THREE.Object3D[] = [];
+  for (const { color, finish, geoms } of groups.values()) {
+    const merged = geoms.length > 1 ? mergeGeometries(geoms, false) : geoms[0]!;
+    if (merged) {
+      if (merged !== geoms[0]) geoms.forEach((g) => g.dispose());
+      out.push(new THREE.Mesh(merged, material(color, finish)));
+    } else {
+      geoms.forEach((g) => out.push(new THREE.Mesh(g, material(color, finish))));
+    }
+  }
+  return out;
+}
+
 function boughtMesh(part: CadPart): THREE.Object3D {
   const inner = new THREE.Group();
-  for (const p of partModel(part.component!).prims) inner.add(primMesh(p));
+  for (const m of modelMeshes(partModel(part.component!).prims)) inner.add(m);
   const outer = new THREE.Group();
   outer.add(inner);
   outer.position.set(...(part.at ?? [0, 0, 0]));

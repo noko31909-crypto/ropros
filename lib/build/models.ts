@@ -7,29 +7,15 @@ import type { ComponentId } from "../hardware/ids.ts";
  * centre of its bottom face, so a part placed at [x, y, 0] sits on the build plate.
  * Sizes follow common datasheets; small details (pins, labels) are left out.
  */
-export type Prim =
-  | { type: "box"; size: [number, number, number]; at: [number, number, number]; color: string; finish?: Finish; rotate?: [number, number, number] }
-  | { type: "cylinder"; r: number; h: number; at: [number, number, number]; color: string; finish?: Finish; rotate?: [number, number, number] }
-  | { type: "sphere"; r: number; at: [number, number, number]; color: string; finish?: Finish };
-export type Finish = "metal" | "glass" | "glossy" | "rubber";
-export type PartModel = { size: [number, number, number]; prims: Prim[] };
+import { BLACK, GOLD, PCB_T, SILVER, WHITE, board, box, cyl, on, primBox, type Box, type Finish, type PartModel, type Prim } from "./prims.ts";
+import { DETAILED_MODELS } from "./part-models.ts";
 
-const PCB_T = 1.6;
-const BLACK = "#16181c", SILVER = "#c9cdd2", GOLD = "#d4a93c", WHITE = "#eef0f2";
+export type { Box, Finish, PartModel, Prim } from "./prims.ts";
+export { primBox } from "./prims.ts";
 
-const box = (size: [number, number, number], at: [number, number, number], color: string, finish?: Finish): Prim => ({ type: "box", size, at, color, ...(finish ? { finish } : {}) });
-const cyl = (r: number, h: number, at: [number, number, number], color: string, finish?: Finish, rotate?: [number, number, number]): Prim => ({ type: "cylinder", r, h, at, color, ...(finish ? { finish } : {}), ...(rotate ? { rotate } : {}) });
-/** A board: the PCB plus parts on top. `on(z)` gives the centre height of something `z` tall sitting on the PCB. */
-const pcb = (w: number, d: number, color: string): Prim => box([w, d, PCB_T], [0, 0, PCB_T / 2], color, "glossy");
-const on = (h: number) => PCB_T + h / 2;
 const header = (len: number, x: number, y: number, alongY = false): Prim =>
   box(alongY ? [2.5, len, 8.5] : [len, 2.5, 8.5], [x, y, on(8.5)], BLACK);
 const chip = (w: number, d: number, x: number, y: number): Prim => box([w, d, 1.2], [x, y, on(1.2)], "#222428");
-
-function board(w: number, d: number, color: string, extra: Prim[]): PartModel {
-  const top = Math.max(PCB_T, ...extra.map((p) => p.at[2] + (p.type === "box" ? p.size[2] / 2 : p.type === "cylinder" ? p.h / 2 : p.r)));
-  return { size: [w, d, Math.round(top * 10) / 10], prims: [pcb(w, d, color), ...extra] };
-}
 
 /**
  * TT gear motor (the yellow one in every robot kit): gearbox along X, the motor can behind it, the output shaft
@@ -67,7 +53,7 @@ function deck(l: number, w: number): Prim[] {
 }
 export const KIT_AXLE_2WD = 30;
 
-const MODELS: Partial<Record<ComponentId, () => PartModel>> = {
+const BASE_MODELS: Partial<Record<ComponentId, () => PartModel>> = {
   "arduino-uno": () => board(68.6, 53.4, "#00878F", [
     box([16, 12, 11], [-29, 9, on(11)], SILVER, "metal"), box([14, 9, 11], [-28.5, -18, on(11)], BLACK),
     header(48, 8, 24.4), header(40, 10, -24.4), box([35, 8, 4], [10, -8, on(4)], "#222428"), cyl(2, 3, [-14, -5, on(3)], SILVER, "metal"),
@@ -152,6 +138,9 @@ const MODELS: Partial<Record<ComponentId, () => PartModel>> = {
   "tp4056-charger": () => board(26, 17, "#1565C0", [box([7.5, 6, 3], [-10, 0, on(3)], SILVER, "metal"), chip(4, 4, 3, 0)]),
 };
 
+/** Detailed models (lib/build/part-models.ts) replace the simple ones where both exist. */
+const MODELS: Partial<Record<ComponentId, () => PartModel>> = { ...BASE_MODELS, ...DETAILED_MODELS };
+
 /** The built-in model, or a plain board-coloured slab sized from the diagram footprint for parts without one. */
 export function partModel(id: ComponentId): PartModel {
   const m = MODELS[id];
@@ -169,46 +158,9 @@ export function modelSizes(): string {
   return (Object.keys(MODELS) as ComponentId[]).map((id) => { const s = partModel(id).size; return `${id} ${s.map((v) => Math.round(v * 10) / 10).join("x")}`; }).join(", ");
 }
 
-/**
- * Mounting holes from the boards' and modules' drawings, in the model's own coordinates (origin = footprint
- * centre), with the screw they take. Only parts whose hole pattern is published and widely used are listed;
- * anything else rests on the floor or on rails.
- */
-export type Mount = { holes: [number, number][]; screw: "M2" | "M2.5" | "M3" };
-export const MOUNTS: Partial<Record<ComponentId, Mount>> = {
-  // Arduino Uno R3: holes at (14.0, 2.5), (15.3, 50.7), (66.1, 7.6), (66.1, 35.5) mm from the lower-left corner of a 68.6 x 53.4 board.
-  "arduino-uno": { holes: [[-20.3, -24.2], [-19.0, 24.0], [31.8, -19.1], [31.8, 8.8]], screw: "M3" },
-  // Arduino Mega 2560: the Uno pattern plus (90.2, 50.7) and (96.5, 2.5) on a 101.6 x 53.3 board.
-  "arduino-mega": { holes: [[-36.8, -24.2], [-35.5, 24.0], [15.3, -19.1], [15.3, 8.8], [39.4, 24.0], [45.7, -24.2]], screw: "M3" },
-  // Raspberry Pi 4: 58 x 49 mm pattern, 3.5 mm in from the USB-C/HDMI corner of an 85 x 56 board.
-  "raspberry-pi-4": { holes: [[-39, -24.5], [19, -24.5], [-39, 24.5], [19, 24.5]], screw: "M2.5" },
-  // Raspberry Pi Pico: 47 x 11.4 mm pattern on a 51 x 21 board.
-  "raspberry-pi-pico": { holes: [[-23.5, -5.7], [-23.5, 5.7], [23.5, -5.7], [23.5, 5.7]], screw: "M2" },
-  // L298N module: 37 x 37 mm pattern on a 43 x 43 board.
-  "l298n": { holes: [[-18.5, -18.5], [18.5, -18.5], [-18.5, 18.5], [18.5, 18.5]], screw: "M3" },
-  // HC-SR04: 41 x 17 mm pattern on a 45 x 20 board.
-  "hc-sr04": { holes: [[-20.5, -8.5], [20.5, -8.5], [-20.5, 8.5], [20.5, 8.5]], screw: "M2" },
-  // 16x2 LCD: 75 x 31 mm pattern on an 80 x 36 board.
-  "lcd-1602-i2c": { holes: [[-37.5, -15.5], [37.5, -15.5], [-37.5, 15.5], [37.5, 15.5]], screw: "M3" },
-};
-/** Screw → [standoff outer radius, pilot hole radius for a self-tapping screw in PLA]. */
-export const SCREW: Record<Mount["screw"], [number, number]> = { M2: [2.2, 0.8], "M2.5": [2.6, 1.05], M3: [3, 1.25] };
+export { MOUNTS, SCREW, type Mount } from "./mounts.ts";
 
-export type Box = { min: [number, number, number]; max: [number, number, number] };
 
-/** Axis-aligned bounds of one primitive in model coordinates (cylinders turned onto X or Y are handled). */
-export function primBox(p: Prim): Box {
-  const [x, y, z] = p.at;
-  let h: [number, number, number];
-  if (p.type === "box") h = [p.size[0] / 2, p.size[1] / 2, p.size[2] / 2];
-  else if (p.type === "sphere") h = [p.r, p.r, p.r];
-  else {
-    const r = p.rotate ?? [0, 0, 0];
-    const axis = Math.abs(r[1]) % 180 === 90 ? 0 : Math.abs(r[0]) % 180 === 90 ? 1 : 2;
-    h = [p.r, p.r, p.r]; h[axis] = p.h / 2;
-  }
-  return { min: [x - h[0], y - h[1], z - h[2]], max: [x + h[0], y + h[1], z + h[2]] };
-}
 
 /** Bounds of a whole built-in model. */
 export function modelBox(id: ComponentId): Box {

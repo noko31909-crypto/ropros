@@ -1,6 +1,7 @@
 import type { ComponentId } from "../hardware/ids.ts";
 import type { Locale } from "../i18n/config.ts";
 import { MOUNTS, SCREW, modelBox, partModel, primBox, wheel, type Prim } from "./models.ts";
+import { PCB_T } from "./prims.ts";
 import { partBox } from "./fit.ts";
 import type { Cad, CadPart, CadShape, ProjectInput as Project, Shape } from "./schema.ts";
 
@@ -52,6 +53,8 @@ const WALL = 2.5, GAP = 5, STANDOFF = 5, LID = 3;
 const FIT = 0.4;
 /** Free band along the inside of the walls, kept clear for the lid screw bosses. */
 const MARGIN = 9;
+/** Forward-looking sensors a build can mount at its front: more than this is not a real robot or box. */
+const MAX_FRONT = 4;
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const v = (x: number, y: number, z: number): V3 => [r1(x), r1(y), r1(z)];
 const sizeOf = (id: ComponentId) => partModel(id).size;
@@ -125,6 +128,15 @@ function cutsThrough(id: ComponentId, at: V, rotate: V | undefined, axis: 0 | 1 
   return out.filter((s, i) => !out.some((o, j) => j !== i && o.type === s.type && o.at.every((x, k) => Math.abs(x - s.at[k]!) < 0.2) && (ext(o) > ext(s) || (ext(o) === ext(s) && j < i))));
 }
 
+/**
+ * How far a forward-looking sensor's board must stay behind the wall it looks through: the tallest flat part on
+ * its face (the HC-SR04's crystal) clears the wall, and only the round parts (the transducer cans) pass through.
+ */
+function frontClearance(id: ComponentId): number {
+  const flat = partModel(id).prims.filter((p) => p.type === "box").map((p) => primBox(p).max[2] - PCB_T);
+  return Math.max(0, ...flat.filter((h) => h > 0.5 && h < 8));
+}
+
 type Item = { id: ComponentId; name: string; role: Role };
 
 /** Every component to draw, from the parts list (qty capped so a bag of 20 LEDs does not become 20 models). */
@@ -174,7 +186,7 @@ function enclosure(p: Project, list: Item[], n: Record<string, string>): Cad {
   const step = stepper(p.assembly.length, 5);
   const board = list.find((i) => i.role === "board")!;
   const floor = [board, ...list.filter((i) => i.role === "inside" || i.role === "power").sort((a, b) => foot(b.id).w * foot(b.id).d - foot(a.id).w * foot(a.id).d)];
-  const front = list.filter((i) => i.role === "front");
+  const front = list.filter((i) => i.role === "front").slice(0, MAX_FRONT);
   const top = list.filter((i) => i.role === "top" || i.role === "servo");
   const outside = list.filter((i) => i.role === "outside" || i.role === "motor");
 
@@ -244,7 +256,7 @@ function enclosure(p: Project, list: Item[], n: Record<string, string>): Cad {
     const f = foot(it.id);
     const cx = fx + f.w / 2 - f.cx, cz = WALL + f.d / 2 + 3;
     fx += f.w + GAP;
-    const at = v(cx, -idp / 2 + 1.6 + FIT, cz);
+    const at = v(cx, -idp / 2 + 1.6 + FIT + frontClearance(it.id), cz);
     placed.push(bought(it, at, [90, 0, 0], step(3)));
     let cuts = cutsThrough(it.id, at, [90, 0, 0], 1, -od / 2, -idp / 2);
     if (!cuts.length) cuts = cutsThrough(it.id, at, [90, 0, 0], 1, -od / 2 - 50, -idp / 2 + 0.01, (q) => q.type !== "box" || q.finish !== "glossy").slice(0, 1)
@@ -303,7 +315,7 @@ function rover(p: Project, list: Item[], n: Record<string, string>): Cad {
   const kit = list.find((i) => i.role === "chassis");
   const kitDeck = kit ? KIT_DECK[kit.id as keyof typeof KIT_DECK] : undefined;
   const motors = kit ? [] : list.filter((i) => i.role === "motor").slice(0, 4);
-  const front = list.filter((i) => i.role === "front");
+  const front = list.filter((i) => i.role === "front").slice(0, MAX_FRONT);
   const deck = [board, ...list.filter((i) => ["inside", "power", "top", "servo"].includes(i.role) && i.role !== "board")];
   const fp = deck.map((i) => ({ w: foot(i.id).w, d: foot(i.id).d }));
   const area = fp.reduce((s, f) => s + (f.w + GAP) * (f.d + GAP), 0);
@@ -357,7 +369,7 @@ function rover(p: Project, list: Item[], n: Record<string, string>): Cad {
     let fy = -span / 2;
     for (const it of front) {
       const f = foot(it.id);
-      const at = v(L / 2 - 7.5 - 1.6 - FIT, fy + f.w / 2 - f.cx, deckZ + f.d / 2 + 3);
+      const at = v(L / 2 - 7.5 - 1.6 - FIT - frontClearance(it.id), fy + f.w / 2 - f.cx, deckZ + f.d / 2 + 3);
       parts.push(bought(it, at, [90, 0, 90], step(4)));
       bracket.push(...cutsThrough(it.id, at, [90, 0, 90], 0, L / 2 - 7.5, L / 2 - 4.5));
       fy += f.w + GAP;
@@ -491,7 +503,7 @@ function open(p: Project, list: Item[], n: Record<string, string>): Cad {
   const step = stepper(p.assembly.length, 3);
   const board = list.find((i) => i.role === "board")!;
   const flat = [board, ...list.filter((i) => i !== board && i.role !== "front" && i.role !== "chassis")];
-  const front = list.filter((i) => i.role === "front");
+  const front = list.filter((i) => i.role === "front").slice(0, MAX_FRONT);
   const fp = flat.map((i) => ({ w: foot(i.id).w, d: foot(i.id).d }));
   const packed = pack(fp, Math.max(fp[0]!.w + 10, Math.sqrt(fp.reduce((s, f) => s + (f.w + GAP) * (f.d + GAP), 0)) * 1.3, 120));
   const frontW = front.reduce((s, i) => s + foot(i.id).w + GAP, 0);
