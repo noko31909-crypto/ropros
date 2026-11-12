@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { Download, Loader2, Pause, Play, RotateCcw, SkipBack } from "lucide-react";
 import { toOpenScad } from "@/lib/build/cad";
+import { printedSize } from "@/lib/build/fit";
 import type { Cad } from "@/lib/build/schema";
 import { build } from "@/lib/i18n/messages/build";
 import { useMessages } from "@/components/i18n/locale-provider";
@@ -76,6 +77,7 @@ export function CadViewer({ cad, title, steps }: { cad: Cad; title: string; step
 
   const toggle = (i: number) => setHidden((h) => { const n = new Set(h); if (n.has(i)) n.delete(i); else n.add(i); return n; });
   const part = current >= 0 ? cad.parts[current] : undefined;
+  const size = printedSize(cad);
   const stepNo = part ? part.step ?? current + 1 : undefined;
   const stepTitle = stepNo ? steps[stepNo - 1]?.title : undefined;
   const base = fileBase(title);
@@ -135,6 +137,12 @@ export function CadViewer({ cad, title, steps }: { cad: Cad; title: string; step
             className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-line px-4 text-sm text-fg-muted hover:border-fg-subtle hover:text-fg disabled:opacity-50">
             <Download className="h-4 w-4" aria-hidden />{t.downloadStl}
           </button>
+          {size && (
+            <p className="rounded-xl border border-line px-3 py-2 text-xs text-fg-muted">
+              {t.size} <span className="font-mono text-fg">{size.join(" × ")} {t.mm}</span>
+              <span className="mt-1 block text-fg-subtle">{t.tolerance}</span>
+            </p>
+          )}
           <p className="text-xs leading-relaxed text-fg-subtle">{t.stlNote}</p>
         </div>
       </div>
