@@ -111,6 +111,7 @@ export default async function GuidePage({ params }: Props) {
           guide={guide}
           diagram={<GuideDiagram guide={source} label={t.diagram.aria(guide.title)} captions={t.diagram.captions} />}
           progress={<ProgressActions projectId={projectId} simulation={guide.simulation} />}
+          serialBaud={source.boardComponent === "raspberry-pi-4" ? null : guide.simulation.baud}
         />
         {/* Build logs need the guide's database row: hidden when the database is unreachable. */}
         {projectId && <BuildLogs projectId={projectId} slug={guide.slug} title={guide.title} />}
