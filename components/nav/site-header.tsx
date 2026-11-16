@@ -111,7 +111,7 @@ export function SiteHeader() {
                 {item.badge && <span className="rounded-full bg-accent-soft px-1.5 py-px font-mono text-[9px] font-semibold uppercase text-accent">{item.badge}</span>}
               </Link>
             ) : (
-              <NavDropdown key={item.key} item={item} active={section === item.key} />
+              <NavDropdown key={item.key} item={item} active={(item.sections ?? [item.key]).includes(section)} />
             ),
           )}
         </nav>
