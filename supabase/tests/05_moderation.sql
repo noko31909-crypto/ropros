@@ -183,3 +183,13 @@ select qa.eq('account: posts, comments, likes, parts and saved builds are gone',
   'select (select count(*) from public.community_posts where user_id = ' || quote_literal(:'DEL') || ') + (select count(*) from public.post_comments where user_id = ' || quote_literal(:'DEL') || ') + (select count(*) from public.post_likes where user_id = ' || quote_literal(:'DEL') || ') + (select count(*) from public.user_parts where user_id = ' || quote_literal(:'DEL') || ') + (select count(*) from public.saved_builds where user_id = ' || quote_literal(:'DEL') || ')', '0');
 select qa.eq('account: counters follow (likes on the post they liked)', 'select likes_count from public.community_posts where id = ' || quote_literal(:'aut2'), '0');
 select qa.eq('account: other makers are untouched', 'select count(*) from public.users where id in (' || quote_literal(:'AUT') || ', ' || quote_literal(:'REP') || ')', '2');
+
+-- ---------- moderator lists ----------
+set role authenticated;
+select set_config('request.jwt.claim.sub', :'REP', false);
+select qa.deny('mods: a maker cannot list banned makers', 'select count(*) from public.admin_banned_users()');
+select set_config('request.jwt.claim.sub', :'MOD', false);
+select count(*) from (select public.set_banned(:'BAN'::uuid, true)) s;
+select qa.eq('mods: a moderator sees who is banned', 'select string_agg(name, '','') from public.admin_banned_users()', (select name from public.users where id = :'BAN'));
+select count(*) from (select public.set_banned(:'BAN'::uuid, false)) s;
+reset role;

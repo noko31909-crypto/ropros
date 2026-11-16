@@ -1,4 +1,4 @@
--- ropros moderation and notifications, part e of 6: Notifications and build counts
+-- ropros moderation and notifications, part e of 7: Notifications and build counts
 -- Paste the whole file into the Supabase SQL editor and run it. Parts go in order, 8a first.
 -- Safe to run again: anything already there is skipped or replaced.
 -- A notice saying a relation already exists is normal, not an error.

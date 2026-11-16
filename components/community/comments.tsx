@@ -9,6 +9,9 @@ import { useToast } from "@/components/ui/toast";
 import { useLocale, useMessages } from "@/components/i18n/locale-provider";
 import { LOCALE_TAG } from "@/lib/i18n/config";
 import { community } from "@/lib/i18n/messages/community";
+import { moderationMessages } from "@/lib/i18n/messages/moderation";
+import { useIsAdmin } from "@/components/moderation/use-is-admin";
+import { ReportButton } from "./report-dialog";
 
 /** Same limit as the post_comments.body check in supabase/migrations/0003_workbench_comments.sql. */
 export const MAX_COMMENT = 500;
@@ -28,6 +31,8 @@ export function cleanComment(text: string): string {
  */
 export function Comments({ postId, postAuthorId, onCountChange }: { postId: string; postAuthorId: string; onCountChange?: (delta: number) => void }) {
   const t = useMessages(community).comments;
+  const m = useMessages(moderationMessages);
+  const isAdmin = useIsAdmin();
   const { locale } = useLocale();
   const { userId, profile, openAuth } = useAuth();
   const toast = useToast();
@@ -99,7 +104,8 @@ export function Comments({ postId, postAuthorId, onCountChange }: { postId: stri
                   </p>
                   <p className="mt-1 whitespace-pre-line break-words text-sm leading-relaxed text-fg-muted">{c.body}</p>
                 </div>
-                {userId && (c.user_id === userId || postAuthorId === userId) && (
+                {c.user_id !== userId && <ReportButton target={{ kind: "comment", id: c.id }} label={m.reportComment(c.author)} />}
+                {userId && (c.user_id === userId || postAuthorId === userId || isAdmin) && (
                   <button type="button" onClick={() => void remove(c)} aria-label={t.del(c.author)} title={t.del(c.author)}
                     className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-fg-subtle hover:bg-ink-800 hover:text-accent">
                     <Trash2 className="h-4 w-4" aria-hidden />

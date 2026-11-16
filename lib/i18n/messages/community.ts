@@ -38,6 +38,7 @@ export const community = defineMessages({
     xpGained: (n: number) => `Published · +${n} XP`,
     xpCapped: "Published · daily XP cap reached (3 rewarded posts a day)",
     open: (title: string) => `Open ${title}`,
+    hiddenBadge: "Hidden by moderators",
     comments: {
       title: "Comments", count: (n: number) => `${n} ${n === 1 ? "comment" : "comments"}`,
       aria: (n: number, title: string) => `${n} ${n === 1 ? "comment" : "comments"} on ${title}`,
@@ -95,6 +96,7 @@ export const community = defineMessages({
     xpGained: (n: number) => `Опубликовано · +${n} XP`,
     xpCapped: "Опубликовано · дневной лимит XP исчерпан (3 награждаемые публикации в день)",
     open: (title: string) => `Открыть: ${title}`,
+    hiddenBadge: "Скрыто модератором",
     comments: {
       title: "Комментарии", count: (n: number) => `${n} ${ruPlural(n, "комментарий", "комментария", "комментариев")}`,
       aria: (n: number, title: string) => `${n} ${ruPlural(n, "комментарий", "комментария", "комментариев")} к посту ${title}`,
@@ -152,6 +154,7 @@ export const community = defineMessages({
     xpGained: (n: number) => `Жарияланды · +${n} XP`,
     xpCapped: "Жарияланды · күндік XP шегіне жеттіңіз (күніне 3 марапатталатын жарияланым)",
     open: (title: string) => `Ашу: ${title}`,
+    hiddenBadge: "Модератор жасырған",
     comments: {
       title: "Пікірлер", count: (n: number) => `${n} пікір`,
       aria: (n: number, title: string) => `${title} постына ${n} пікір`,

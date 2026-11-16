@@ -7,6 +7,9 @@ import { Avatar } from "@/components/auth/avatar";
 import { useMessages } from "@/components/i18n/locale-provider";
 import { community } from "@/lib/i18n/messages/community";
 import { Comments } from "./comments";
+import { ReportButton } from "./report-dialog";
+import { useAuth } from "@/components/auth/auth-provider";
+import { moderationMessages } from "@/lib/i18n/messages/moderation";
 import { StatusBadge } from "./status-badge";
 import type { FeedPost } from "./post-card";
 
@@ -16,6 +19,8 @@ import type { FeedPost } from "./post-card";
  */
 export function PostDialog({ post, guideTitle, onClose, onCountChange }: { post: FeedPost; guideTitle?: string; onClose: () => void; onCountChange?: (delta: number) => void }) {
   const t = useMessages(community);
+  const m = useMessages(moderationMessages);
+  const { userId } = useAuth();
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -59,6 +64,7 @@ export function PostDialog({ post, guideTitle, onClose, onCountChange }: { post:
                 </p>
               )}
             </div>
+            {post.user_id !== userId && <ReportButton target={{ kind: "post", id: post.id }} label={m.reportPost(post.title)} className="h-9 w-9" />}
             <button ref={closeRef} type="button" onClick={onClose} aria-label={t.dialog.close}
               className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-fg-subtle hover:bg-ink-800 hover:text-fg"><X className="h-5 w-5" aria-hidden /></button>
           </div>

@@ -11,6 +11,7 @@
 -- 6. notifications: a post author hears about each new comment from someone else. Only the recipient reads them.
 -- 7. project_build_counts(): how many makers shared a build of a guide and how many got it working.
 -- 8. delete_my_account(): deletes the caller and, through foreign keys, everything they own.
+-- 9. admin_banned_users(): the banned makers, for moderators.
 -- Every limit is enforced by one atomic statement or under a per-user lock, so parallel requests cannot overshoot.
 -- =====================================================================
 
@@ -334,3 +335,16 @@ begin
 end $delete_my_account$;
 revoke execute on function public.delete_my_account() from public, anon;
 grant  execute on function public.delete_my_account() to authenticated;
+
+-- ---------- 9. Moderator lists ----------
+-- The banned flag is not readable by clients, so moderators get the list of banned makers from here.
+create or replace function public.admin_banned_users() returns table (id uuid, name text)
+language plpgsql stable security definer set search_path = '' as $admin_banned_users$
+begin
+  if not public.is_admin() then
+    raise exception 'not allowed' using errcode = '42501';
+  end if;
+  return query select u.id, u.name from public.users u where u.banned order by u.name;
+end $admin_banned_users$;
+revoke execute on function public.admin_banned_users() from public, anon;
+grant  execute on function public.admin_banned_users() to authenticated;

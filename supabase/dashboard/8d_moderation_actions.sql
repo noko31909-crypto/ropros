@@ -1,4 +1,4 @@
--- ropros moderation and notifications, part d of 6: Moderation actions
+-- ropros moderation and notifications, part d of 7: Moderation actions
 -- Paste the whole file into the Supabase SQL editor and run it. Parts go in order, 8a first.
 -- Safe to run again: anything already there is skipped or replaced.
 -- A notice saying a relation already exists is normal, not an error.

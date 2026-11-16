@@ -38,14 +38,15 @@ export function CommunityShowcase() {
   }, [openPost]);
 
   const load = useCallback(async () => {
-    const feed = (counts: boolean) => supabase
+    const feed = (extra: string) => supabase
       .from("community_posts")
-      .select(`id, user_id, title, status, image_url, likes_count,${counts ? " comments_count," : ""} created_at, users!community_posts_user_id_fkey(name, level), projects!community_posts_project_id_fkey(slug)`)
+      .select(`id, user_id, title, status, image_url, likes_count,${extra} created_at, users!community_posts_user_id_fkey(name, level), projects!community_posts_project_id_fkey(slug)`)
       .order("created_at", { ascending: false })
       .limit(90);
-    let { data, error: err } = await feed(true);
-    // 42703: comments_count is missing until migration 0003 runs. Keep the feed up without comment counts.
-    if (err?.code === "42703") ({ data, error: err } = await feed(false));
+    // 42703: a column from a migration that has not run yet (hidden: 0004, comments_count: 0003). Keep the feed up without it.
+    let { data, error: err } = await feed(" comments_count, hidden,");
+    if (err?.code === "42703") ({ data, error: err } = await feed(" comments_count,"));
+    if (err?.code === "42703") ({ data, error: err } = await feed(""));
     if (err) { setError(true); setPosts([]); return; }
     setError(false);
     const rows = (data ?? []) as unknown as (Omit<FeedPost, "author" | "authorLevel" | "signedUrl" | "guide"> & { users: { name: string; level: number } | null; projects: { slug: string } | null })[];
