@@ -5,6 +5,8 @@ import type { GuideContent, WIRE_COLORS } from "./content/schema.ts";
 import type { CoverId as CardCoverId } from "../components/cards/covers.tsx";
 import { getComponent } from "./hardware/components.ts";
 import { localPartName } from "./hardware/names.ts";
+import { canonicalPart } from "./finder/normalize.ts";
+import { CONSUMABLES } from "./finder/consumables.ts";
 import { CONTENT_GUIDES } from "../content/guides/index.ts";
 
 /**
@@ -561,7 +563,11 @@ export function allGuideSlugs(): string[] {
 export type LocalizedGuide = {
   slug: string; title: string; summary: string; board: string; platform: Platform; cover: CoverId;
   difficulty: Difficulty; hours: number; costUsd: number; xpReward: number; verification: string;
-  parts: { name: string; qty: number; spec: string; role: string; optional: boolean }[];
+  /**
+   * `key`: the parts-catalog id (lib/parts-catalog.ts), so a workbench can say which parts you own.
+   * `required`: counted by the finder and the shopping list (not optional, not a consumable like a breadboard).
+   */
+  parts: { name: string; qty: number; spec: string; role: string; optional: boolean; key?: string; required: boolean }[];
   steps: { title: string; body: string; expect: string; mistake: string }[];
   code: CodeFile[];
   troubleshooting: { symptom: string; cause: string; fix: string }[];
@@ -594,7 +600,12 @@ export function localizeGuide(g: Guide, locale: Locale): LocalizedGuide {
   return {
     slug: g.slug, title: g.title[locale], summary: g.summary[locale], board: g.board, platform: g.platform, cover: g.cover,
     difficulty: g.difficulty, hours: g.hours, costUsd: g.costUsd, xpReward: g.xpReward, verification: g.verification[locale],
-    parts: g.parts.map((p) => ({ name: localPartName(p.component, p.name, locale), qty: p.qty, spec: p.spec[locale], role: p.role[locale], optional: !!p.optional })),
+    parts: g.parts.map((p) => {
+      const part = canonicalPart(p.name);
+      const key = part.category === "Other" ? undefined : part.key;
+      const required = !p.optional && key !== undefined && !(p.component && CONSUMABLES.has(p.component));
+      return { name: localPartName(p.component, p.name, locale), qty: p.qty, spec: p.spec[locale], role: p.role[locale], optional: !!p.optional, ...(key ? { key } : {}), required };
+    }),
     steps: g.steps.map((s) => ({ title: s.title[locale], body: s.body[locale], expect: s.expect[locale], mistake: s.mistake[locale] })),
     code: g.code,
     troubleshooting: g.troubleshooting.map((t) => ({ symptom: t.symptom[locale], cause: t.cause[locale], fix: t.fix[locale] })),

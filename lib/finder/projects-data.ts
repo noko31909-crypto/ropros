@@ -1,5 +1,8 @@
 import { FINDER_GUIDES } from "../../content/guides/finder.ts";
 import type { Locale } from "../i18n/config.ts";
+import { PART_BY_ID } from "../parts-catalog.ts";
+import { CONSUMABLES } from "./consumables.ts";
+import { matchProjects, type FinderResult } from "./match.ts";
 import { ProjectSchema, type ProjectRecord } from "./schema.ts";
 
 /**
@@ -7,9 +10,6 @@ import { ProjectSchema, type ProjectRecord } from "./schema.ts";
  * (content/guides/finder.ts, a slim copy of the catalog), so it always matches what /projects lists. Validated at load so a
  * malformed record fails loudly instead of matching wrongly.
  */
-
-/** Parts every maker has in a starter kit: not counted as requirements, so they never block a match. */
-const CONSUMABLES = new Set(["breadboard", "jumper-wires", "resistor", "capacitor", "enclosure", "usb-5v"]);
 
 /** The three hand-written guides in lib/guides.ts (not in content/guides), with their parts as the finder names them. */
 const HANDWRITTEN = [
@@ -43,3 +43,8 @@ export const PROJECT_TITLES: ReadonlyMap<string, Record<Locale, string>> = new M
   ...HANDWRITTEN.map((p) => [p.project_id, p.title] as const),
   ...FINDER_GUIDES.map((g) => [g.slug, g.title] as const),
 ]);
+
+/** Match parts-catalog ids (a workbench, a finder desk) against every guide. Pure, like matchProjects. */
+export function matchPartIds(ids: readonly string[]): FinderResult {
+  return matchProjects(PROJECTS, ids.map((id) => PART_BY_ID.get(id)?.name ?? id));
+}
