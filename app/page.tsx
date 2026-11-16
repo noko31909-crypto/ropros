@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/container";
 import { ButtonLink } from "@/components/ui/button";
 import { IntroVideo } from "@/components/home/intro-video";
 import { ProjectCard } from "@/components/cards/project-card";
+import { WorkbenchSummary } from "@/components/workbench/workbench-summary";
 import { getLocale } from "@/lib/i18n/server";
 import { home } from "@/lib/i18n/messages/home";
 import { components } from "@/lib/i18n/messages/components";
@@ -99,6 +100,8 @@ export default async function HomePage() {
 
       <section className="py-14 sm:py-28">
         <Container>
+          {/* Only for makers who added parts: real counts from the finder, nothing otherwise. */}
+          <WorkbenchSummary quiet className="mb-4 sm:mb-6" />
           <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
             <ToolCard href="/finder" icon={PackageSearch} title="Project Finder" body={t.finderBody} cta={t.open("Project Finder")} />
             <ToolCard href="/components" icon={Boxes} title={lib.title} body={lib.description} cta={finder[locale].emptyCta} />

@@ -18,8 +18,11 @@ app/
   page.tsx              home: hero, stats, platforms, featured, finder + component library, community CTA
   projects/page.tsx     Project Hub: search, filter sidebar, card grid
   components/page.tsx   Component Library
-  finder/page.tsx       Project Finder: match the parts you own against every guide
-  community/page.tsx    Community feed slot
+  finder/page.tsx       Project Finder: your workbench (the parts you own) matched against every guide
+  shopping/page.tsx     Shopping list: missing parts for your saved builds
+  serial/page.tsx       Serial monitor (Web Serial, Chrome/Edge on a computer)
+  community/page.tsx    Community feed, comments
+  privacy, terms        Privacy policy and terms of use
 components/
   brand/logo.tsx        wordmark + robot "o" mark (SVG)
   nav/site-header.tsx   sticky header, accessible dropdowns, mobile menu
@@ -45,7 +48,7 @@ Type: IBM Plex Sans (UI), JetBrains Mono (pins, code, labels), Gloock (logo and 
 
 ## Next steps
 - Replace the logo SVG with your exported vector in `components/brand/logo.tsx`.
-- Wire search to a command palette, and filters to URL search params.
+- Set `CONTACT_EMAIL` (server-only) in Vercel so the privacy policy and terms show a contact address.
 
 ## Project Finder API
 `POST /api/finder` with `{ "parts": ["Arduino Uno", "HC-SR04", "DC Motor"] }` returns:
@@ -60,7 +63,8 @@ Note: `npm test` uses Node's TypeScript stripping, which needs `.ts` extensions 
 
 ## Auth + database (Supabase)
 1. Create a Supabase project, copy `.env.example` to `.env.local` and fill in the URL and anon key.
-2. Run `supabase/migrations/0001_init.sql` (Supabase CLI: `supabase db push`, or paste into the SQL editor).
+2. Run `supabase/migrations/0001_init.sql`, `0002_security_hardening.sql` and `0003_workbench_comments.sql` in order
+   (Supabase CLI: `supabase db push`, or paste the files from `supabase/dashboard/` into the SQL editor, in order).
 3. `POST /api/progress` with `{ projectId, action: "simulate" | "complete" }` saves progress for the signed-in user.
    `components/guide/progress-actions.tsx` has the "Run Simulator" / "Mark as Completed" buttons that call it.
 4. Refresh the auth session in proxy/middleware as described in the Supabase SSR guide for Next.js.

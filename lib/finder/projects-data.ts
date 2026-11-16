@@ -1,5 +1,8 @@
 import { FINDER_GUIDES } from "../../content/guides/finder.ts";
 import type { Locale } from "../i18n/config.ts";
+import { PART_BY_ID } from "../parts-catalog.ts";
+import { CONSUMABLES } from "./consumables.ts";
+import { matchProjects, type FinderResult } from "./match.ts";
 import { ProjectSchema, type ProjectRecord } from "./schema.ts";
 
 /**
@@ -8,15 +11,16 @@ import { ProjectSchema, type ProjectRecord } from "./schema.ts";
  * malformed record fails loudly instead of matching wrongly.
  */
 
-/** Parts every maker has in a starter kit: not counted as requirements, so they never block a match. */
-const CONSUMABLES = new Set(["breadboard", "jumper-wires", "resistor", "capacitor", "enclosure", "usb-5v"]);
-
-/** The three hand-written guides in lib/guides.ts (not in content/guides), with their parts as the finder names them. */
+/**
+ * The three hand-written guides in lib/guides.ts (not in content/guides), with their parts as the finder names them.
+ * Keep them equal to the guides' required parts: tests/workbench.test.ts checks it, since the parts table and the
+ * shopping list read the guides themselves.
+ */
 const HANDWRITTEN = [
   { project_id: "obstacle-avoiding-robot", title: { en: "Obstacle Avoiding Robot", ru: "Робот, объезжающий препятствия", kk: "Кедергіні айналып өтетін робот" },
-    microcontroller: "Arduino Uno", components_required: ["HC-SR04", "SG90 Servo", "L298N Motor Driver", "DC Gear Motor (TT)", "Robot chassis", "2x 18650 Battery Pack"] },
+    microcontroller: "Arduino Uno", components_required: ["HC-SR04", "SG90 Servo", "L298N Motor Driver", "DC Gear Motor (TT)", "Robot chassis", "2x 18650 Battery Pack", "LM2596 Buck Converter"] },
   { project_id: "line-follower", title: { en: "Precision Line Following Bot", ru: "Точный робот, едущий по линии", kk: "Сызық бойымен дәл жүретін робот" },
-    microcontroller: "Arduino Uno", components_required: ["TCRT5000 IR Line Sensor", "L298N Motor Driver", "DC Gear Motor (TT)", "Robot chassis", "2x 18650 Battery Pack"] },
+    microcontroller: "Arduino Nano", components_required: ["TCRT5000 IR Line Sensor", "L298N Motor Driver", "DC Gear Motor (TT)", "Robot chassis", "2x 18650 Battery Pack"] },
   { project_id: "iot-plant-care", title: { en: "IoT Smart Plant Monitor", ru: "Умный IoT-монитор для растений", kk: "Өсімдікке арналған ақылды IoT-монитор" },
     microcontroller: "ESP32 DevKit", components_required: ["Capacitive Soil Moisture Sensor", "5V Relay Module", "DHT22", "SSD1306 OLED", "Water pump"] },
 ];
@@ -43,3 +47,8 @@ export const PROJECT_TITLES: ReadonlyMap<string, Record<Locale, string>> = new M
   ...HANDWRITTEN.map((p) => [p.project_id, p.title] as const),
   ...FINDER_GUIDES.map((g) => [g.slug, g.title] as const),
 ]);
+
+/** Match parts-catalog ids (a workbench, a finder desk) against every guide. Pure, like matchProjects. */
+export function matchPartIds(ids: readonly string[]): FinderResult {
+  return matchProjects(PROJECTS, ids.map((id) => PART_BY_ID.get(id)?.name ?? id));
+}

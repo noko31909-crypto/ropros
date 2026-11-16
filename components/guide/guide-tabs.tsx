@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import Link from "next/link";
 import { clsx } from "clsx";
-import { AlertTriangle, CircuitBoard, Code2, LayoutList, ListChecks, Package, Rows3 } from "lucide-react";
+import { AlertTriangle, ArrowRight, CircuitBoard, Code2, LayoutList, ListChecks, Package, Rows3, Usb } from "lucide-react";
 import type { LocalizedGuide } from "@/lib/guides";
 import { guideMessages } from "@/lib/i18n/messages/guide";
 import { useMessages } from "@/components/i18n/locale-provider";
@@ -14,14 +15,34 @@ import { Troubleshooting } from "./troubleshooting";
 
 type TabId = "parts" | "wiring" | "steps" | "code" | "troubleshooting";
 
-/** Parts · Wiring diagram · Steps · Code · Troubleshooting. `diagram` is a server-rendered SVG; `progress` sits above the steps. */
-export function GuideTabs({ guide, diagram, progress }: { guide: LocalizedGuide; diagram: ReactNode; progress: ReactNode }) {
+/** "Uploaded the sketch? Open the serial monitor at 9600 baud." Below the code of boards that talk over USB serial. */
+function SerialCallout({ baud }: { baud: number }) {
+  const t = useMessages(guideMessages).serial;
+  return (
+    <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-line bg-ink-900 p-5 sm:flex-row sm:items-center">
+      <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-accent/30 bg-accent-soft text-accent"><Usb className="h-5 w-5" aria-hidden /></span>
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold text-fg">{t.title}</p>
+        <p className="mt-0.5 text-sm text-fg-muted">{t.body(baud)}</p>
+      </div>
+      <Link href={`/serial?baud=${baud}`} className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-ink-700 bg-ink-850 px-4 text-sm font-semibold text-fg hover:border-fg-subtle">
+        {t.cta}<ArrowRight className="h-4 w-4" aria-hidden />
+      </Link>
+    </div>
+  );
+}
+
+/**
+ * Parts · Wiring diagram · Steps · Code · Troubleshooting. `diagram` is a server-rendered SVG; `progress` sits above the steps.
+ * `serialBaud`: the sketch's Serial.begin() rate, for boards you watch over USB serial (null for a Raspberry Pi running Linux).
+ */
+export function GuideTabs({ guide, diagram, progress, serialBaud = null }: { guide: LocalizedGuide; diagram: ReactNode; progress: ReactNode; serialBaud?: number | null }) {
   const t = useMessages(guideMessages).tabs;
   const tabs: { id: TabId; label: string; icon: typeof Package; badge?: number; content: ReactNode }[] = [
     { id: "parts", label: t.parts, icon: Package, badge: guide.parts.length, content: <PartsTable parts={guide.parts} /> },
     { id: "wiring", label: t.wiring, icon: CircuitBoard, content: <DiagramSlot verification={guide.verification} wiring={guide.wiring}>{diagram}</DiagramSlot> },
     { id: "steps", label: t.steps, icon: ListChecks, badge: guide.steps.length, content: <>{progress}<StepChecklist slug={guide.slug} steps={guide.steps} /></> },
-    { id: "code", label: t.code, icon: Code2, content: <CodeBlock files={guide.code} /> },
+    { id: "code", label: t.code, icon: Code2, content: <><CodeBlock files={guide.code} />{serialBaud !== null && <SerialCallout baud={serialBaud} />}</> },
     { id: "troubleshooting", label: t.troubleshooting, icon: AlertTriangle, content: <Troubleshooting issues={guide.troubleshooting} safety={guide.safety} /> },
   ];
   const [active, setActive] = useState<TabId>("parts");

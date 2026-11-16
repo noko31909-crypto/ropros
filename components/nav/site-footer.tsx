@@ -26,7 +26,11 @@ export async function SiteFooter() {
         ))}
       </Container>
       <Container className="flex flex-col gap-2 border-t border-line py-6 text-xs text-fg-subtle sm:flex-row sm:justify-between">
-        <span>© {new Date().getFullYear()} {t.footer.rights}</span>
+        <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span>© {new Date().getFullYear()} {t.footer.rights}</span>
+          <Link href="/privacy" className="-my-2 inline-flex min-h-8 items-center hover:text-fg">{t.footer.privacy}</Link>
+          <Link href="/terms" className="-my-2 inline-flex min-h-8 items-center hover:text-fg">{t.footer.terms}</Link>
+        </span>
         <span>{t.footer.safety}</span>
       </Container>
     </footer>

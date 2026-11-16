@@ -19,6 +19,7 @@ import { PlatformPill } from "@/components/cards/project-card";
 import { getProject, projectHref } from "@/lib/projects";
 import { useSavedBuilds } from "@/lib/saved";
 import { StatusBadge, type BuildStatus } from "@/components/community/status-badge";
+import { WorkbenchSummary } from "@/components/workbench/workbench-summary";
 
 type Stats = { simulated: number; completed: number; posts: number; working: number; debugging: number; likes: number };
 type XpEvent = { id: number; reason: string; amount: number; created_at: string };
@@ -144,6 +145,8 @@ export function ProfileView() {
             </div>
           ))}
         </dl>
+
+        <WorkbenchSummary chips />
 
         <section>
           <div className="mb-5 flex items-baseline gap-3">

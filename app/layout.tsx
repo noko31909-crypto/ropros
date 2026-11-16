@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/nav/site-footer";
 import { TabBar } from "@/components/nav/tab-bar";
 import { LocaleProvider } from "@/components/i18n/locale-provider";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { WorkbenchProvider } from "@/components/workbench/workbench-provider";
 import { ToastProvider } from "@/components/ui/toast";
 import { getLocale } from "@/lib/i18n/server";
 import { common } from "@/lib/i18n/messages/common";
@@ -34,13 +35,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <LocaleProvider initial={locale}>
           <ToastProvider>
             <AuthProvider>
-              <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-ink-950">
-                {t.skip}
-              </a>
-              <SiteHeader />
-              <main id="main" className="flex-1">{children}</main>
-              <SiteFooter />
-              <TabBar />
+              <WorkbenchProvider>
+                <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-ink-950">
+                  {t.skip}
+                </a>
+                <SiteHeader />
+                <main id="main" className="flex-1">{children}</main>
+                <SiteFooter />
+                <TabBar />
+              </WorkbenchProvider>
             </AuthProvider>
           </ToastProvider>
         </LocaleProvider>

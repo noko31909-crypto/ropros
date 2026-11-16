@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { clsx } from "clsx";
-import { Bookmark, ChevronDown, Menu, Search, X } from "lucide-react";
+import { Bookmark, ChevronDown, Menu, X } from "lucide-react";
 import { buildNav, sectionOf, type NavItem } from "@/lib/nav";
 import { common } from "@/lib/i18n/messages/common";
 import { useMessages } from "@/components/i18n/locale-provider";
@@ -13,6 +13,7 @@ import { Logo } from "@/components/brand/logo";
 import { Container } from "@/components/ui/container";
 import { Avatar } from "@/components/auth/avatar";
 import { levelBand, useAuth } from "@/components/auth/auth-provider";
+import { SiteSearch } from "@/components/search/site-search";
 
 /** Accessible dropdown: opens on click, closes on Escape, outside click or route change. */
 function NavDropdown({ item, active }: { item: Extract<NavItem, { children: unknown }>; active: boolean }) {
@@ -33,7 +34,7 @@ function NavDropdown({ item, active }: { item: Extract<NavItem, { children: unkn
   return (
     <div ref={ref} className="relative">
       <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)}
-        className={clsx("relative inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors",
+        className={clsx("relative inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-colors",
           active || open ? "text-fg" : "text-fg-muted hover:text-fg",
           active && "after:absolute after:inset-x-3 after:-bottom-[15px] after:h-0.5 after:rounded-full after:bg-accent")}>
         {item.label}
@@ -105,22 +106,19 @@ export function SiteHeader() {
           {nav.map((item) =>
             "href" in item ? (
               <Link key={item.key} href={item.href} aria-current={section === item.key ? "page" : undefined}
-                className={clsx("relative inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors",
+                className={clsx("relative inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-colors",
                   section === item.key ? "text-fg after:absolute after:inset-x-3 after:-bottom-[15px] after:h-0.5 after:rounded-full after:bg-accent" : "text-fg-muted hover:text-fg")}>
                 {item.label}
                 {item.badge && <span className="rounded-full bg-accent-soft px-1.5 py-px font-mono text-[9px] font-semibold uppercase text-accent">{item.badge}</span>}
               </Link>
             ) : (
-              <NavDropdown key={item.key} item={item} active={section === item.key} />
+              <NavDropdown key={item.key} item={item} active={(item.sections ?? [item.key]).includes(section)} />
             ),
           )}
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <Link href="/projects" className="hidden h-9 items-center gap-3 rounded-lg border border-line bg-ink-900 pl-3 pr-2 text-sm text-fg-subtle transition-colors hover:border-ink-700 hover:text-fg-muted 2xl:inline-flex" aria-label={t.nav.search}>
-            <Search className="h-4 w-4" aria-hidden />
-            <span className="w-40 text-left">{t.nav.search}</span>
-          </Link>
+          <SiteSearch />
           <div className="hidden sm:block"><LocaleSwitcher /></div>
           {profile ? (
             <Link href="/profile#saved" aria-label={t.nav.saved}

@@ -27,6 +27,7 @@ export const guideMessages = defineMessages({
       xpGained: (n: number) => `+${n} XP`, savedNoXp: "Progress saved",
     },
     sim: { title: "Serial Monitor", running: "running", idle: "idle", finished: "done", close: "Close simulator", baud: (n: number) => `${n} baud`, leds: "Board LEDs" },
+    serial: { title: "Watch the real board", body: (baud: number) => `Uploaded the sketch? Open the serial monitor at ${baud} baud to see what your board prints.`, cta: "Open serial monitor" },
     notFound: { title: "Guide not found", body: "This build doesn’t exist or was moved.", back: "Back to Project Hub" },
   },
   ru: {
@@ -54,6 +55,7 @@ export const guideMessages = defineMessages({
       xpGained: (n: number) => `+${n} XP`, savedNoXp: "Прогресс сохранён",
     },
     sim: { title: "Монитор порта", running: "работает", idle: "ожидание", finished: "готово", close: "Закрыть симулятор", baud: (n: number) => `${n} бод`, leds: "Светодиоды платы" },
+    serial: { title: "Посмотрите на настоящую плату", body: (baud: number) => `Загрузили скетч? Откройте Serial-монитор на ${baud} бод и посмотрите, что печатает плата.`, cta: "Открыть Serial-монитор" },
     notFound: { title: "Гайд не найден", body: "Такой сборки нет или она перемещена.", back: "Вернуться в Project Hub" },
   },
   kk: {
@@ -81,6 +83,7 @@ export const guideMessages = defineMessages({
       xpGained: (n: number) => `+${n} XP`, savedNoXp: "Прогресс сақталды",
     },
     sim: { title: "Порт мониторы", running: "жұмыс істеуде", idle: "күту", finished: "дайын", close: "Симуляторды жабу", baud: (n: number) => `${n} бод`, leds: "Тақта жарықдиодтары" },
+    serial: { title: "Нақты тақтаны бақылаңыз", body: (baud: number) => `Скетчті жүктедіңіз бе? Тақта не басып шығаратынын көру үшін Serial-мониторды ${baud} бодпен ашыңыз.`, cta: "Serial-мониторды ашу" },
     notFound: { title: "Нұсқаулық табылмады", body: "Мұндай құрастыру жоқ немесе ол көшірілген.", back: "Project Hub-қа оралу" },
   },
 });
