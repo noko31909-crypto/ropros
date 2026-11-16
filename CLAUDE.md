@@ -1,13 +1,15 @@
 # ropros — project context for Claude Code
 
 ropros is a premium maker platform: a repository of hardware builds (166 Arduino/ESP32/Raspberry Pi builds, 40 robotics guides)
-with a Project Finder (match the parts you own), a component library and a community showcase. No AI features: the
-assistant and the project generator were removed; don't add AI wording or AI-styled UI back without the owner asking.
+with a Project Finder (match the parts you own, kept as your workbench), a shopping list, a browser serial monitor,
+site search, a component library and a community showcase with comments. No AI features: the assistant and the project
+generator were removed; don't add AI wording or AI-styled UI back without the owner asking.
 
 ## Stack
 - Next.js (App Router) + TypeScript (strict) + Tailwind CSS v4 + lucide-react
 - Supabase (Postgres + Auth + Storage). Schema: `supabase/migrations/0001_init.sql` + `0002_security_hardening.sql`
-  (dashboard copies in `supabase/dashboard/` (6a–6e, run in order; max 2 functions per file, unique dollar tags — the SQL editor mis-parses bigger scripts); keep their comments free of quotes and semicolons for the SQL editor)
+  + `0003_workbench_comments.sql` (dashboard copies in `supabase/dashboard/` (6a–6e, then 7a–7b, run in order; max 2 functions per file, unique dollar tags — the SQL editor mis-parses bigger scripts); keep their comments free of quotes and semicolons for the SQL editor).
+  Attack tests: `supabase/tests/run.sh` against a throwaway local Postgres (CI runs it); every new rule or limit gets a check there, limits also a parallel one.
 - zod for every external input. Versions are pinned exactly in package.json; verify they are current before installing.
 
 ## Design system (do not drift)
@@ -28,7 +30,18 @@ assistant and the project generator were removed; don't add AI wording or AI-sty
   it regenerates `index.ts` (all guides, server only), `catalog.ts` (card fields for hub/home/profile), `finder.ts`
   (what the parts finder searches) and `slugs.ts` (the 404 check in `proxy.ts`). Tests fail if they are stale.
 - `lib/finder/*` — part normalization + matcher (pure, tested in `tests/finder.test.ts`), searching every guide; page at `/finder`
-  (old `/ai/*` links redirect there, `next.config.ts`), API at `app/api/finder/route.ts`
+  (old `/ai/*` links redirect there, `next.config.ts`), API at `app/api/finder/route.ts`. `lib/parts-catalog.ts` must know every
+  part a guide requires (tests check it), so it can be owned, matched and shopped for.
+- Workbench (parts you own): `components/workbench/workbench-provider.tsx` (`useWorkbench()`): `public.user_parts` when signed in,
+  local storage (`ropros:workbench`) for guests, merged into the account on sign-in. The Finder desk is the workbench;
+  guide parts tables tick owned parts; `WorkbenchSummary` on home and profile.
+- `/shopping` — missing parts for saved builds (`lib/saved.ts`) minus the workbench (`lib/shopping.ts`, store search links, no affiliate tags).
+- `/serial` — Web Serial monitor (`components/serial/serial-monitor.tsx`, `lib/serial.ts`); guide code tabs link to it with the sketch's baud.
+- Search: `components/search/site-search.tsx` (header button, Ctrl/⌘+K, "/"), index in `lib/search.ts` (lazy-loaded).
+- Community: `components/community/*` — feed, share modal, `post-dialog.tsx` + `comments.tsx` (comments), `build-logs.tsx`
+  ("Built by the community" + "I built this" on guide pages; posts link to a guide through `community_posts.project_id`).
+- `/privacy`, `/terms` — text in `lib/i18n/messages/legal.ts`; keep them in step with what the site stores. Contact = `CONTACT_EMAIL`
+  (server env), else the GitHub issues link.
 - `app/api/progress/route.ts` — saves progress via the `record_progress` RPC
 - `components/guide/*` — guide tabs, parts table, diagram slot, step checklist, code block, troubleshooting, banner, progress buttons
 - `components/finder/*` — tags input, animated find button, results
@@ -37,16 +50,19 @@ assistant and the project generator were removed; don't add AI wording or AI-sty
 1. Removed: the AI assistant and the AI project generator (with their API routes, keys and the three.js 3D viewer).
 2. Done on `/` (app/page.tsx): Supabase Auth sign-in/sign-up, session refresh in `proxy.ts`, XP via `/api/progress`,
    community feed/uploads/likes (`/community` too). `/projects` and `/finder` are built from the guide files, not from the database.
-3. Learning paths have no table yet: module progress is local-only and awards no XP.
+3. Learning paths have no table yet: module progress is local-only and awards no XP. Saved builds are device-local too.
 4. Guides live in `content/guides` (static, generated indexes); move them to Supabase only if editing without a deploy is needed.
 5. Done: daily cap of 3 rewarded posts per user (`reward_post()`).
 6. Rate limiter in `lib/rate-limit.ts` is in-memory (per-instance burst control only). Daily limits that matter live in
-   Postgres (0002): 10 posts, 5 photos waiting without a post, 3 completed / 5 simulated guides paying XP. The `assistant_usage` table and
-   `consume_assistant_quota()` from 0002 are no longer used by the app.
+   Postgres (0002): 10 posts, 5 photos waiting without a post, 3 completed / 5 simulated guides paying XP; (0003) 50 comments a day,
+   200 workbench parts. The `assistant_usage` table and `consume_assistant_quota()` from 0002 are no longer used by the app.
+7. Not built: flashing ESP32 firmware from the browser. It needs Espressif's `esptool-js` (install it through the Socket npm
+   firewall, not straight from npmjs) and firmware to flash: the guides ship source code, not binaries.
+8. Shopping list prices: none on purpose (no price source); the links open each shop's own search.
 
 ## Rules
 - Never trust ids from request bodies for ownership; use the verified session (`supabase.auth.getUser()`).
-- XP, levels, likes_count and progress are written only by DB functions/triggers. Never from the client.
+- XP, levels, likes_count, comments_count and progress are written only by DB functions/triggers. Never from the client.
 - No dangerouslySetInnerHTML for user or model content. No secrets with NEXT_PUBLIC_. No service-role key in client code.
 - Cookie-authenticated POST routes call `isCrossSiteRequest` and `isJsonRequest` (`lib/request-guard.ts`).
 - The CSP in `proxy.ts` is nonce-based: no inline scripts or eval; a new image or API host must be added there.
