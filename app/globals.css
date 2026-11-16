@@ -15,7 +15,7 @@
   --color-accent: #ff7a1a;        /* neon orange: primary actions */
   --color-accent-hover: #ff9446;
   --color-accent-soft: #ff7a1a1f;
-  --color-signal: #2ee6c9;        /* electric teal: AI + live states only */
+  --color-signal: #2ee6c9;        /* electric teal: live states + the Arduino pill only */
   --color-signal-soft: #2ee6c91a;
 
   --color-brand-from: #efb3a3;    /* logo gradient (peach) */

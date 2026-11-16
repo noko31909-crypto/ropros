@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronRight, Clock, Cpu, Gauge, Sparkles, Wallet } from "lucide-react";
+import { ChevronRight, Clock, Cpu, Gauge, Trophy, Wallet } from "lucide-react";
 import { Container } from "@/components/ui/container";
-import { AssistantDrawer } from "@/components/assistant/assistant-drawer";
 import { GuideBanner } from "@/components/guide/guide-banner";
 import { GuideTabs } from "@/components/guide/guide-tabs";
 import { GuideActions } from "@/components/guide/guide-actions";
@@ -98,7 +97,7 @@ export default async function GuidePage({ params }: Props) {
                 </li>
               ))}
               <li className="inline-flex items-center gap-2 rounded-full border border-line bg-ink-900 px-3 py-1.5 text-sm text-fg-muted">
-                <Sparkles className="h-4 w-4 text-accent" aria-hidden />{t.xpReward(guide.xpReward)}
+                <Trophy className="h-4 w-4 text-accent" aria-hidden />{t.xpReward(guide.xpReward)}
               </li>
             </ul>
             <GuideActions slug={guide.slug} />
@@ -113,7 +112,6 @@ export default async function GuidePage({ params }: Props) {
           progress={<ProgressActions projectId={projectId} simulation={guide.simulation} />}
         />
       </Container>
-      <AssistantDrawer context={{ guideSlug: guide.slug, guideTitle: guide.title }} />
     </>
   );
 }

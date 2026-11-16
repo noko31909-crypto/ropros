@@ -20,7 +20,7 @@ const serifCyr = Noto_Serif_Display({ subsets: ["latin", "cyrillic", "cyrillic-e
 
 export const metadata: Metadata = {
   title: { default: "ropros — hardware builds for engineers", template: "%s · ropros" },
-  description: "Arduino, ESP32 and Raspberry Pi build guides with wiring diagrams, code and an AI build assistant.",
+  description: "Arduino, ESP32 and Raspberry Pi build guides with wiring diagrams, code and a finder that matches the parts you own.",
 };
 
 export const viewport: Viewport = { themeColor: "#07090c", colorScheme: "dark", viewportFit: "cover" };

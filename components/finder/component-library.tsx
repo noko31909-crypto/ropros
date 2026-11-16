@@ -67,7 +67,7 @@ export function ComponentLibrary() {
             {/* A grid (not CSS columns): rows read left to right and no column is left empty. The whole card is the link. */}
             <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
               {parts.map((p) => (
-                <Link key={p.id} href={`/ai/finder?parts=${encodeURIComponent(p.id)}`} aria-label={`${p.name}: ${t.findBuilds}`}
+                <Link key={p.id} href={`/finder?parts=${encodeURIComponent(p.id)}`} aria-label={`${p.name}: ${t.findBuilds}`}
                   className="group flex animate-fade-up flex-col rounded-[28px] border border-line bg-ink-850 p-4 transition-colors hover:border-accent/40 sm:p-5">
                   <div className="flex items-center gap-3">
                     <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-line bg-ink-900 text-fg-muted"><Icon className="h-5 w-5" aria-hidden /></span>

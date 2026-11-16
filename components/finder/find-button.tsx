@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { clsx } from "clsx";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import { useMessages } from "@/components/i18n/locale-provider";
 import { finder } from "@/lib/i18n/messages/finder";
 
@@ -55,7 +55,7 @@ export function FindButton({ loading, disabled, onClick }: { loading: boolean; d
         </>
       ) : (
         <>
-          <Sparkles className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" aria-hidden />
+          <Search className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" aria-hidden />
           {t.find}
           <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
         </>

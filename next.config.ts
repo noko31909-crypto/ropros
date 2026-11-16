@@ -19,6 +19,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  // The AI section is gone: the parts finder moved to /finder (its ?parts= query is kept), and old links
+  // to the removed assistant and generator land there too.
+  async redirects() {
+    return [
+      { source: "/ai", destination: "/finder", permanent: true },
+      { source: "/ai/:path*", destination: "/finder", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

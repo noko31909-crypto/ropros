@@ -1,7 +1,8 @@
 # ropros — project context for Claude Code
 
 ropros is a premium maker platform: a repository of hardware builds (166 Arduino/ESP32/Raspberry Pi builds, 40 robotics guides)
-with an AI Project Finder, an AI build assistant, a component library and a community showcase.
+with a Project Finder (match the parts you own), a component library and a community showcase. No AI features: the
+assistant and the project generator were removed; don't add AI wording or AI-styled UI back without the owner asking.
 
 ## Stack
 - Next.js (App Router) + TypeScript (strict) + Tailwind CSS v4 + lucide-react
@@ -11,7 +12,7 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
 
 ## Design system (do not drift)
 - Dark by default. Tokens live in `app/globals.css` (@theme): ink-950…700 slate surfaces, `line` hairlines,
-  `accent` #FF7A1A neon orange = primary actions, `signal` #2EE6C9 electric teal = AI features and live states only.
+  `accent` #FF7A1A neon orange = primary actions, `signal` #2EE6C9 electric teal = live states and the Arduino pill only.
 - Logo gradient (#EFB3A3 → #A5A57A) only for the wordmark and one display phrase per page.
 - Type: IBM Plex Sans (UI), JetBrains Mono (pins, code), Gloock (display). Respect prefers-reduced-motion.
 - Cards: Pinterest-style masonry (`columns-*`, `break-inside-avoid`), rounded-[28px], image on top, neon platform pill
@@ -26,30 +27,28 @@ with an AI Project Finder, an AI build assistant, a component library and a comm
 - `content/guides/*.ts` — the guides. After adding or editing one, run `node --experimental-strip-types scripts/guides-index.ts`:
   it regenerates `index.ts` (all guides, server only), `catalog.ts` (card fields for hub/home/profile), `finder.ts`
   (what the parts finder searches) and `slugs.ts` (the 404 check in `proxy.ts`). Tests fail if they are stale.
-- `lib/finder/*` — part normalization + matcher (pure, tested in `tests/finder.test.ts`), searching every guide; API at `app/api/finder/route.ts`
-- `lib/build/part-models.ts` + `lib/build/prims.ts` — the detailed 3D part models and their building blocks; preview any part at `/dev/models?id=<component>` (dev only)
+- `lib/finder/*` — part normalization + matcher (pure, tested in `tests/finder.test.ts`), searching every guide; page at `/finder`
+  (old `/ai/*` links redirect there, `next.config.ts`), API at `app/api/finder/route.ts`
 - `app/api/progress/route.ts` — saves progress via the `record_progress` RPC
 - `components/guide/*` — guide tabs, parts table, diagram slot, step checklist, code block, troubleshooting, banner, progress buttons
-- `components/assistant/*` — terminal-style assistant UI; `app/api/assistant/route.ts` streams replies via OpenRouter
-  (`OPENROUTER_API_KEY`, `lib/assistant/openrouter.ts`) or Anthropic (`ANTHROPIC_API_KEY`); no key = demo mode
 - `components/finder/*` — tags input, animated find button, results
 
 ## Still mocked / TODO
-1. Done: assistant server route with guide context, sign-in required, rate limited.
+1. Removed: the AI assistant and the AI project generator (with their API routes, keys and the three.js 3D viewer).
 2. Done on `/` (app/page.tsx): Supabase Auth sign-in/sign-up, session refresh in `proxy.ts`, XP via `/api/progress`,
-   community feed/uploads/likes (`/community` too). `/projects` and `/ai/finder` are built from the guide files, not from the database.
+   community feed/uploads/likes (`/community` too). `/projects` and `/finder` are built from the guide files, not from the database.
 3. Learning paths have no table yet: module progress is local-only and awards no XP.
 4. Guides live in `content/guides` (static, generated indexes); move them to Supabase only if editing without a deploy is needed.
 5. Done: daily cap of 3 rewarded posts per user (`reward_post()`).
 6. Rate limiter in `lib/rate-limit.ts` is in-memory (per-instance burst control only). Daily limits that matter live in
-   Postgres (0002): 10 posts, 5 photos waiting without a post, 3 completed / 5 simulated guides paying XP, assistant quota.
+   Postgres (0002): 10 posts, 5 photos waiting without a post, 3 completed / 5 simulated guides paying XP. The `assistant_usage` table and
+   `consume_assistant_quota()` from 0002 are no longer used by the app.
 
 ## Rules
 - Never trust ids from request bodies for ownership; use the verified session (`supabase.auth.getUser()`).
 - XP, levels, likes_count and progress are written only by DB functions/triggers. Never from the client.
 - No dangerouslySetInnerHTML for user or model content. No secrets with NEXT_PUBLIC_. No service-role key in client code.
-- Cookie-authenticated POST routes call `isCrossSiteRequest` and `isJsonRequest` (`lib/request-guard.ts`). Assistant input goes
-  through `parseAssistantRequest` (size and count before zod) and `redactSecrets` before any provider call.
+- Cookie-authenticated POST routes call `isCrossSiteRequest` and `isJsonRequest` (`lib/request-guard.ts`).
 - The CSP in `proxy.ts` is nonce-based: no inline scripts or eval; a new image or API host must be added there.
 - No fake community activity in production: seed data belongs in dev fixtures only.
 - Before finishing a task: `npm run typecheck` and `npm test`.

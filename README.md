@@ -15,10 +15,10 @@ Versions are pinned exactly. Check they're current before installing (`npm view 
 app/
   layout.tsx            fonts, header, footer, skip link
   globals.css           design tokens (@theme) + utilities
-  page.tsx              home: hero, stats, platforms, featured, AI tools, community CTA
+  page.tsx              home: hero, stats, platforms, featured, finder + component library, community CTA
   projects/page.tsx     Project Hub: search, filter sidebar, card grid
   components/page.tsx   Component Library
-  ai/page.tsx           AI Tools index (finder + assistant routes to build next)
+  finder/page.tsx       Project Finder: match the parts you own against every guide
   community/page.tsx    Community feed slot
 components/
   brand/logo.tsx        wordmark + robot "o" mark (SVG)
@@ -38,7 +38,7 @@ lib/
 | line | #1C2430 | hairline borders |
 | fg / fg-muted | #E9EEF3 / #8B98A9 | text |
 | accent | #FF7A1A | primary actions, active nav |
-| signal | #2EE6C9 | AI features and live states only |
+| signal | #2EE6C9 | live states and the Arduino pill only |
 | brand-from → brand-to | #EFB3A3 → #A5A57A | logo gradient only |
 
 Type: IBM Plex Sans (UI), JetBrains Mono (pins, code, labels), Gloock (logo and one display phrase per page).
@@ -46,9 +46,8 @@ Type: IBM Plex Sans (UI), JetBrains Mono (pins, code, labels), Gloock (logo and 
 ## Next steps
 - Replace the logo SVG with your exported vector in `components/brand/logo.tsx`.
 - Wire search to a command palette, and filters to URL search params.
-- AI routes: call the model only from server code; never expose API keys to the client.
 
-## AI Project Finder API
+## Project Finder API
 `POST /api/finder` with `{ "parts": ["Arduino Uno", "HC-SR04", "DC Motor"] }` returns:
 - `ready`: projects where you own 100% of the required parts (microcontroller included)
 - `close_matches`: missing 1–2 parts, none of them a board or chassis

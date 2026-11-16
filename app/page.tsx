@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, Bot, Boxes, Cpu, MessagesSquare, Radio, Sparkles, Users, type LucideIcon } from "lucide-react";
+import { ArrowRight, Bot, Boxes, Cpu, PackageSearch, Radio, Users, type LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { ButtonLink } from "@/components/ui/button";
 import { IntroVideo } from "@/components/home/intro-video";
 import { ProjectCard } from "@/components/cards/project-card";
 import { getLocale } from "@/lib/i18n/server";
 import { home } from "@/lib/i18n/messages/home";
+import { components } from "@/lib/i18n/messages/components";
+import { finder } from "@/lib/i18n/messages/finder";
 import { CATALOG_COUNTS, FEATURED } from "@/lib/projects";
 
 function SectionHeading({ title, href, cta }: { title: string; href: string; cta: string }) {
@@ -21,12 +23,12 @@ function SectionHeading({ title, href, cta }: { title: string; href: string; cta
 
 function ToolCard({ href, icon: Icon, title, body, cta }: { href: string; icon: LucideIcon; title: string; body: string; cta: string }) {
   return (
-    <Link href={href} className="group relative flex flex-col overflow-hidden rounded-[28px] border border-line bg-ink-850 p-6 transition-colors hover:border-signal/40 sm:p-8">
-      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-signal/10 opacity-60 blur-3xl transition-opacity group-hover:opacity-100" />
-      <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-signal/30 bg-signal-soft text-signal"><Icon className="h-5 w-5" aria-hidden /></span>
+    <Link href={href} className="group relative flex flex-col overflow-hidden rounded-[28px] border border-line bg-ink-850 p-6 transition-colors hover:border-accent/40 sm:p-8">
+      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent/10 opacity-60 blur-3xl transition-opacity group-hover:opacity-100" />
+      <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent/30 bg-accent-soft text-accent"><Icon className="h-5 w-5" aria-hidden /></span>
       <h3 className="mt-6 text-2xl font-semibold text-fg">{title}</h3>
       <p className="mt-3 max-w-md text-fg-muted">{body}</p>
-      <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-semibold text-signal">
+      <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-semibold text-accent">
         {cta}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 motion-reduce:group-hover:translate-x-0" aria-hidden />
       </span>
     </Link>
@@ -36,6 +38,7 @@ function ToolCard({ href, icon: Icon, title, body, cta }: { href: string; icon: 
 export default async function HomePage() {
   const locale = await getLocale();
   const t = home[locale];
+  const lib = components[locale];
   // Icons carry the platform colours of the card pills (Arduino teal, ESP32 orange, Raspberry Pi pink).
   const platforms: [string, string, string, LucideIcon, string][] = [
     ["Arduino", "/projects?board=arduino", t.platforms.arduino, Cpu, "text-signal"],
@@ -61,7 +64,7 @@ export default async function HomePage() {
               <p className="mt-5 max-w-xl text-base leading-relaxed text-fg-muted sm:mt-6 sm:text-lg">{t.subtitle}</p>
               <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap">
                 <ButtonLink href="/projects?category=robotics" className="justify-center">{t.ctaRobotics}<ArrowRight className="h-4 w-4" aria-hidden /></ButtonLink>
-                <ButtonLink href="/ai/finder" variant="secondary" className="justify-center"><Sparkles className="h-4 w-4 text-signal" aria-hidden />{t.ctaFinder}</ButtonLink>
+                <ButtonLink href="/finder" variant="secondary" className="justify-center"><PackageSearch className="h-4 w-4 text-accent" aria-hidden />{t.ctaFinder}</ButtonLink>
               </div>
             </div>
             <IntroVideo labels={t.video} />
@@ -97,8 +100,8 @@ export default async function HomePage() {
       <section className="py-14 sm:py-28">
         <Container>
           <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
-            <ToolCard href="/ai/finder" icon={Sparkles} title="Project Finder" body={t.finderBody} cta={t.open("Project Finder")} />
-            <ToolCard href="/ai/assistant" icon={MessagesSquare} title="Build Assistant" body={t.assistantBody} cta={t.open("Build Assistant")} />
+            <ToolCard href="/finder" icon={PackageSearch} title="Project Finder" body={t.finderBody} cta={t.open("Project Finder")} />
+            <ToolCard href="/components" icon={Boxes} title={lib.title} body={lib.description} cta={finder[locale].emptyCta} />
           </div>
         </Container>
       </section>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
-import { Cpu, Layers, LogIn, Sparkles, Users } from "lucide-react";
+import { Cpu, Layers, LogIn, PackageSearch, Users } from "lucide-react";
 import { sectionOf } from "@/lib/nav";
 import { common } from "@/lib/i18n/messages/common";
 import { useMessages } from "@/components/i18n/locale-provider";
@@ -18,7 +18,7 @@ export function TabBar() {
   const tabs = [
     { id: "home", href: "/", label: t.tabs.home, Icon: Cpu },
     { id: "projects", href: "/projects", label: t.tabs.projects, Icon: Layers },
-    { id: "ai", href: "/ai", label: t.tabs.finder, Icon: Sparkles },
+    { id: "finder", href: "/finder", label: t.tabs.finder, Icon: PackageSearch },
     { id: "community", href: "/community", label: t.tabs.community, Icon: Users },
   ];
   const item = "relative flex h-full flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors";
@@ -30,8 +30,8 @@ export function TabBar() {
           return (
             <li key={id}>
               <Link href={href} aria-current={on ? "page" : undefined} className={clsx(item, on ? "text-fg" : "text-fg-muted")}>
-                {on && <span className={clsx("absolute top-0 h-0.5 w-8 rounded-full", id === "ai" ? "bg-signal" : "bg-accent")} />}
-                <Icon className={clsx("h-[22px] w-[22px]", on && (id === "ai" ? "text-signal" : "text-accent"))} aria-hidden />
+                {on && <span className="absolute top-0 h-0.5 w-8 rounded-full bg-accent" />}
+                <Icon className={clsx("h-[22px] w-[22px]", on && "text-accent")} aria-hidden />
                 <span>{label}</span>
               </Link>
             </li>
