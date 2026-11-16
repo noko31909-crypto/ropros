@@ -246,7 +246,8 @@ const PI_HEADER: string[] = [
   "GPIO9", "GPIO25", "GPIO11", "GPIO8", "GND5", "GPIO7", "ID_SD", "ID_SC", "GPIO5", "GND6",
   "GPIO6", "GPIO12", "GPIO13", "GND7", "GPIO19", "GPIO16", "GPIO26", "GPIO20", "GND8", "GPIO21",
 ];
-const PI4_PINS: PinDef[] = PI_HEADER.map((id, i): PinDef => {
+/** The 40-pin header, identical on the Raspberry Pi 4 and 5 (on the Pi 5 the RP1 chip drives it, still 3.3 V only). */
+const PI_PINS: PinDef[] = PI_HEADER.map((id, i): PinDef => {
   const label = `pin ${i + 1}`;
   if (id.startsWith("GPIO")) {
     const n = Number(id.slice(4));
@@ -309,7 +310,10 @@ export const COMPONENTS: Record<ComponentId, ComponentDef> = {
   "esp32-cam": c("esp32-cam", { name: "ESP32-CAM (AI-Thinker, OV2640)", category: "Boards", kind: "board", logicVolts: 3.3, fiveVoltTolerant: false,
     supply: { min: 4.75, max: 5.25 }, drawMa: 310, pins: ESP32CAM_PINS, draw: { w: 9, h: 13, color: "#1C1C1E", textColor: "#FFFFFF" }, finderPartId: "esp32cam" }),
   "raspberry-pi-4": c("raspberry-pi-4", { name: "Raspberry Pi 4 Model B", category: "Boards", kind: "board", logicVolts: 3.3, fiveVoltTolerant: false,
-    supply: { min: 4.75, max: 5.25 }, drawMa: 1000, pins: PI4_PINS, draw: { w: 28, h: 18, color: "#2E7D32", textColor: "#FFFFFF" }, finderPartId: "rpi4" }),
+    supply: { min: 4.75, max: 5.25 }, drawMa: 1000, pins: PI_PINS, draw: { w: 28, h: 18, color: "#2E7D32", textColor: "#FFFFFF" }, finderPartId: "rpi4" }),
+  // Pi 5: same header, RP1 I/O chip (use gpiozero/lgpio, not RPi.GPIO); 5 V 5 A USB-C PD supply for full USB power.
+  "raspberry-pi-5": c("raspberry-pi-5", { name: "Raspberry Pi 5", category: "Boards", kind: "board", logicVolts: 3.3, fiveVoltTolerant: false,
+    supply: { min: 4.75, max: 5.25 }, drawMa: 1500, pins: PI_PINS, draw: { w: 28, h: 18, color: "#2E7D32", textColor: "#FFFFFF" }, finderPartId: "rpi5" }),
   "raspberry-pi-pico": c("raspberry-pi-pico", { name: "Raspberry Pi Pico (RP2040)", category: "Boards", kind: "board", logicVolts: 3.3, fiveVoltTolerant: false,
     supply: { min: 1.8, max: 5.5 }, drawMa: 30, pins: PICO_PINS, draw: { w: 17, h: 7, color: "#2E7D32", textColor: "#FFFFFF" }, finderPartId: "pico" }),
 
