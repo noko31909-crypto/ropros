@@ -1,7 +1,7 @@
 #!/bin/bash
 # Attack tests for the database rules, run against a throwaway local PostgreSQL (16+) set up like Supabase.
 #   PGHOST=/tmp PGPORT=5432 PGUSER=postgres supabase/tests/run.sh [after|before]
-# after (default) = 0001 + 0002 + 0003, before = 0001 only. Each check states the secure expectation, so a FAIL line
+# after (default) = 0001 + 0002 + 0003 + 0004, before = 0001 only. Each check states the secure expectation, so a FAIL line
 # is a weakness. The parallel checks at the end fire requests at the same instant, so every limit is proven
 # under concurrency. In "after" mode the script exits non-zero if any check fails, which is what CI relies on.
 # It drops and recreates $TEST_DB (default ropros_test): never point it at production.
@@ -18,11 +18,13 @@ $P -f "$D/00_supabase_stubs.sql"
 $P -f "$R/migrations/0001_init.sql"
 [ "$MODE" = after ] && $P -f "$R/migrations/0002_security_hardening.sql"
 [ "$MODE" = after ] && $P -f "$R/migrations/0003_workbench_comments.sql"
+[ "$MODE" = after ] && $P -f "$R/migrations/0004_moderation_notifications.sql"
 $P -f "$R/seed.sql"
 $P -f "$D/01_qa.sql"
 $P -f "$D/02_attacks.sql" >/dev/null
 [ "$MODE" = after ] && $P -f "$D/03_after_fix.sql" >/dev/null
 [ "$MODE" = after ] && $P -f "$D/04_features.sql" >/dev/null
+[ "$MODE" = after ] && $P -f "$D/05_moderation.sql" >/dev/null
 $P -c "select case when pass then 'PASS' else 'FAIL' end as result, name, left(detail, 70) as detail from qa.results order by n"
 FAILED=$($P -tA -c "select count(*) from qa.results where not pass")
 $P -tA -c "select count(*) filter (where pass) || ' passed, ' || count(*) filter (where not pass) || ' failed' from qa.results"
@@ -72,6 +74,21 @@ if [ "$MODE" = after ]; then
   for i in $(seq 1 25); do $P -c "$(as $W) insert into public.post_comments (post_id, user_id, body) values ('$BP', '$W', 'race $i');" >/dev/null 2>&1 & done; wait
   expect "25 simultaneous comments after 40 today (limit 50), stored" "$($P -tA -c "select count(*) from public.post_comments where user_id='$W'")" 50
   expect "comments_count after the comment race" "$($P -tA -c "select comments_count - (select count(*) from public.post_comments where post_id = '$BP') from public.community_posts where id = '$BP'")" 0
+  SB=99999999-0000-4000-8000-000000000004
+  $P -c "insert into auth.users (id, email) values ('$SB', 'sam@example.com')"
+  $P -c "insert into public.saved_builds (user_id, slug) select '$SB', 'saved-' || g from generate_series(1, 290) g"
+  for i in $(seq 1 25); do $P -c "$(as $SB) insert into public.saved_builds (user_id, slug) values ('$SB', 'race-$i');" >/dev/null 2>&1 & done; wait
+  expect "25 simultaneous saves onto 290 saved builds (limit 300), stored" "$($P -tA -c "select count(*) from public.saved_builds where user_id='$SB'")" 300
+  PA=99999999-0000-4000-8000-000000000005
+  RP=99999999-0000-4000-8000-000000000006
+  $P -c "insert into auth.users (id, email) values ('$PA', 'pat@example.com'), ('$RP', 'rob@example.com')"
+  $P -c "insert into storage.objects (bucket_id, name, owner) values ('community', '$PA/p.jpg', '$PA')"
+  $P -c "insert into public.community_posts (user_id, title, image_url) values ('$PA', 'Pat build', '$PA/p.jpg')"
+  PP=$($P -tA -c "select id from public.community_posts where title = 'Pat build'")
+  $P -c "insert into public.post_comments (post_id, user_id, body) select '$PP', '$PA', 'c' || g from generate_series(1, 40) g"
+  $P -c "insert into public.content_reports (reporter_id, comment_id, reason) select '$RP', id, 'spam' from public.post_comments where post_id = '$PP' and body in ($(seq -s, 1 15 | sed "s/\([0-9]*\)/'c\1'/g"))"
+  for i in $(seq 16 40); do $P -c "$(as $RP) insert into public.content_reports (reporter_id, comment_id, reason) select '$RP', id, 'spam' from public.post_comments where post_id = '$PP' and body = 'c$i';" >/dev/null 2>&1 & done; wait
+  expect "25 simultaneous reports after 15 today (limit 20), stored" "$($P -tA -c "select count(*) from public.content_reports where reporter_id='$RP'")" 20
   [ "$FAILED" = 0 ] || problems+=("$FAILED attack check(s) failed")
   if [ ${#problems[@]} -gt 0 ]; then printf 'FAILED: %s\n' "${problems[@]}" >&2; exit 1; fi
   echo "All database checks hold."

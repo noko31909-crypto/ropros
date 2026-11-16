@@ -22,6 +22,7 @@ insert into public.user_parts (user_id, part_id) values (:'L', 'uno'), (:'L', 'h
 insert into public.post_comments (post_id, user_id, body) values (:'lee_post', :'L', 'First test run on a taped oval.');
 
 -- ---------- anonymous visitor ----------
+select set_config('request.jwt.claim.sub', '', false);   -- an anonymous request carries no user id
 set role anon;
 select qa.deny('workbench: anon cannot read anyone''s parts', 'select count(*) from public.user_parts');
 select qa.deny('workbench: anon cannot add parts', 'insert into public.user_parts (user_id, part_id) values (' || quote_literal(:'L') || ', ''uno'')');
