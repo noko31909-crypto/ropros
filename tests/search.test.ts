@@ -11,8 +11,7 @@ const PAGES: SearchPage[] = [
 
 test("a part number finds the part first, then the guides that use it", () => {
   const hits = searchSite("hc-sr04", "en", PAGES);
-  const parts = hits.filter((h) => h.kind === "part");
-  assert.equal(parts[0]?.href, "/finder?parts=hcsr04");
+  assert.equal(hits[0]?.href, "/finder?parts=hcsr04", "the part itself comes first");
   assert.ok(hits.some((h) => h.kind === "guide" && h.href === "/projects/obstacle-avoiding-robot"));
   assert.deepEqual(searchSite("hcsr04", "en", PAGES).find((h) => h.kind === "part")?.href, "/finder?parts=hcsr04");
 });

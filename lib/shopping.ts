@@ -47,7 +47,7 @@ export function shoppingList(guides: readonly ShoppingGuide[], planned: readonly
 
 /** The list as plain text for the clipboard. */
 export function shoppingText(header: string, items: readonly ShoppingItem[]): string {
-  return [header, "", ...items.map((i) => `- ${i.name} ×${i.qty} (${i.uses.map((u) => u.title).join(", ")})`)].join("\n");
+  return [header, "", ...items.map((i) => `- ${i.name} ×${i.qty} (${i.uses.map((u) => u.title).join("; ")})`)].join("\n");
 }
 
 /** Shops whose own search opens for a part. No affiliate parameters. */

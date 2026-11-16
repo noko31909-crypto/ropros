@@ -34,7 +34,7 @@ function NavDropdown({ item, active }: { item: Extract<NavItem, { children: unkn
   return (
     <div ref={ref} className="relative">
       <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)}
-        className={clsx("relative inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors",
+        className={clsx("relative inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-colors",
           active || open ? "text-fg" : "text-fg-muted hover:text-fg",
           active && "after:absolute after:inset-x-3 after:-bottom-[15px] after:h-0.5 after:rounded-full after:bg-accent")}>
         {item.label}
@@ -106,7 +106,7 @@ export function SiteHeader() {
           {nav.map((item) =>
             "href" in item ? (
               <Link key={item.key} href={item.href} aria-current={section === item.key ? "page" : undefined}
-                className={clsx("relative inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors",
+                className={clsx("relative inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-colors",
                   section === item.key ? "text-fg after:absolute after:inset-x-3 after:-bottom-[15px] after:h-0.5 after:rounded-full after:bg-accent" : "text-fg-muted hover:text-fg")}>
                 {item.label}
                 {item.badge && <span className="rounded-full bg-accent-soft px-1.5 py-px font-mono text-[9px] font-semibold uppercase text-accent">{item.badge}</span>}

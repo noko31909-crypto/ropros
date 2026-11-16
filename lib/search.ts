@@ -80,9 +80,10 @@ export function searchSite(query: string, locale: Locale, pages: readonly Search
     if (score) pageHits.push({ kind: "page", ...p, score: score + (starts(title) ? 6 : 0) });
   }
   const best = (a: SearchHit, b: SearchHit) => b.score - a.score || a.title.localeCompare(b.title);
-  return [
-    ...guides.sort(best).slice(0, limits.guides),
-    ...parts.sort(best).slice(0, limits.parts),
-    ...pageHits.sort(best).slice(0, limits.pages),
-  ];
+  // Groups keep their order (guides, parts, pages) unless another group has the better top hit:
+  // "hc-sr04" puts the part itself above the guides that use it.
+  const groups = [guides.sort(best).slice(0, limits.guides), parts.sort(best).slice(0, limits.parts), pageHits.sort(best).slice(0, limits.pages)];
+  return groups.map((g, i) => ({ g, i, top: g[0]?.score ?? -1 }))
+    .sort((a, b) => b.top - a.top || a.i - b.i)
+    .flatMap(({ g }) => g);
 }

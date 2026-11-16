@@ -73,7 +73,7 @@ export function ShoppingList({ guides }: { guides: ShoppingGuide[] }) {
                       <p className="mt-1 text-sm text-fg-subtle">
                         {t.forBuilds}{" "}
                         {item.uses.map((u, i) => (
-                          <span key={u.slug}>{i > 0 && ", "}<Link href={`/projects/${encodeURIComponent(u.slug)}`} className="text-fg-muted underline-offset-2 hover:text-fg hover:underline">{u.title}</Link>{u.qty > 1 && <span className="font-mono"> ×{u.qty}</span>}</span>
+                          <span key={u.slug}>{i > 0 && " · "}<Link href={`/projects/${encodeURIComponent(u.slug)}`} className="text-fg-muted underline-offset-2 hover:text-fg hover:underline">{u.title}</Link>{u.qty > 1 && <span className="font-mono"> ×{u.qty}</span>}</span>
                         ))}
                       </p>
                       <div className="mt-3 flex flex-wrap items-center gap-2">

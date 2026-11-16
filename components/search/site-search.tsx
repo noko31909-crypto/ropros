@@ -108,18 +108,18 @@ export function SiteSearch() {
     else if (e.key === "Tab") e.preventDefault();   // focus stays in the dialog; Esc closes it
   };
 
-  const groups = (["guide", "part", "page"] as const)
-    .map((kind) => ({ kind, items: hits.map((h, i) => ({ h, i })).filter(({ h }) => h.kind === kind) }))
-    .filter((g) => g.items.length);
+  // Groups in the order the search ranked them.
+  const groups = [...new Set(hits.map((h) => h.kind))]
+    .map((kind) => ({ kind, items: hits.map((h, i) => ({ h, i })).filter(({ h }) => h.kind === kind) }));
   const trimmed = query.trim();
 
   return (
     <>
       <button type="button" onClick={show} aria-label={t.label} aria-keyshortcuts="Control+K Meta+K" title={`${t.label} (${shortcut})`}
-        className="inline-flex h-11 w-11 items-center justify-center gap-3 rounded-lg border border-line bg-ink-900 text-sm text-fg-subtle transition-colors hover:border-ink-700 hover:text-fg-muted lg:h-9 lg:w-9 xl:w-auto xl:justify-start xl:pl-3 xl:pr-2">
+        className="inline-flex h-11 w-11 shrink-0 items-center justify-center gap-3 rounded-lg border border-line bg-ink-900 text-sm text-fg-subtle transition-colors hover:border-ink-700 hover:text-fg-muted lg:h-9 lg:w-9 2xl:w-auto 2xl:justify-start 2xl:pl-3 2xl:pr-2">
         <Search className="h-4 w-4 shrink-0" aria-hidden />
-        <span className="hidden w-36 text-left xl:inline">{c.nav.search}</span>
-        <kbd className="hidden rounded-md border border-line px-1.5 py-0.5 font-mono text-[10px] text-fg-subtle xl:inline">{shortcut}</kbd>
+        <span className="hidden min-w-16 text-left 2xl:inline">{c.nav.searchShort}</span>
+        <kbd className="hidden whitespace-nowrap rounded-md border border-line px-1.5 py-0.5 font-mono text-[10px] text-fg-subtle 2xl:inline">{shortcut}</kbd>
       </button>
       {open && createPortal(
         <div className="fixed inset-0 z-[90] flex items-start justify-center sm:p-6 sm:pt-[12vh]">

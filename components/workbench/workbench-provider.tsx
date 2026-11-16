@@ -76,6 +76,8 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase.from("user_parts").select("part_id").eq("user_id", userId)
         .order("created_at", { ascending: true }).limit(MAX_WORKBENCH_PARTS);
       if (cancelled) return;
+      // PGRST205 / 42P01: the table is missing until migration 0003 runs. Keep a working workbench on this device meanwhile.
+      if (error && (error.code === "PGRST205" || error.code === "42P01")) { ownerRef.current = null; show(readLocalWorkbench(), "device"); return; }
       if (error) { show([], "account"); toast(messages.current.loadError); return; }
       let parts = cleanPartIds((data ?? []).map((r: { part_id: unknown }) => r.part_id));
       const guest = readLocalWorkbench().filter((id) => !parts.includes(id)).slice(0, Math.max(0, MAX_WORKBENCH_PARTS - parts.length));

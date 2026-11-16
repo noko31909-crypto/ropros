@@ -47,3 +47,12 @@ test("guide parts carry their catalog id and whether the finder counts them", as
   for (const p of g.parts) if (p.required) assert.ok(p.key && PART_BY_ID.has(p.key), p.name);
   for (const p of g.parts) if (p.optional) assert.equal(p.required, false, p.name);
 });
+
+test("the finder asks for exactly the parts each guide lists as required", async () => {
+  const { getGuide, localizeGuide } = await import("../lib/guides.ts");
+  for (const p of PROJECTS) {
+    const finder = new Set([p.microcontroller, ...p.components_required].map((n) => canonicalPart(n).key));
+    const guide = new Set(localizeGuide(getGuide(p.project_id)!, "en").parts.filter((x) => x.required).map((x) => x.key!));
+    assert.deepEqual([...finder].sort(), [...guide].sort(), p.project_id);
+  }
+});

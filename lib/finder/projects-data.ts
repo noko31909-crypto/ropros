@@ -11,12 +11,16 @@ import { ProjectSchema, type ProjectRecord } from "./schema.ts";
  * malformed record fails loudly instead of matching wrongly.
  */
 
-/** The three hand-written guides in lib/guides.ts (not in content/guides), with their parts as the finder names them. */
+/**
+ * The three hand-written guides in lib/guides.ts (not in content/guides), with their parts as the finder names them.
+ * Keep them equal to the guides' required parts: tests/workbench.test.ts checks it, since the parts table and the
+ * shopping list read the guides themselves.
+ */
 const HANDWRITTEN = [
   { project_id: "obstacle-avoiding-robot", title: { en: "Obstacle Avoiding Robot", ru: "Робот, объезжающий препятствия", kk: "Кедергіні айналып өтетін робот" },
-    microcontroller: "Arduino Uno", components_required: ["HC-SR04", "SG90 Servo", "L298N Motor Driver", "DC Gear Motor (TT)", "Robot chassis", "2x 18650 Battery Pack"] },
+    microcontroller: "Arduino Uno", components_required: ["HC-SR04", "SG90 Servo", "L298N Motor Driver", "DC Gear Motor (TT)", "Robot chassis", "2x 18650 Battery Pack", "LM2596 Buck Converter"] },
   { project_id: "line-follower", title: { en: "Precision Line Following Bot", ru: "Точный робот, едущий по линии", kk: "Сызық бойымен дәл жүретін робот" },
-    microcontroller: "Arduino Uno", components_required: ["TCRT5000 IR Line Sensor", "L298N Motor Driver", "DC Gear Motor (TT)", "Robot chassis", "2x 18650 Battery Pack"] },
+    microcontroller: "Arduino Nano", components_required: ["TCRT5000 IR Line Sensor", "L298N Motor Driver", "DC Gear Motor (TT)", "Robot chassis", "2x 18650 Battery Pack"] },
   { project_id: "iot-plant-care", title: { en: "IoT Smart Plant Monitor", ru: "Умный IoT-монитор для растений", kk: "Өсімдікке арналған ақылды IoT-монитор" },
     microcontroller: "ESP32 DevKit", components_required: ["Capacitive Soil Moisture Sensor", "5V Relay Module", "DHT22", "SSD1306 OLED", "Water pump"] },
 ];

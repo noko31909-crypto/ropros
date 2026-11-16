@@ -34,19 +34,19 @@ export function BuildLogs({ projectId, slug, title }: { projectId: string; slug:
 
   const load = useCallback(async () => {
     const supabase = getSupabaseBrowserClient();
-    const [list, count] = await Promise.all([
-      supabase.from("community_posts")
-        .select("id, user_id, title, status, image_url, likes_count, comments_count, created_at, users!community_posts_user_id_fkey(name, level)")
-        .eq("project_id", projectId).order("created_at", { ascending: false }).limit(SHOWN),
-      supabase.rpc("project_builders", { p_project: projectId }),
-    ]);
+    const query = (counts: boolean) => supabase.from("community_posts")
+      .select(`id, user_id, title, status, image_url, likes_count,${counts ? " comments_count," : ""} created_at, users!community_posts_user_id_fkey(name, level)`)
+      .eq("project_id", projectId).order("created_at", { ascending: false }).limit(SHOWN);
+    let [list, count] = await Promise.all([query(true), supabase.rpc("project_builders", { p_project: projectId })]);
+    // 42703: comments_count is missing until migration 0003 runs (project_builders too: the count falls back below).
+    if (list.error?.code === "42703") list = await query(false);
     if (list.error) { setError(true); setPosts([]); return; }
     setError(false);
     const rows = (list.data ?? []) as unknown as Row[];
     const paths = rows.map((r) => r.image_url);
     const signed = paths.length ? (await supabase.storage.from("community").createSignedUrls(paths, 3600)).data ?? [] : [];
     const urlByPath = new Map(signed.map((s) => [s.path, s.signedUrl]));
-    setPosts(rows.map(({ users, ...r }) => ({ ...r, author: users?.name ?? "maker", authorLevel: users?.level, signedUrl: urlByPath.get(r.image_url) ?? undefined, guide: slug })));
+    setPosts(rows.map(({ users, ...r }) => ({ ...r, comments_count: r.comments_count ?? 0, author: users?.name ?? "maker", authorLevel: users?.level, signedUrl: urlByPath.get(r.image_url) ?? undefined, guide: slug })));
     setBuilders(typeof count.data === "number" ? count.data : new Set(rows.map((r) => r.user_id)).size);
   }, [projectId, slug]);
 

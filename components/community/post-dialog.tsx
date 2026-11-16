@@ -37,8 +37,8 @@ export function PostDialog({ post, onClose, onCountChange }: { post: FeedPost; o
         <div className="relative flex shrink-0 items-center justify-center bg-ink-950 md:w-[55%]">
           {post.signedUrl
             // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL from a private bucket
-            ? <img src={post.signedUrl} alt={post.title} className="max-h-[42vh] w-full object-contain md:max-h-[90vh]" />
-            : <div className="aspect-[4/5] max-h-[42vh] w-full bg-ink-800 bg-grid md:max-h-none" />}
+            ? <img src={post.signedUrl} alt={post.title} className="max-h-[34vh] w-full object-contain md:max-h-[90vh]" />
+            : <div className="aspect-[4/5] max-h-[34vh] w-full bg-ink-800 bg-grid md:max-h-none" />}
           <div className="absolute left-3 top-3"><StatusBadge status={post.status} label={t.status[post.status]} /></div>
         </div>
         <div className="flex min-h-0 flex-1 flex-col p-5 sm:p-6">
@@ -51,9 +51,11 @@ export function PostDialog({ post, onClose, onCountChange }: { post: FeedPost; o
                 <span className="inline-flex items-center gap-1 font-mono text-xs"><Heart className="h-3.5 w-3.5" aria-hidden />{t.dialog.likes(post.likes_count)}</span>
               </p>
               {guide && (
-                <Link href={`/projects/${encodeURIComponent(guide.slug)}`} className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-hover">
-                  <BookOpen className="h-4 w-4 shrink-0" aria-hidden /><span className="text-fg-subtle">{t.dialog.builtFrom}:</span> {guide.title}
-                </Link>
+                <p className="mt-2 text-sm">
+                  <BookOpen className="mr-1.5 inline h-4 w-4 align-[-3px] text-accent" aria-hidden />
+                  <span className="text-fg-subtle">{t.dialog.builtFrom}:</span>{" "}
+                  <Link href={`/projects/${encodeURIComponent(guide.slug)}`} className="font-medium text-accent hover:text-accent-hover">{guide.title}</Link>
+                </p>
               )}
             </div>
             <button ref={closeRef} type="button" onClick={onClose} aria-label={t.dialog.close}
