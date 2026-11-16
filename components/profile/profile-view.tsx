@@ -20,6 +20,7 @@ import { getProject, projectHref } from "@/lib/projects";
 import { useSavedBuilds } from "@/components/saved/saved-provider";
 import { StatusBadge, type BuildStatus } from "@/components/community/status-badge";
 import { WorkbenchSummary } from "@/components/workbench/workbench-summary";
+import { DeleteAccount } from "./delete-account";
 import { useIsAdmin } from "@/components/moderation/use-is-admin";
 import { moderationMessages } from "@/lib/i18n/messages/moderation";
 
@@ -259,6 +260,7 @@ export function ProfileView() {
             )}
           </section>
         </div>
+        <DeleteAccount userId={profile.id} name={profile.name} />
       </Container>
     </>
   );

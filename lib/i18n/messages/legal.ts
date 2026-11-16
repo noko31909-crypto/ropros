@@ -85,7 +85,7 @@ export const privacyMessages = defineMessages({
         "Account data is kept while your account exists. Posts and comments stay until you delete them or the account is deleted. Hosting logs are kept for the short period the provider sets.",
       ] },
       { id: "rights", title: "Your rights", body: [
-        "You can ask for a copy of your data, ask us to correct it, or ask us to delete your account and everything linked to it. Write to us (see Contact) and we’ll reply within 30 days.",
+        "You can delete your account and everything linked to it yourself: Profile → Delete account. You can also ask us for a copy of your data or to correct it. Write to us (see Contact) and we’ll reply within 30 days.",
       ] },
       { id: "children", title: "Children", body: [
         "You need to be at least 13 to create an account. If you’re under the age of majority where you live, ask a parent or guardian first. If you think a child under 13 has an account, contact us and we’ll delete it.",
@@ -147,7 +147,7 @@ export const privacyMessages = defineMessages({
         "Данные аккаунта хранятся, пока существует аккаунт. Посты и комментарии остаются, пока вы их не удалите или пока не будет удалён аккаунт. Журналы хостинга хранятся недолго, столько, сколько задаёт провайдер.",
       ] },
       { id: "rights", title: "Ваши права", body: [
-        "Вы можете запросить копию своих данных, попросить их исправить или удалить аккаунт со всем, что с ним связано. Напишите нам (см. «Контакты»), и мы ответим в течение 30 дней.",
+        "Удалить аккаунт со всем, что с ним связано, можно самостоятельно: Профиль → «Удалить аккаунт». Ещё вы можете запросить копию своих данных или попросить их исправить. Напишите нам (см. «Контакты»), и мы ответим в течение 30 дней.",
       ] },
       { id: "children", title: "Дети", body: [
         "Создать аккаунт можно с 13 лет. Если вы младше возраста совершеннолетия в вашей стране, сначала спросите разрешения у родителей или опекуна. Если вы считаете, что аккаунт есть у ребёнка младше 13 лет, напишите нам, и мы его удалим.",
@@ -209,7 +209,7 @@ export const privacyMessages = defineMessages({
         "Аккаунт деректері аккаунт бар кезде сақталады. Посттар мен пікірлер оларды өзіңіз жойғанша немесе аккаунт жойылғанша қалады. Хостинг журналдары провайдер белгілеген қысқа мерзімде сақталады.",
       ] },
       { id: "rights", title: "Сіздің құқықтарыңыз", body: [
-        "Деректеріңіздің көшірмесін сұрай аласыз, оларды түзетуді немесе аккаунтыңызды онымен байланысты барлық нәрсемен бірге жоюды сұрай аласыз. Бізге жазыңыз («Байланыс» бөлімін қараңыз), біз 30 күн ішінде жауап береміз.",
+        "Аккаунтыңызды онымен байланысты барлық нәрсемен бірге өзіңіз жоя аласыз: Профиль → «Аккаунтты жою». Сондай-ақ деректеріңіздің көшірмесін сұрай аласыз немесе оларды түзетуді сұрай аласыз. Бізге жазыңыз («Байланыс» бөлімін қараңыз), біз 30 күн ішінде жауап береміз.",
       ] },
       { id: "children", title: "Балалар", body: [
         "Аккаунтты 13 жастан бастап жасауға болады. Еліңіздегі кәмелет жасына толмаған болсаңыз, алдымен ата-анаңыздан немесе қамқоршыңыздан рұқсат сұраңыз. 13 жасқа толмаған баланың аккаунты бар деп ойласаңыз, бізге жазыңыз, біз оны жоямыз.",
