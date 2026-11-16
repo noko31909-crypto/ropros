@@ -33,6 +33,8 @@ export function CommunityShowcase({ initialPost }: { initialPost?: string }) {
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
   const [openPost, setOpenPost] = useState<string | null>(initialPost ?? null);
+  // A notification can link here while the feed is already open: follow the new ?post= too.
+  useEffect(() => { if (initialPost) setOpenPost(initialPost); }, [initialPost]);
   const router = useRouter();
   const closePost = useCallback(() => {
     setOpenPost(null);
