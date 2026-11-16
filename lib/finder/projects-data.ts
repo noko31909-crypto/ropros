@@ -4,6 +4,7 @@ import { PART_BY_ID } from "../parts-catalog.ts";
 import { CONSUMABLES } from "./consumables.ts";
 import { matchProjects, type FinderResult } from "./match.ts";
 import { ProjectSchema, type ProjectRecord } from "./schema.ts";
+import { HANDWRITTEN_CARDS } from "../handwritten-cards.ts";
 
 /**
  * What the parts finder searches: every published guide, built from the generated guide catalog
@@ -17,11 +18,11 @@ import { ProjectSchema, type ProjectRecord } from "./schema.ts";
  * shopping list read the guides themselves.
  */
 const HANDWRITTEN = [
-  { project_id: "obstacle-avoiding-robot", title: { en: "Obstacle Avoiding Robot", ru: "Робот, объезжающий препятствия", kk: "Кедергіні айналып өтетін робот" },
+  { project_id: "obstacle-avoiding-robot", title: HANDWRITTEN_CARDS["obstacle-avoiding-robot"].title,
     microcontroller: "Arduino Uno", components_required: ["HC-SR04", "SG90 Servo", "L298N Motor Driver", "DC Gear Motor (TT)", "Robot chassis", "2x 18650 Battery Pack", "LM2596 Buck Converter"] },
-  { project_id: "line-follower", title: { en: "Precision Line Following Bot", ru: "Точный робот, едущий по линии", kk: "Сызық бойымен дәл жүретін робот" },
+  { project_id: "line-follower", title: HANDWRITTEN_CARDS["line-follower"].title,
     microcontroller: "Arduino Nano", components_required: ["TCRT5000 IR Line Sensor", "L298N Motor Driver", "DC Gear Motor (TT)", "Robot chassis", "2x 18650 Battery Pack"] },
-  { project_id: "iot-plant-care", title: { en: "IoT Smart Plant Monitor", ru: "Умный IoT-монитор для растений", kk: "Өсімдікке арналған ақылды IoT-монитор" },
+  { project_id: "iot-plant-care", title: HANDWRITTEN_CARDS["iot-plant-care"].title,
     microcontroller: "ESP32 DevKit", components_required: ["Capacitive Soil Moisture Sensor", "5V Relay Module", "DHT22", "SSD1306 OLED", "Water pump"] },
 ];
 

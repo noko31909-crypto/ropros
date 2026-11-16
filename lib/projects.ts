@@ -2,6 +2,7 @@ import type { Locale } from "@/lib/i18n/config";
 import { GUIDE_CATALOG } from "@/content/guides/catalog";
 import { coverFor } from "@/lib/cover-art";
 import { BOARD_LABEL, type Board, type Difficulty, type Project } from "@/lib/project-meta";
+import { HANDWRITTEN_CARDS } from "@/lib/handwritten-cards";
 
 export { BOARDS, BOARD_LABEL, DIFFICULTIES, isBoard, isDifficulty, projectHref } from "@/lib/project-meta";
 export type { Board, Difficulty, Project } from "@/lib/project-meta";
@@ -11,12 +12,12 @@ export type { Board, Difficulty, Project } from "@/lib/project-meta";
  * Built from content/guides/catalog.ts, never from the full guides, so client components can import it cheaply.
  */
 const ALL_PROJECTS: Project[] = [
-  { slug: "obstacle-avoiding-robot", title: { en: "Obstacle Avoiding Robot", ru: "Робот, объезжающий препятствия", kk: "Кедергіні айналып өтетін робот" }, board: "arduino", difficulty: "intermediate", hours: 5, robotics: true, fullGuide: true, cover: "obstacle", aspect: "aspect-[4/5]",
-    summary: { en: "Scans with a servo-mounted ultrasonic sensor and drives toward open space.", ru: "Сканирует пространство ультразвуком на сервоприводе и уезжает туда, где свободно.", kk: "Сервоға орнатылған ультрадыбыс датчигімен айналаны шолып, бос жаққа қарай жүреді." } },
-  { slug: "line-follower", title: { en: "Precision Line Following Bot", ru: "Точный робот, едущий по линии", kk: "Сызық бойымен дәл жүретін робот" }, board: "arduino", difficulty: "intermediate", hours: 4, robotics: true, fullGuide: true, cover: "line", aspect: "aspect-[2/3]",
-    summary: { en: "Four IR sensors and a PID loop keep it locked to the black line, even on tight corners.", ru: "Четыре ИК-датчика и PID-регулятор держат робота точно на чёрной линии даже на крутых поворотах.", kk: "Төрт ИҚ датчигі мен PID-реттегіш роботты тік бұрылыстарда да қара сызықта ұстайды." } },
-  { slug: "iot-plant-care", title: { en: "IoT Smart Plant Monitor", ru: "Умный IoT-монитор для растений", kk: "Өсімдікке арналған ақылды IoT-монитор" }, board: "esp32", difficulty: "beginner", hours: 3, robotics: false, fullGuide: true, cover: "plant", aspect: "aspect-[3/4]",
-    summary: { en: "An ESP32 tracks soil moisture, temperature and air, shown on an OLED and your phone.", ru: "ESP32 следит за влажностью почвы, температурой и воздухом и показывает данные на OLED и в телефоне.", kk: "ESP32 топырақ ылғалдылығын, температура мен ауаны бақылап, деректерді OLED пен телефонда көрсетеді." } },
+  { slug: "obstacle-avoiding-robot", title: HANDWRITTEN_CARDS["obstacle-avoiding-robot"].title, board: "arduino", difficulty: "intermediate", hours: 5, robotics: true, fullGuide: true, cover: "obstacle", aspect: "aspect-[4/5]",
+    summary: HANDWRITTEN_CARDS["obstacle-avoiding-robot"].summary },
+  { slug: "line-follower", title: HANDWRITTEN_CARDS["line-follower"].title, board: "arduino", difficulty: "intermediate", hours: 4, robotics: true, fullGuide: true, cover: "line", aspect: "aspect-[2/3]",
+    summary: HANDWRITTEN_CARDS["line-follower"].summary },
+  { slug: "iot-plant-care", title: HANDWRITTEN_CARDS["iot-plant-care"].title, board: "esp32", difficulty: "beginner", hours: 3, robotics: false, fullGuide: true, cover: "plant", aspect: "aspect-[3/4]",
+    summary: HANDWRITTEN_CARDS["iot-plant-care"].summary },
   { slug: "self-balancing-robot", title: { en: "Self-balancing robot", ru: "Балансирующий робот", kk: "Тепе-теңдік сақтайтын робот" }, board: "arduino", difficulty: "advanced", hours: 12, robotics: true, fullGuide: false, cover: "balance", aspect: "aspect-[5/7]",
     summary: { en: "Stepper motors hold an inverted pendulum upright with a tuned PID loop.", ru: "Шаговые моторы удерживают перевёрнутый маятник с настроенным PID-регулятором.", kk: "Қадамдық моторлар бапталған PID-реттегішпен төңкерілген маятникті тік ұстайды." } },
   { slug: "mecanum-rover", title: { en: "Mecanum omnidirectional rover", ru: "Всенаправленный ровер на колёсах Mecanum", kk: "Mecanum дөңгелекті жан-жақты ровер" }, board: "esp32", difficulty: "advanced", hours: 10, robotics: true, fullGuide: false, cover: "mecanum", aspect: "aspect-[15/16]",

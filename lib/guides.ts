@@ -8,6 +8,7 @@ import { localPartName } from "./hardware/names.ts";
 import { canonicalPart } from "./finder/normalize.ts";
 import { CONSUMABLES } from "./finder/consumables.ts";
 import { CONTENT_GUIDES } from "../content/guides/index.ts";
+import { HANDWRITTEN_CARDS } from "./handwritten-cards.ts";
 
 /**
  * Guide content model. Human-language text is stored per locale; part names, pins and code stay untranslated.
@@ -42,12 +43,8 @@ const same = (s: string): L => ({ en: s, ru: s, kk: s });
 
 const OBSTACLE: Guide = {
   slug: "obstacle-avoiding-robot",
-  title: { en: "Obstacle Avoiding Robot", ru: "Робот, объезжающий препятствия", kk: "Кедергіні айналып өтетін робот" },
-  summary: {
-    en: "Drives forward while the way is clear, then a servo swings the sensor left and right and the robot turns toward the side with more room.",
-    ru: "Едет вперёд, пока впереди свободно, затем сервопривод поворачивает датчик влево и вправо, и робот уезжает в сторону, где больше места.",
-    kk: "Алдыңғы жол бос болғанша алға жүреді, содан кейін серво датчикті солға және оңға бұрады, ал робот бос орны көп жаққа бұрылады.",
-  },
+  title: HANDWRITTEN_CARDS["obstacle-avoiding-robot"].title,
+  summary: HANDWRITTEN_CARDS["obstacle-avoiding-robot"].summary,
   board: "Arduino Uno", boardComponent: "arduino-uno", platform: "arduino", cover: "obstacle", difficulty: "intermediate", hours: 5, costUsd: 40, xpReward: 250,
   verification: {
     en: "Wiring checked against the L298N, HC-SR04, SG90 and LM2596 datasheets and by the automatic circuit checker. Not yet bench-tested on real hardware.",
@@ -190,12 +187,8 @@ void loop() {
 
 const LINE: Guide = {
   slug: "line-follower",
-  title: { en: "PID Line Follower", ru: "Робот по линии с PID", kk: "PID сызық бойымен жүретін робот" },
-  summary: {
-    en: "Four TCRT5000 IR sensors read a black line and a PID loop on an Arduino Nano steers two DC motors smoothly along it.",
-    ru: "Четыре ИК-датчика TCRT5000 видят чёрную линию, а PID-регулятор на Arduino Nano плавно ведёт по ней два мотора.",
-    kk: "Төрт TCRT5000 ИҚ датчигі қара сызықты оқиды, ал Arduino Nano-дағы PID реттегіш екі моторды сызық бойымен бірқалыпты басқарады.",
-  },
+  title: HANDWRITTEN_CARDS["line-follower"].title,
+  summary: HANDWRITTEN_CARDS["line-follower"].summary,
   board: "Arduino Nano", boardComponent: "arduino-nano", platform: "arduino", cover: "line", difficulty: "intermediate", hours: 4, costUsd: 29, xpReward: 200,
   verification: {
     en: "Pinout checked against the Nano, L298N and TCRT5000 module datasheets. PID gains are starting values: tune them on your track.",
@@ -349,12 +342,8 @@ void loop() {
 
 const PLANT: Guide = {
   slug: "iot-plant-care",
-  title: { en: "IoT Plant Care Station", ru: "IoT-станция ухода за растением", kk: "Өсімдік күтімінің IoT станциясы" },
-  summary: {
-    en: "An ESP32 reads soil moisture, temperature and humidity, shows them on an OLED, waters the plant through a relay-driven pump and serves a live page on your Wi-Fi.",
-    ru: "ESP32 измеряет влажность почвы, температуру и влажность воздуха, выводит их на OLED, поливает растение через насос на реле и показывает живую страницу в вашей Wi-Fi-сети.",
-    kk: "ESP32 топырақ ылғалдылығын, температура мен ауа ылғалдылығын өлшеп, OLED-ке шығарады, реле арқылы сорғымен өсімдікті суарады және Wi-Fi желісінде тірі бет көрсетеді.",
-  },
+  title: HANDWRITTEN_CARDS["iot-plant-care"].title,
+  summary: HANDWRITTEN_CARDS["iot-plant-care"].summary,
   board: "ESP32 DevKit V1", boardComponent: "esp32-devkit", platform: "esp32", cover: "plant", difficulty: "beginner", hours: 3, costUsd: 24, xpReward: 180,
   verification: {
     en: "Pins checked against the ESP32-WROOM-32, DHT22 and SSD1306 datasheets. Calibrate the soil sensor in your own pot.",
