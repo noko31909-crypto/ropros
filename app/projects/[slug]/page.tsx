@@ -8,6 +8,7 @@ import { GuideTabs } from "@/components/guide/guide-tabs";
 import { GuideActions } from "@/components/guide/guide-actions";
 import { ProgressActions } from "@/components/guide/progress-actions";
 import { BuildLogs } from "@/components/community/build-logs";
+import { WorkingBadge } from "@/components/community/working-badge";
 import { GuideDiagram } from "@/components/guide/diagrams";
 import { allGuideSlugs, getGuide, localizeGuide } from "@/lib/guides";
 import { BOARD_LABEL, getProject } from "@/lib/projects";
@@ -116,6 +117,7 @@ export default async function GuidePage({ params }: Props) {
               <li className="inline-flex items-center gap-2 rounded-full border border-line bg-ink-900 px-3 py-1.5 text-sm text-fg-muted">
                 <Trophy className="h-4 w-4 text-accent" aria-hidden />{t.xpReward(guide.xpReward)}
               </li>
+              {projectId && <WorkingBadge projectId={projectId} />}
             </ul>
             <GuideActions slug={guide.slug} />
           </div>
