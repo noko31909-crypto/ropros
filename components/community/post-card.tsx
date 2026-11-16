@@ -1,7 +1,7 @@
 "use client";
 
 import { clsx } from "clsx";
-import { Heart } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
 import { Avatar } from "@/components/auth/avatar";
 import { useMessages } from "@/components/i18n/locale-provider";
 import { community } from "@/lib/i18n/messages/community";
@@ -9,11 +9,13 @@ import { DeletePost } from "./delete-post";
 import { StatusBadge, type BuildStatus } from "./status-badge";
 
 export type FeedPost = {
-  id: string; user_id: string; title: string; status: BuildStatus; image_url: string; likes_count: number; created_at: string;
+  id: string; user_id: string; title: string; status: BuildStatus; image_url: string; likes_count: number; comments_count: number; created_at: string;
   author: string; authorLevel?: number; signedUrl?: string;
+  /** Slug of the guide the build follows (community_posts.project_id), if any. */
+  guide?: string;
 };
 
-export function PostCard({ post, liked, mine, onLike, onDeleted }: { post: FeedPost; liked: boolean; mine: boolean; onLike: () => void; onDeleted?: (id: string) => void }) {
+export function PostCard({ post, liked, mine, onLike, onDeleted, onOpen }: { post: FeedPost; liked: boolean; mine: boolean; onLike: () => void; onDeleted?: (id: string) => void; onOpen?: () => void }) {
   const t = useMessages(community);
   return (
     <article className="group mb-3 break-inside-avoid overflow-hidden rounded-[20px] border border-line bg-ink-850 transition-all duration-300 hover:border-ink-700 sm:mb-6 sm:rounded-[28px]">
@@ -27,6 +29,8 @@ export function PostCard({ post, liked, mine, onLike, onDeleted }: { post: FeedP
           <StatusBadge status={post.status} label={t.status[post.status]} />
         </div>
         <h3 className="absolute inset-x-3 bottom-2.5 text-[13px] font-semibold leading-snug text-fg drop-shadow sm:inset-x-4 sm:bottom-3 sm:text-[17px]">{post.title}</h3>
+        {/* The photo opens the post with its comments. */}
+        {onOpen && <button type="button" onClick={onOpen} aria-label={t.open(post.title)} className="absolute inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent" />}
       </div>
       <div className="flex flex-wrap items-center gap-2 p-2.5 sm:gap-3 sm:p-4">
         <span className="hidden sm:inline-flex"><Avatar name={post.author} size="sm" level={post.authorLevel} /></span>
@@ -34,6 +38,12 @@ export function PostCard({ post, liked, mine, onLike, onDeleted }: { post: FeedP
           <p className="truncate text-[12px] font-semibold text-fg sm:text-sm">@{post.author}</p>
           {mine && <span className="mt-1 hidden items-center rounded-full border border-accent/40 bg-accent-soft px-2 py-0.5 text-[10.5px] font-semibold text-accent sm:inline-flex">{t.you}</span>}
         </div>
+        {onOpen && (
+          <button type="button" onClick={onOpen} aria-label={t.comments.aria(post.comments_count, post.title)}
+            className="inline-flex h-9 shrink-0 items-center gap-1 rounded-xl border border-line bg-ink-900 px-2 text-[13px] font-semibold tabular-nums text-fg-muted transition-colors hover:border-accent/40 hover:text-fg sm:h-10 sm:gap-1.5 sm:px-3 sm:text-sm">
+            <MessageCircle className="h-[18px] w-[18px]" aria-hidden /><span>{post.comments_count}</span>
+          </button>
+        )}
         <button type="button" aria-pressed={liked} aria-label={`${liked ? t.unlike : t.like}: ${post.title}`} onClick={onLike}
           className={clsx("inline-flex h-9 shrink-0 items-center gap-1 rounded-xl border px-2 text-[13px] font-semibold tabular-nums transition-all active:scale-95 sm:h-10 sm:gap-1.5 sm:px-3 sm:text-sm",
             liked ? "border-accent/50 bg-accent-soft text-accent" : "border-line bg-ink-900 text-fg-muted hover:border-accent/40 hover:text-accent")}>

@@ -12,12 +12,16 @@ import type { BuildStatus } from "./status-badge";
 type ProjectOption = { id: string; title: string };
 
 /** Upload a photo to the private `community` bucket under `<uid>/` and insert a community_posts row. XP is awarded by DB triggers. */
-export function ShareModal({ userId, onClose, onPublished }: { userId: string; onClose: () => void; onPublished: () => void }) {
+export function ShareModal({ userId, onClose, onPublished, initialProjectId = "", initialTitle = "" }: {
+  userId: string; onClose: () => void; onPublished: () => void;
+  /** Preselects the linked guide, e.g. "I built this" on a guide page. */
+  initialProjectId?: string; initialTitle?: string;
+}) {
   const t = useMessages(community);
   const supabase = getSupabaseBrowserClient();
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(initialTitle.slice(0, 80));
   const [status, setStatus] = useState<BuildStatus>("working");
-  const [projectId, setProjectId] = useState("");
+  const [projectId, setProjectId] = useState(initialProjectId);
   const [projects, setProjects] = useState<ProjectOption[]>([]);
   const [photo, setPhoto] = useState<Resized | null>(null);
   const [busy, setBusy] = useState(false);

@@ -7,6 +7,7 @@ import { GuideBanner } from "@/components/guide/guide-banner";
 import { GuideTabs } from "@/components/guide/guide-tabs";
 import { GuideActions } from "@/components/guide/guide-actions";
 import { ProgressActions } from "@/components/guide/progress-actions";
+import { BuildLogs } from "@/components/community/build-logs";
 import { GuideDiagram } from "@/components/guide/diagrams";
 import { allGuideSlugs, getGuide, localizeGuide } from "@/lib/guides";
 import { BOARD_LABEL, getProject } from "@/lib/projects";
@@ -111,6 +112,8 @@ export default async function GuidePage({ params }: Props) {
           diagram={<GuideDiagram guide={source} label={t.diagram.aria(guide.title)} captions={t.diagram.captions} />}
           progress={<ProgressActions projectId={projectId} simulation={guide.simulation} />}
         />
+        {/* Build logs need the guide's database row: hidden when the database is unreachable. */}
+        {projectId && <BuildLogs projectId={projectId} slug={guide.slug} title={guide.title} />}
       </Container>
     </>
   );

@@ -12,6 +12,7 @@ import { useMessages } from "@/components/i18n/locale-provider";
 import { community } from "@/lib/i18n/messages/community";
 import { PostCard, type FeedPost } from "./post-card";
 import { ShareModal } from "./share-modal";
+import { PostDialog } from "./post-dialog";
 
 type Filter = "all" | "working" | "debugging";
 type Sort = "newest" | "popular";
@@ -28,20 +29,28 @@ export function CommunityShowcase() {
   const [sort, setSort] = useState<Sort>("newest");
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
+  const [openPost, setOpenPost] = useState<string | null>(null);
+  const closePost = useCallback(() => setOpenPost(null), []);
+  const countComments = useCallback((delta: number) => {
+    setPosts((ps) => ps?.map((p) => (p.id === openPost ? { ...p, comments_count: Math.max(0, p.comments_count + delta) } : p)) ?? null);
+  }, [openPost]);
 
   const load = useCallback(async () => {
-    const { data, error: err } = await supabase
+    const feed = (counts: boolean) => supabase
       .from("community_posts")
-      .select("id, user_id, title, status, image_url, likes_count, created_at, users!community_posts_user_id_fkey(name, level)")
+      .select(`id, user_id, title, status, image_url, likes_count,${counts ? " comments_count," : ""} created_at, users!community_posts_user_id_fkey(name, level), projects!community_posts_project_id_fkey(slug)`)
       .order("created_at", { ascending: false })
       .limit(90);
+    let { data, error: err } = await feed(true);
+    // 42703: comments_count is missing until migration 0003 runs. Keep the feed up without comment counts.
+    if (err?.code === "42703") ({ data, error: err } = await feed(false));
     if (err) { setError(true); setPosts([]); return; }
     setError(false);
-    const rows = (data ?? []) as unknown as (Omit<FeedPost, "author" | "authorLevel" | "signedUrl"> & { users: { name: string; level: number } | null })[];
+    const rows = (data ?? []) as unknown as (Omit<FeedPost, "author" | "authorLevel" | "signedUrl" | "guide"> & { users: { name: string; level: number } | null; projects: { slug: string } | null })[];
     const paths = rows.map((r) => r.image_url);
     const signed = paths.length ? (await supabase.storage.from("community").createSignedUrls(paths, 3600)).data ?? [] : [];
     const urlByPath = new Map(signed.map((s) => [s.path, s.signedUrl]));
-    setPosts(rows.map(({ users, ...r }) => ({ ...r, author: users?.name ?? "maker", authorLevel: users?.level, signedUrl: urlByPath.get(r.image_url) ?? undefined })));
+    setPosts(rows.map(({ users, projects, ...r }) => ({ ...r, comments_count: r.comments_count ?? 0, author: users?.name ?? "maker", authorLevel: users?.level, signedUrl: urlByPath.get(r.image_url) ?? undefined, guide: projects?.slug })));
   }, [supabase]);
 
   useEffect(() => { void load(); }, [load]);
@@ -147,11 +156,14 @@ export function CommunityShowcase() {
         ) : (
           <div className="columns-2 gap-3 sm:gap-6 lg:columns-3 2xl:columns-4">
             {list.map((p) => <PostCard key={p.id} post={p} liked={liked.has(p.id)} mine={!!userId && p.user_id === userId} onLike={() => void toggleLike(p)}
-              onDeleted={(id) => setPosts((ps) => ps?.filter((x) => x.id !== id) ?? null)} />)}
+              onDeleted={(id) => setPosts((ps) => ps?.filter((x) => x.id !== id) ?? null)} onOpen={() => setOpenPost(p.id)} />)}
           </div>
         )}
       </Container>
       {open && userId && <ShareModal userId={userId} onClose={close} onPublished={() => void onPublished()} />}
+      {openPost && posts?.some((p) => p.id === openPost) && (
+        <PostDialog post={posts.find((p) => p.id === openPost)!} onClose={closePost} onCountChange={countComments} />
+      )}
     </>
   );
 }
