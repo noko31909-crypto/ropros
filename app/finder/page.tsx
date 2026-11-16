@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sparkles } from "lucide-react";
+import { PackageSearch } from "lucide-react";
 import { z } from "zod";
 import { Container, PageHeader } from "@/components/ui/container";
 import { ProjectFinder } from "@/components/finder/project-finder";
@@ -22,7 +22,7 @@ export default async function FinderPage({ searchParams }: { searchParams: Promi
   const initialParts = parsed.success ? parsed.data : [];
   return (
     <>
-      <PageHeader eyebrowIcon={<Sparkles className="h-5 w-5 text-signal" aria-hidden />} title={t.title} description={t.description} />
+      <PageHeader eyebrowIcon={<PackageSearch className="h-5 w-5 text-accent" aria-hidden />} title={t.title} description={t.description} />
       <Container className="py-12">
         <div className="mx-auto max-w-4xl"><ProjectFinder key={initialParts.join(",")} initialParts={initialParts} /></div>
       </Container>

@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-const field = "h-11 w-full rounded-xl border border-ink-700 bg-ink-950 px-4 text-sm text-fg placeholder:text-fg-subtle focus:border-accent focus:outline-none";
+const field = "h-11 w-full rounded-xl border border-ink-700 bg-ink-950 px-4 text-base text-fg sm:text-sm placeholder:text-fg-subtle focus:border-accent focus:outline-none";
 
 function AuthModal({ reason, onClose }: { reason?: string; onClose: () => void }) {
   const t = useMessages(authMessages);

@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Bot, Boxes, Box, CircuitBoard, Cpu, Layers, MessagesSquare, Radio, Sparkles, Users } from "lucide-react";
+import { Bot, Boxes, CircuitBoard, Cpu, Layers, PackageSearch, Radio, Users } from "lucide-react";
 import type { common } from "@/lib/i18n/messages/common";
 
 type T = (typeof common)["en"];
@@ -18,11 +18,7 @@ export function buildNav(t: T): NavItem[] {
       { label: "ESP32", href: "/projects?board=esp32", description: t.nav.esp32Desc, icon: Radio },
     ]},
     { key: "components", label: t.nav.components, href: "/components", icon: Boxes },
-    { key: "ai", label: t.nav.ai, icon: Sparkles, children: [
-      { label: t.nav.finder, href: "/ai/finder", description: t.nav.finderDesc, icon: Sparkles },
-      { label: t.nav.assistant, href: "/ai/assistant", description: t.nav.assistantDesc, icon: MessagesSquare },
-      { label: t.nav.generator, href: "/ai/build", description: t.nav.generatorDesc, icon: Box },
-    ]},
+    { key: "finder", label: t.nav.finder, href: "/finder", icon: PackageSearch },
     { key: "community", label: t.nav.community, href: "/community", icon: Users, badge: t.nav.new },
   ];
 }
@@ -33,15 +29,11 @@ export function buildFooter(t: T): { title: string; links: NavLink[] }[] {
       { label: t.nav.hub, href: "/projects" },
       { label: t.nav.robotics, href: "/projects?category=robotics" },
       { label: t.nav.components, href: "/components" },
-    ]},
-    { title: t.footer.aiTools, links: [
-      { label: t.nav.finder, href: "/ai/finder" },
-      { label: t.nav.assistant, href: "/ai/assistant" },
-      { label: t.nav.generator, href: "/ai/build" },
+      { label: t.nav.finder, href: "/finder" },
     ]},
     { title: t.footer.community, links: [
       { label: t.footer.buildLogs, href: "/community" },
-      { label: t.footer.guides, href: "/projects/obstacle-avoiding-robot" },
+      { label: t.footer.guides, href: "/projects" },
     ]},
   ];
 }
@@ -52,7 +44,7 @@ export function sectionOf(pathname: string): string {
   if (pathname.startsWith("/profile")) return "profile";
   if (pathname.startsWith("/projects")) return "projects";
   if (pathname.startsWith("/components")) return "components";
-  if (pathname.startsWith("/ai")) return "ai";
+  if (pathname.startsWith("/finder")) return "finder";
   if (pathname.startsWith("/community")) return "community";
   return "";
 }

@@ -16,7 +16,7 @@ export function BookmarkButton({ slug, title }: { slug: string; title: string })
   return (
     <button type="button" onClick={onClick} aria-pressed={saved} aria-label={saved ? t.unsave(title) : t.saveLabel(title)}
       className={clsx(
-        "absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-md transition-all focus-visible:translate-y-0 focus-visible:opacity-100",
+        "absolute right-2 top-2 inline-flex h-11 w-11 items-center justify-center sm:right-3 sm:top-3 sm:h-9 sm:w-9 rounded-full backdrop-blur-md transition-all focus-visible:translate-y-0 focus-visible:opacity-100",
         saved ? "bg-accent text-ink-950 opacity-100" : "translate-y-1 bg-ink-950/60 text-fg opacity-100 sm:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:translate-y-0",
       )}>
       {saved ? <BookmarkCheck className="h-4 w-4" aria-hidden /> : <Bookmark className="h-4 w-4" aria-hidden />}

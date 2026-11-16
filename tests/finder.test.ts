@@ -46,3 +46,31 @@ test("duplicates and unknowns", () => {
   assert.deepEqual(r.ready.map(x => x.project_id), ["ropros-radar-02"]);
   assert.deepEqual(r.unrecognized, ["Flux capacitor"]);
 });
+
+test("the finder searches every published guide, and ranks builds that use more of your parts first", async () => {
+  const { PROJECTS, GUIDE_SLUGS, PROJECT_TITLES } = await import("../lib/finder/projects-data.ts");
+  const { GUIDE_CATALOG } = await import("../content/guides/catalog.ts");
+  assert.ok(PROJECTS.length >= GUIDE_CATALOG.length, "every content guide is searchable");
+  for (const g of GUIDE_CATALOG) assert.ok(GUIDE_SLUGS.has(g.slug) || !g.parts.some((p) => p.component !== g.board), g.slug);
+  for (const p of PROJECTS) {
+    assert.ok(!/\.\.\.|void loop\(\) \{ \.\.\. \}/.test(p.code_snippet), `${p.project_id}: no stub code`);
+    assert.ok(PROJECT_TITLES.get(p.project_id)?.ru, `${p.project_id}: has a Russian title`);
+  }
+  const r = matchProjects(PROJECTS, ["Arduino Nano", "DS3231", "TM1637", "Push Button"]);
+  assert.equal([...r.ready, ...r.close_matches][0]?.project_id, "desk-clock-ds3231");
+});
+
+test("the guide catalog is in sync with the guide files (run scripts/guides-index.ts after editing a guide)", async () => {
+  const { GUIDE_CATALOG } = await import("../content/guides/catalog.ts");
+  const { CONTENT_GUIDES } = await import("../content/guides/index.ts");
+  const { FINDER_GUIDES } = await import("../content/guides/finder.ts");
+  const { catalogEntry, finderEntry } = await import("../scripts/guides-index.ts");
+  assert.deepEqual(GUIDE_CATALOG, CONTENT_GUIDES.map(catalogEntry));
+  assert.deepEqual(FINDER_GUIDES, CONTENT_GUIDES.map(finderEntry));
+});
+
+test("the 404 check in proxy.ts knows every guide page (run scripts/guides-index.ts after adding a guide)", async () => {
+  const { GUIDE_SLUG_LIST } = await import("../content/guides/slugs.ts");
+  const { allGuideSlugs } = await import("../lib/guides.ts");
+  assert.deepEqual([...GUIDE_SLUG_LIST], allGuideSlugs());
+});

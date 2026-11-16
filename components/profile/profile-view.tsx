@@ -88,7 +88,7 @@ export function ProfileView() {
   const header = (inner: React.ReactNode) => (
     <header className="relative overflow-hidden border-b border-line">
       <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
-      <div className="pointer-events-none absolute -top-32 left-1/3 h-72 w-[600px] max-w-full rounded-full bg-accent/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-32 left-1/2 h-72 w-[600px] max-w-full -translate-x-1/2 rounded-full bg-accent/10 blur-3xl" />
       <Container className="relative py-14 sm:py-20">{inner}</Container>
     </header>
   );
@@ -97,10 +97,11 @@ export function ProfileView() {
 
   if (!userId || !profile) {
     return header(
-      <div className="max-w-lg rounded-[28px] border border-line bg-ink-850 p-8">
+      <div className="mx-auto max-w-lg rounded-[28px] border border-line bg-ink-850 p-6 text-center sm:p-8">
         <h1 className="text-3xl font-semibold tracking-tight text-fg sm:text-4xl">{t.signedOutTitle}</h1>
         <p className="mt-3 text-fg-muted">{t.signedOutLead}</p>
-        <button type="button" onClick={() => openAuth()} className="mt-6 inline-flex h-11 items-center rounded-xl bg-accent px-5 text-sm font-semibold text-ink-950 shadow-glow hover:bg-accent-hover">{t.signIn}</button>
+        <button type="button" onClick={() => openAuth()} className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-xl bg-accent px-5 text-sm font-semibold text-ink-950 shadow-glow hover:bg-accent-hover sm:w-auto">{t.signIn}</button>
+        <p className="mt-6 border-t border-line pt-5 text-sm text-fg-subtle">{t.howTo}</p>
       </div>,
     );
   }
@@ -185,11 +186,11 @@ export function ProfileView() {
                 <Link key={p.slug} href={projectHref(p)}
                   className="group mb-4 block break-inside-avoid overflow-hidden rounded-[28px] border border-line bg-ink-850 transition-colors hover:border-accent/40">
                   <div className="relative aspect-[4/3] overflow-hidden">
-                    <Cover id={p.cover} image={coverImage(p.slug)} title={p.title} className="absolute inset-0 h-full w-full" />
+                    <Cover id={p.cover} image={coverImage(p.slug)} title={p.title[locale]} className="absolute inset-0 h-full w-full" />
                   </div>
                   <div className="flex flex-col gap-2 p-4">
                     <PlatformPill board={p.board} />
-                    <p className="font-semibold leading-snug text-fg group-hover:text-accent">{p.title}</p>
+                    <p className="font-semibold leading-snug text-fg group-hover:text-accent">{p.title[locale]}</p>
                   </div>
                 </Link>
               ))}

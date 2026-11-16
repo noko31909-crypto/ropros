@@ -43,15 +43,15 @@ export function GuideTabs({ guide, diagram, progress }: { guide: LocalizedGuide;
       <div className="sticky top-16 z-30 -mx-5 border-b border-line bg-ink-950/85 px-5 backdrop-blur-xl sm:-mx-8 sm:px-8">
         <div className="flex items-center justify-between gap-4">
           {!stacked ? (
-            <div role="tablist" aria-label={t.label} className="-mb-px flex gap-1 overflow-x-auto [scrollbar-width:none]">
+            <div role="tablist" aria-label={t.label} className="-mb-px flex gap-0.5 overflow-x-auto [mask-image:linear-gradient(to_right,black_88%,transparent)] [scrollbar-width:none] sm:gap-1 sm:[mask-image:none]">
               {tabs.map((tab, i) => {
                 const on = tab.id === active;
                 return (
                   <button key={tab.id} ref={(el) => { refs.current[i] = el; }} type="button" role="tab" id={`tab-${tab.id}`} aria-selected={on} aria-controls={`panel-${tab.id}`}
                     tabIndex={on ? 0 : -1} onClick={() => setActive(tab.id)} onKeyDown={(e) => onKey(e, i)}
-                    className={clsx("inline-flex h-14 shrink-0 items-center gap-2 border-b-2 px-3 text-sm font-semibold transition-colors",
-                      on ? "border-accent text-fg" : tab.id === "troubleshooting" ? "border-transparent text-amber-300/80 hover:text-amber-200" : "border-transparent text-fg-muted hover:text-fg")}>
-                    <tab.icon className="h-4 w-4" aria-hidden />{tab.label}
+                    className={clsx("inline-flex h-14 shrink-0 items-center gap-2 border-b-2 px-2.5 text-sm font-semibold transition-colors sm:px-3",
+                      on ? "border-accent text-fg" : "border-transparent text-fg-muted hover:text-fg")}>
+                    <tab.icon className={clsx("h-4 w-4", tab.id === "troubleshooting" && !on && "text-amber-300/80")} aria-hidden />{tab.label}
                     {tab.badge !== undefined && <span className={clsx("rounded-md px-1.5 py-0.5 font-mono text-[10px]", on ? "bg-accent text-ink-950" : "bg-ink-800 text-fg-muted")}>{tab.badge}</span>}
                   </button>
                 );

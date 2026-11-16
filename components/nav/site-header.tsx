@@ -108,7 +108,7 @@ export function SiteHeader() {
                 className={clsx("relative inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors",
                   section === item.key ? "text-fg after:absolute after:inset-x-3 after:-bottom-[15px] after:h-0.5 after:rounded-full after:bg-accent" : "text-fg-muted hover:text-fg")}>
                 {item.label}
-                {item.badge && <span className="rounded-full bg-signal/15 px-1.5 py-px font-mono text-[9px] font-semibold uppercase text-signal">{item.badge}</span>}
+                {item.badge && <span className="rounded-full bg-accent-soft px-1.5 py-px font-mono text-[9px] font-semibold uppercase text-accent">{item.badge}</span>}
               </Link>
             ) : (
               <NavDropdown key={item.key} item={item} active={section === item.key} />
@@ -121,7 +121,7 @@ export function SiteHeader() {
             <Search className="h-4 w-4" aria-hidden />
             <span className="w-40 text-left">{t.nav.search}</span>
           </Link>
-          <LocaleSwitcher className="hidden sm:inline-flex" />
+          <div className="hidden sm:block"><LocaleSwitcher /></div>
           {profile ? (
             <Link href="/profile#saved" aria-label={t.nav.saved}
               className="hidden h-9 w-9 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-ink-800 hover:text-fg sm:inline-flex">
@@ -135,7 +135,7 @@ export function SiteHeader() {
           )}
           <AuthChip />
           <button type="button" onClick={() => setMobileOpen((v) => !v)} aria-expanded={mobileOpen} aria-controls="mobile-nav" aria-label={mobileOpen ? t.nav.close : t.nav.menu}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line text-fg lg:hidden">
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-line text-fg lg:hidden">
             {mobileOpen ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
           </button>
         </div>

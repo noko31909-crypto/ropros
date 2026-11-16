@@ -10,7 +10,7 @@ export const PLATFORM_TONE: Record<Platform, string> = {
   raspberry_pi: "border-[#ff4fa3]/45 bg-[#ff4fa3]/10 text-[#ff7dbb] shadow-[0_0_14px_rgba(255,79,163,.35)]",
 };
 
-/** Welcome banner: cover art, gradient fading into the page, blurred lower band carrying the title. Server component. */
+/** Welcome banner: cover art, gradient fading into the page, blurred lower band with the welcome line and the guide size. Server component. */
 export function GuideBanner({ guide, welcome, steps, parts }: { guide: LocalizedGuide; welcome: string; steps: string; parts: string }) {
   return (
     <div className="relative isolate min-h-[300px] overflow-hidden rounded-[28px] border border-white/10 shadow-[0_40px_90px_-40px_rgba(0,0,0,.9)] sm:min-h-[380px] sm:rounded-[32px] lg:min-h-[460px]">
@@ -22,12 +22,12 @@ export function GuideBanner({ guide, welcome, steps, parts }: { guide: Localized
         <span className="h-1.5 w-1.5 rounded-full bg-current" />{guide.board}
       </span>
       <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9">
-        <p className="text-sm font-medium text-fg-muted">{welcome}</p>
-        <p className="mt-2 font-display text-[2.2rem] leading-[1.05] text-brand-gradient sm:text-5xl">{guide.title}</p>
-        <div className="mt-5 flex items-center gap-3 text-sm text-fg-muted">
-          <span className="inline-flex items-center gap-1.5"><ListChecks className="h-4 w-4 text-accent" aria-hidden />{steps}</span>
+        {/* The title is the page H1 right next to this banner; here it would only repeat it. */}
+        <p className="font-headline text-2xl leading-tight text-brand-gradient sm:text-3xl">{welcome}</p>
+        <div className="mt-4 flex items-center gap-3 text-sm text-fg-muted">
+          <span className="inline-flex items-center gap-1.5"><ListChecks className="h-4 w-4 text-fg-subtle" aria-hidden />{steps}</span>
           <span className="h-1 w-1 rounded-full bg-fg-subtle" aria-hidden />
-          <span className="inline-flex items-center gap-1.5"><Package className="h-4 w-4 text-accent" aria-hidden />{parts}</span>
+          <span className="inline-flex items-center gap-1.5"><Package className="h-4 w-4 text-fg-subtle" aria-hidden />{parts}</span>
         </div>
       </div>
     </div>

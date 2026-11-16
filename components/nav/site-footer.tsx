@@ -17,9 +17,9 @@ export async function SiteFooter() {
         {buildFooter(t).map((col) => (
           <div key={col.title}>
             <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-fg-subtle">{col.title}</h2>
-            <ul className="mt-4 space-y-2.5">
+            <ul className="mt-3 space-y-0.5">
               {col.links.map((l) => (
-                <li key={l.href + l.label}><Link href={l.href} className="text-sm text-fg-muted transition-colors hover:text-accent">{l.label}</Link></li>
+                <li key={l.href + l.label}><Link href={l.href} className="inline-block py-1.5 text-sm text-fg-muted transition-colors hover:text-accent">{l.label}</Link></li>
               ))}
             </ul>
           </div>

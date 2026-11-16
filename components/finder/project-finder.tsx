@@ -7,8 +7,8 @@ import { TagsInput } from "./tags-input";
 import { FindButton } from "./find-button";
 import { PART_BY_ID, STARTER_KITS } from "@/lib/parts-catalog";
 import { matchProjects, type FinderResult, type MatchResult } from "@/lib/finder/match";
-import { GUIDE_SLUGS, PROJECTS } from "@/lib/finder/projects-data";
-import { useMessages } from "@/components/i18n/locale-provider";
+import { GUIDE_SLUGS, PROJECTS, PROJECT_TITLES } from "@/lib/finder/projects-data";
+import { useLocale, useMessages } from "@/components/i18n/locale-provider";
 import { finder } from "@/lib/i18n/messages/finder";
 
 /** Long enough for the phase animation to read; matching itself is instant and pure. */
@@ -116,18 +116,20 @@ function ResultSection({ title, note, tone, items, empty }: { title: string; not
 }
 
 function ResultCard({ m, index, getLabel, openLabel, soonLabel }: { m: MatchResult; index: number; getLabel: string; openLabel: string; soonLabel: string }) {
+  const { locale } = useLocale();
+  const title = PROJECT_TITLES.get(m.project_id)?.[locale] ?? m.title;
   const pct = Math.round(m.coverage * 100);
   const hasGuide = GUIDE_SLUGS.has(m.project_id);
   const body = (
     <>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-semibold text-fg group-hover:text-accent">{m.title}</h3>
+          <h3 className="font-semibold text-fg group-hover:text-accent">{title}</h3>
           <p className="mt-0.5 font-mono text-[11px] uppercase tracking-wider text-fg-subtle">{m.microcontroller}</p>
         </div>
         <span className="font-mono text-2xl font-semibold tabular-nums text-accent">{pct}<span className="text-xs text-fg-subtle">%</span></span>
       </div>
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-ink-800" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={m.title}>
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-ink-800" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={title}>
         <div className="h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
       </div>
       <p className="mt-4 flex items-start gap-2 text-sm text-fg-muted"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-signal" aria-hidden />{m.owned.join(", ")}</p>

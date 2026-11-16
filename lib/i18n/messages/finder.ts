@@ -1,11 +1,11 @@
 import { defineMessages } from "../config";
 import type { StarterKitKey } from "../../parts-catalog";
 
-/** AI Project Finder + the /ai overview page. */
+/** Project Finder (/finder): match the parts you own against every guide. */
 export const finder = defineMessages({
   en: {
-    metaTitle: "AI Project Finder",
-    title: "AI Project Finder",
+    metaTitle: "Project Finder",
+    title: "Project Finder",
     description: "Tell us what you own. We match it against the builds and show what you can make now, and what you’re one or two parts away from.",
     deskTitle: "What’s on your desk?",
     selected: (n: number) => `${n} part${n === 1 ? "" : "s"} selected`,
@@ -36,23 +36,10 @@ export const finder = defineMessages({
     emptyTitle: "No builds match yet",
     emptyBody: "Every build needs a board. Add the board you own plus a sensor or a motor, then search again.",
     emptyCta: "Browse components",
-    overview: {
-      metaTitle: "AI Tools",
-      title: "AI Tools",
-      description: "Two tools that work from the real catalog, so they can’t invent a pin map.",
-      finderTitle: "Project Finder",
-      finderBody: "List the parts on your desk and get builds you can make right now, plus the ones you’re one part away from.",
-      generatorTitle: "Project Generator",
-      generatorBody: "Describe an idea and get a plan, a 3D model you can download, a checked wiring diagram, assembly steps and code.",
-      assistantTitle: "Build Assistant",
-      assistantBody: "A terminal-style helper for wiring, code and debugging. On a guide page it reads that guide’s wiring and code.",
-      open: "Open",
-      live: "live",
-    },
   },
   ru: {
-    metaTitle: "AI Project Finder",
-    title: "AI Project Finder",
+    metaTitle: "Project Finder",
+    title: "Project Finder",
     description: "Укажите, что у вас есть. Мы сопоставим это со сборками и покажем, что можно собрать сейчас, а чего не хватает одной-двух деталей.",
     deskTitle: "Что лежит у вас на столе?",
     selected: (n: number) => `выбрано деталей: ${n}`,
@@ -83,23 +70,10 @@ export const finder = defineMessages({
     emptyTitle: "Пока ничего не подходит",
     emptyBody: "Каждой сборке нужна плата. Добавьте свою плату и датчик или мотор, затем повторите поиск.",
     emptyCta: "Смотреть компоненты",
-    overview: {
-      metaTitle: "AI-инструменты",
-      title: "AI-инструменты",
-      description: "Два инструмента, которые работают по реальному каталогу, поэтому не выдумают распиновку.",
-      finderTitle: "Project Finder",
-      finderBody: "Перечислите детали со стола и получите сборки, которые можно сделать сразу, и те, где не хватает одной детали.",
-      generatorTitle: "Генератор проектов",
-      generatorBody: "Опишите идею и получите план, 3D-модель для скачивания, проверенную схему, шаги сборки и код.",
-      assistantTitle: "Build Assistant",
-      assistantBody: "Помощник в стиле терминала: проводка, код и отладка. На странице гайда он читает его схему и код.",
-      open: "Открыть",
-      live: "live",
-    },
   },
   kk: {
-    metaTitle: "AI Project Finder",
-    title: "AI Project Finder",
+    metaTitle: "Project Finder",
+    title: "Project Finder",
     description: "Қолыңызда не бар екенін көрсетіңіз. Біз оны құрастырулармен салыстырып, қазір не жасауға болатынын және қай жобаға бір-екі бөлшек жетпейтінін көрсетеміз.",
     deskTitle: "Үстеліңізде не жатыр?",
     selected: (n: number) => `таңдалған бөлшек: ${n}`,
@@ -130,18 +104,5 @@ export const finder = defineMessages({
     emptyTitle: "Әзірге ештеңе сәйкес келмейді",
     emptyBody: "Әр құрастыруға плата керек. Платаңызды және датчик не моторды қосып, қайта іздеңіз.",
     emptyCta: "Компоненттерді қарау",
-    overview: {
-      metaTitle: "AI құралдары",
-      title: "AI құралдары",
-      description: "Нақты каталог бойынша жұмыс істейтін екі құрал, сондықтан пин картасын ойдан шығармайды.",
-      finderTitle: "Project Finder",
-      finderBody: "Үстеліңіздегі бөлшектерді тізіп, қазір жасауға болатын және бір бөлшек жетпейтін құрастыруларды алыңыз.",
-      generatorTitle: "Жоба генераторы",
-      generatorBody: "Идеяны сипаттаңыз: жоспар, жүктеуге болатын 3D модель, тексерілген сызба, құрастыру қадамдары және код.",
-      assistantTitle: "Build Assistant",
-      assistantBody: "Терминал стиліндегі көмекші: сымдар, код және жөндеу. Нұсқаулық бетінде ол сол нұсқаулықтың сызбасы мен кодын оқиды.",
-      open: "Ашу",
-      live: "live",
-    },
   },
 });

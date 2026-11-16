@@ -2,7 +2,7 @@
  * Components users can pick. IDs must match the matching engine's catalog.
  * Names, specs and pins stay untranslated; category labels are localised in lib/i18n/messages/components.ts.
  */
-export const PART_CATEGORIES = ["Boards", "Sensors", "Actuators", "Drivers", "Displays", "Wireless", "Power", "Mechanical"] as const;
+export const PART_CATEGORIES = ["Boards", "Basics", "Sensors", "Actuators", "Drivers", "Displays", "Wireless", "Interface", "Power", "Mechanical"] as const;
 export type PartCategory = (typeof PART_CATEGORIES)[number];
 export type CatalogPart = { id: string; name: string; category: PartCategory; aliases: string[]; specs: string[] };
 
@@ -42,11 +42,11 @@ export const PARTS: CatalogPart[] = [
   // Appended for the hardware registry (lib/hardware/components.ts).
   { id: "esp8266", name: "ESP8266 NodeMCU", category: "Boards", aliases: ["esp8266", "nodemcu", "wemos"], specs: ["ESP-12E", "3.3 V logic", "Wi-Fi"] },
   { id: "rpi4", name: "Raspberry Pi 4", category: "Boards", aliases: ["pi 4", "raspberry pi 4", "rpi4"], specs: ["Cortex-A72", "3.3 V GPIO", "5 V 3 A USB-C"] },
-  { id: "led", name: "LED 5 mm", category: "Actuators", aliases: ["светодиод"], specs: ["~2 V fwd (red)", "20 mA max", "needs resistor"] },
-  { id: "resistor", name: "Resistor", category: "Mechanical", aliases: ["resistors", "резистор"], specs: ["1/4 W", "220 Ω–10 kΩ", "through-hole"] },
-  { id: "button", name: "Push Button", category: "Sensors", aliases: ["push button", "pushbutton", "tactile switch", "кнопка"], specs: ["6×6 mm", "momentary", "INPUT_PULLUP"] },
-  { id: "potentiometer", name: "Potentiometer 10k", category: "Sensors", aliases: ["pot", "potentiometer", "потенциометр"], specs: ["10 kΩ", "linear", "analog"] },
-  { id: "buzzer", name: "Buzzer", category: "Actuators", aliases: ["buzzer", "piezo", "пищалка", "зуммер"], specs: ["active / passive", "5 V", "tone()"] },
+  { id: "led", name: "LED 5 mm", category: "Basics", aliases: ["светодиод"], specs: ["~2 V fwd (red)", "20 mA max", "needs resistor"] },
+  { id: "resistor", name: "Resistor", category: "Basics", aliases: ["resistors", "резистор"], specs: ["1/4 W", "220 Ω–10 kΩ", "through-hole"] },
+  { id: "button", name: "Push Button", category: "Basics", aliases: ["push button", "pushbutton", "tactile switch", "кнопка"], specs: ["6×6 mm", "momentary", "INPUT_PULLUP"] },
+  { id: "potentiometer", name: "Potentiometer 10k", category: "Basics", aliases: ["pot", "potentiometer", "потенциометр"], specs: ["10 kΩ", "linear", "analog"] },
+  { id: "buzzer", name: "Buzzer", category: "Basics", aliases: ["buzzer", "piezo", "пищалка", "зуммер"], specs: ["active / passive", "5 V", "tone()"] },
   { id: "dht11", name: "DHT11 Temperature & Humidity", category: "Sensors", aliases: ["dht11"], specs: ["±2 °C", "single-wire", "3.3–5 V"] },
   { id: "ds18b20", name: "DS18B20 Temperature Sensor", category: "Sensors", aliases: ["ds18b20", "1-wire temperature", "waterproof temperature"], specs: ["±0.5 °C", "1-Wire", "4.7k pull-up"] },
   { id: "bme280", name: "BME280 / BMP280 Sensor", category: "Sensors", aliases: ["bme280", "bmp280", "barometer", "pressure", "давление"], specs: ["pressure + temp", "I2C 0x76", "3.3 V"] },
@@ -61,13 +61,13 @@ export const PARTS: CatalogPart[] = [
   { id: "a4988", name: "A4988 Stepper Driver", category: "Drivers", aliases: ["a4988", "stepper driver"], specs: ["2 A", "8–35 V", "STEP / DIR"] },
   { id: "uln2003", name: "28BYJ-48 + ULN2003", category: "Drivers", aliases: ["uln2003", "28byj-48", "28byj48"], specs: ["5 V unipolar", "2048 steps/rev", "4 IN"] },
   { id: "hx711", name: "HX711 Load Cell Amp", category: "Sensors", aliases: ["hx711", "load cell", "scale", "весы"], specs: ["24-bit", "DT / SCK", "2.6–5.5 V"] },
-  { id: "sdcard", name: "microSD Card Module", category: "Wireless", aliases: ["sd card", "microsd", "sd module"], specs: ["SPI", "5 V w/ level shift", "FAT32"] },
+  { id: "sdcard", name: "microSD Card Module", category: "Interface", aliases: ["sd card", "microsd", "sd module"], specs: ["SPI", "5 V w/ level shift", "FAT32"] },
   { id: "dfplayer", name: "DFPlayer Mini MP3", category: "Actuators", aliases: ["dfplayer", "mp3 player"], specs: ["UART 9600", "3 W amp", "microSD"] },
   { id: "lora", name: "SX1278 LoRa Module", category: "Wireless", aliases: ["lora", "sx1278", "ra-02"], specs: ["433 MHz", "SPI", "3.3 V only"] },
   { id: "pump", name: "Mini Water Pump", category: "Actuators", aliases: ["water pump", "pump", "помпа", "насос"], specs: ["3–5 V", "~200 mA", "submersible"] },
   { id: "tp4056", name: "TP4056 Li-ion Charger", category: "Power", aliases: ["tp4056", "charger", "зарядка"], specs: ["1 A", "USB in", "protection"] },
   { id: "bat9v", name: "9V Battery", category: "Power", aliases: ["9v battery", "крона"], specs: ["9 V", "~500 mAh", "PP3"] },
-  { id: "levelshift", name: "Logic Level Shifter", category: "Power", aliases: ["level shifter", "logic level converter"], specs: ["4 ch", "BSS138", "3.3 ↔ 5 V"] },
+  { id: "levelshift", name: "Logic Level Shifter", category: "Interface", aliases: ["level shifter", "logic level converter"], specs: ["4 ch", "BSS138", "3.3 ↔ 5 V"] },
 ];
 
 export const PART_BY_ID: ReadonlyMap<string, CatalogPart> = new Map(PARTS.map((p) => [p.id, p]));
