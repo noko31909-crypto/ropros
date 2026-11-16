@@ -1,7 +1,7 @@
 #!/bin/bash
 # Attack tests for the database rules, run against a throwaway local PostgreSQL (16+) set up like Supabase.
 #   PGHOST=/tmp PGPORT=5432 PGUSER=postgres supabase/tests/run.sh [after|before]
-# after (default) = 0001 + 0002, before = 0001 only. Each check states the secure expectation, so a FAIL line
+# after (default) = 0001 + 0002 + 0003, before = 0001 only. Each check states the secure expectation, so a FAIL line
 # is a weakness. The parallel checks at the end fire requests at the same instant, so every limit is proven
 # under concurrency. In "after" mode the script exits non-zero if any check fails, which is what CI relies on.
 # It drops and recreates $TEST_DB (default ropros_test): never point it at production.
@@ -17,10 +17,12 @@ P="$PSQL -d $DB"
 $P -f "$D/00_supabase_stubs.sql"
 $P -f "$R/migrations/0001_init.sql"
 [ "$MODE" = after ] && $P -f "$R/migrations/0002_security_hardening.sql"
+[ "$MODE" = after ] && $P -f "$R/migrations/0003_workbench_comments.sql"
 $P -f "$R/seed.sql"
 $P -f "$D/01_qa.sql"
 $P -f "$D/02_attacks.sql" >/dev/null
 [ "$MODE" = after ] && $P -f "$D/03_after_fix.sql" >/dev/null
+[ "$MODE" = after ] && $P -f "$D/04_features.sql" >/dev/null
 $P -c "select case when pass then 'PASS' else 'FAIL' end as result, name, left(detail, 70) as detail from qa.results order by n"
 FAILED=$($P -tA -c "select count(*) from qa.results where not pass")
 $P -tA -c "select count(*) filter (where pass) || ' passed, ' || count(*) filter (where not pass) || ' failed' from qa.results"
@@ -60,6 +62,16 @@ if [ "$MODE" = after ]; then
   for i in $(seq 1 20); do ($P -tA -c "$(as $E) select public.consume_assistant_quota(5);" > "$T/$i" 2>&1) & done; wait
   expect "20 simultaneous assistant calls with a limit of 5, allowed" "$(grep -lx t "$T"/* | wc -l)" 5
   rm -rf "$T"
+  W=99999999-0000-4000-8000-000000000003
+  $P -c "insert into auth.users (id, email) values ('$W', 'wes@example.com')"
+  $P -c "insert into public.user_parts (user_id, part_id) select '$W', 'w' || g from generate_series(1, 190) g"
+  for i in $(seq 1 25); do $P -c "$(as $W) insert into public.user_parts (user_id, part_id) values ('$W', 'x$i');" >/dev/null 2>&1 & done; wait
+  expect "25 simultaneous parts onto a workbench holding 190 (limit 200), stored" "$($P -tA -c "select count(*) from public.user_parts where user_id='$W'")" 200
+  BP=$($P -tA -c "select id from public.community_posts where title = 'Bob build'")
+  $P -c "insert into public.post_comments (post_id, user_id, body) select '$BP', '$W', 'pre ' || g from generate_series(1, 40) g"
+  for i in $(seq 1 25); do $P -c "$(as $W) insert into public.post_comments (post_id, user_id, body) values ('$BP', '$W', 'race $i');" >/dev/null 2>&1 & done; wait
+  expect "25 simultaneous comments after 40 today (limit 50), stored" "$($P -tA -c "select count(*) from public.post_comments where user_id='$W'")" 50
+  expect "comments_count after the comment race" "$($P -tA -c "select comments_count - (select count(*) from public.post_comments where post_id = '$BP') from public.community_posts where id = '$BP'")" 0
   [ "$FAILED" = 0 ] || problems+=("$FAILED attack check(s) failed")
   if [ ${#problems[@]} -gt 0 ]; then printf 'FAILED: %s\n' "${problems[@]}" >&2; exit 1; fi
   echo "All database checks hold."
