@@ -8,7 +8,7 @@ generator were removed; don't add AI wording or AI-styled UI back without the ow
 ## Stack
 - Next.js (App Router) + TypeScript (strict) + Tailwind CSS v4 + lucide-react
 - Supabase (Postgres + Auth + Storage). Schema: `supabase/migrations/0001_init.sql` + `0002_security_hardening.sql`
-  + `0003_workbench_comments.sql` (dashboard copies in `supabase/dashboard/` (6a–6e, then 7a–7b, run in order; max 2 functions per file, unique dollar tags — the SQL editor mis-parses bigger scripts); keep their comments free of quotes and semicolons for the SQL editor).
+  + `0003_workbench_comments.sql` + `0004_moderation_notifications.sql` (dashboard copies in `supabase/dashboard/` (6a–6e, 7a–7b, 8a–8g, 9a, run in order; max 2 functions per file, unique dollar tags — the SQL editor mis-parses bigger scripts); keep their comments free of quotes and semicolons for the SQL editor).
   Attack tests: `supabase/tests/run.sh` against a throwaway local Postgres (CI runs it); every new rule or limit gets a check there, limits also a parallel one.
 - zod for every external input. Versions are pinned exactly in package.json; verify they are current before installing.
 
@@ -42,6 +42,16 @@ generator were removed; don't add AI wording or AI-styled UI back without the ow
   ("Built by the community" + "I built this" on guide pages; posts link to a guide through `community_posts.project_id`).
 - `/privacy`, `/terms` — text in `lib/i18n/messages/legal.ts`; keep them in step with what the site stores. Contact = `CONTACT_EMAIL`
   (server env), else the GitHub issues link.
+- Saved builds: `components/saved/saved-provider.tsx` (`useSavedBuilds()`): `public.saved_builds` when signed in, local storage for guests.
+- Moderation: report buttons (`components/community/report-dialog.tsx`), `/admin` (`components/moderation/admin-panel.tsx`).
+  Moderators are rows in `public.app_admins`, added in the SQL editor only; every action is a DB function that re-checks `is_admin()`.
+  Hidden posts are visible only to their author and moderators; banned makers cannot post, comment, like, report or upload.
+- Notifications: `components/notifications/notification-bell.tsx` (comments on your posts, written by a trigger); `/community?post=<id>` opens a post.
+- Account deletion: `components/profile/delete-account.tsx` (photos via the Storage API, then `delete_my_account()`).
+- SEO: `app/sitemap.ts`, `app/robots.ts`, share images (`app/opengraph-image.tsx`, `app/projects/[slug]/opengraph-image.tsx`),
+  guide structured data (`components/seo/guide-jsonld.tsx`, carries the CSP nonce). Site origin: `SITE_URL`, else Vercel's production domain.
+- Raspberry Pi 5 guides use gpiozero (lgpio), never RPi.GPIO, which does not run on the Pi 5. After adding a guide, also run
+  `node --experimental-strip-types scripts/guides-seed.ts` and give the owner the new `projects` rows to run (see `supabase/dashboard/9a_pi5_guides.sql`).
 - `app/api/progress/route.ts` — saves progress via the `record_progress` RPC
 - `components/guide/*` — guide tabs, parts table, diagram slot, step checklist, code block, troubleshooting, banner, progress buttons
 - `components/finder/*` — tags input, animated find button, results
@@ -55,14 +65,14 @@ generator were removed; don't add AI wording or AI-styled UI back without the ow
 5. Done: daily cap of 3 rewarded posts per user (`reward_post()`).
 6. Rate limiter in `lib/rate-limit.ts` is in-memory (per-instance burst control only). Daily limits that matter live in
    Postgres (0002): 10 posts, 5 photos waiting without a post, 3 completed / 5 simulated guides paying XP; (0003) 50 comments a day,
-   200 workbench parts. The `assistant_usage` table and `consume_assistant_quota()` from 0002 are no longer used by the app.
+   200 workbench parts; (0004) 300 saved builds, 20 reports a day. The `assistant_usage` table and `consume_assistant_quota()` from 0002 are no longer used by the app.
 7. Not built: flashing ESP32 firmware from the browser. It needs Espressif's `esptool-js` (install it through the Socket npm
    firewall, not straight from npmjs) and firmware to flash: the guides ship source code, not binaries.
 8. Shopping list prices: none on purpose (no price source); the links open each shop's own search.
 
 ## Rules
 - Never trust ids from request bodies for ownership; use the verified session (`supabase.auth.getUser()`).
-- XP, levels, likes_count, comments_count and progress are written only by DB functions/triggers. Never from the client.
+- XP, levels, likes_count, comments_count, progress, notifications, hidden posts and bans are written only by DB functions/triggers. Never from the client.
 - No dangerouslySetInnerHTML for user or model content. No secrets with NEXT_PUBLIC_. No service-role key in client code.
 - Cookie-authenticated POST routes call `isCrossSiteRequest` and `isJsonRequest` (`lib/request-guard.ts`).
 - The CSP in `proxy.ts` is nonce-based: no inline scripts or eval; a new image or API host must be added there.

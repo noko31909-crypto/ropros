@@ -74,3 +74,9 @@ test("the 404 check in proxy.ts knows every guide page (run scripts/guides-index
   const { allGuideSlugs } = await import("../lib/guides.ts");
   assert.deepEqual([...GUIDE_SLUG_LIST], allGuideSlugs());
 });
+
+test("every guide has one name: the finder, search and hub cards use the guide page's title", async () => {
+  const { PROJECT_TITLES } = await import("../lib/finder/projects-data.ts");
+  const { allGuideSlugs, getGuide } = await import("../lib/guides.ts");
+  for (const slug of allGuideSlugs()) assert.deepEqual(PROJECT_TITLES.get(slug), getGuide(slug)!.title, slug);
+});

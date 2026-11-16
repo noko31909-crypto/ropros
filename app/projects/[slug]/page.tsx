@@ -8,6 +8,7 @@ import { GuideTabs } from "@/components/guide/guide-tabs";
 import { GuideActions } from "@/components/guide/guide-actions";
 import { ProgressActions } from "@/components/guide/progress-actions";
 import { BuildLogs } from "@/components/community/build-logs";
+import { WorkingBadge } from "@/components/community/working-badge";
 import { GuideDiagram } from "@/components/guide/diagrams";
 import { allGuideSlugs, getGuide, localizeGuide } from "@/lib/guides";
 import { BOARD_LABEL, getProject } from "@/lib/projects";
@@ -15,6 +16,9 @@ import { getLocale } from "@/lib/i18n/server";
 import { common } from "@/lib/i18n/messages/common";
 import { guideMessages } from "@/lib/i18n/messages/guide";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { GuideJsonLd } from "@/components/seo/guide-jsonld";
+import { siteUrl } from "@/lib/site";
+import { coverImage } from "@/lib/covers";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -25,7 +29,15 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const [guide, locale] = [getGuide((await params).slug), await getLocale()];
   if (!guide) return { title: guideMessages[locale].notFound.title };
-  return { title: guide.title[locale], description: guide.summary[locale] };
+  const url = `/projects/${guide.slug}`;
+  const [title, description] = [guide.title[locale], guide.summary[locale]];
+  // The share picture comes from ./opengraph-image.tsx.
+  return {
+    title, description,
+    alternates: { canonical: url },
+    openGraph: { type: "article", siteName: "ropros", url, title, description },
+    twitter: { card: "summary_large_image", title, description },
+  };
 }
 
 /** How long the guide waits for the database before rendering without the progress buttons' project id. */
@@ -78,8 +90,13 @@ export default async function GuidePage({ params }: Props) {
     ? { href: "/projects?category=robotics", label: t.robotics }
     : { href: `/projects?board=${board}`, label: BOARD_LABEL[board] };
 
+  const base = siteUrl();
+  const abs = (path: string) => new URL(path, base).toString();
+
   return (
     <>
+      <GuideJsonLd guide={guide} url={abs(`/projects/${guide.slug}`)} image={coverImage(guide.slug)}
+        crumbs={[{ name: "ropros", url: abs("/") }, { name: t.hub, url: abs("/projects") }, { name: category.label, url: abs(category.href) }, { name: guide.title, url: abs(`/projects/${guide.slug}`) }]} />
       <header className="relative overflow-hidden border-b border-line">
         <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <Container className="relative grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
@@ -100,6 +117,7 @@ export default async function GuidePage({ params }: Props) {
               <li className="inline-flex items-center gap-2 rounded-full border border-line bg-ink-900 px-3 py-1.5 text-sm text-fg-muted">
                 <Trophy className="h-4 w-4 text-accent" aria-hidden />{t.xpReward(guide.xpReward)}
               </li>
+              {projectId && <WorkingBadge projectId={projectId} />}
             </ul>
             <GuideActions slug={guide.slug} />
           </div>
@@ -111,7 +129,7 @@ export default async function GuidePage({ params }: Props) {
           guide={guide}
           diagram={<GuideDiagram guide={source} label={t.diagram.aria(guide.title)} captions={t.diagram.captions} />}
           progress={<ProgressActions projectId={projectId} simulation={guide.simulation} />}
-          serialBaud={source.boardComponent === "raspberry-pi-4" ? null : guide.simulation.baud}
+          serialBaud={source.platform === "raspberry_pi" && source.boardComponent !== "raspberry-pi-pico" ? null : guide.simulation.baud}
         />
         {/* Build logs need the guide's database row: hidden when the database is unreachable. */}
         {projectId && <BuildLogs projectId={projectId} slug={guide.slug} title={guide.title} />}

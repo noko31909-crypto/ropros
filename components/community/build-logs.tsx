@@ -11,6 +11,7 @@ import type { FeedPost } from "./post-card";
 import { PostDialog } from "./post-dialog";
 import { ShareModal } from "./share-modal";
 import { StatusBadge } from "./status-badge";
+import { useBuildCounts } from "./use-build-counts";
 
 const SHOWN = 8;
 type Row = Omit<FeedPost, "author" | "authorLevel" | "signedUrl" | "guide"> & { users: { name: string; level: number } | null };
@@ -25,7 +26,7 @@ export function BuildLogs({ projectId, slug, title }: { projectId: string; slug:
   const { userId, profile, openAuth, refreshProfile } = useAuth();
   const toast = useToast();
   const [posts, setPosts] = useState<FeedPost[] | null>(null);
-  const [builders, setBuilders] = useState(0);
+  const { counts, refresh: refreshCounts } = useBuildCounts(projectId);
   const [error, setError] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [openPost, setOpenPost] = useState<string | null>(null);
@@ -37,8 +38,8 @@ export function BuildLogs({ projectId, slug, title }: { projectId: string; slug:
     const query = (counts: boolean) => supabase.from("community_posts")
       .select(`id, user_id, title, status, image_url, likes_count,${counts ? " comments_count," : ""} created_at, users!community_posts_user_id_fkey(name, level)`)
       .eq("project_id", projectId).order("created_at", { ascending: false }).limit(SHOWN);
-    let [list, count] = await Promise.all([query(true), supabase.rpc("project_builders", { p_project: projectId })]);
-    // 42703: comments_count is missing until migration 0003 runs (project_builders too: the count falls back below).
+    let list = await query(true);
+    // 42703: comments_count is missing until migration 0003 runs.
     if (list.error?.code === "42703") list = await query(false);
     if (list.error) { setError(true); setPosts([]); return; }
     setError(false);
@@ -47,7 +48,6 @@ export function BuildLogs({ projectId, slug, title }: { projectId: string; slug:
     const signed = paths.length ? (await supabase.storage.from("community").createSignedUrls(paths, 3600)).data ?? [] : [];
     const urlByPath = new Map(signed.map((s) => [s.path, s.signedUrl]));
     setPosts(rows.map(({ users, ...r }) => ({ ...r, comments_count: r.comments_count ?? 0, author: users?.name ?? "maker", authorLevel: users?.level, signedUrl: urlByPath.get(r.image_url) ?? undefined, guide: slug })));
-    setBuilders(typeof count.data === "number" ? count.data : new Set(rows.map((r) => r.user_id)).size);
   }, [projectId, slug]);
 
   useEffect(() => { void load(); }, [load]);
@@ -60,6 +60,7 @@ export function BuildLogs({ projectId, slug, title }: { projectId: string; slug:
     setSharing(false);
     const before = profile?.xp ?? 0;
     await load();
+    refreshCounts();
     void refreshProfile();
     // XP is written by database triggers: re-read our own row to say what this post earned (0 after the daily cap).
     let gained = 0;
@@ -78,7 +79,9 @@ export function BuildLogs({ projectId, slug, title }: { projectId: string; slug:
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 id="build-logs" className="text-2xl font-semibold tracking-tight text-fg">{t.builds.title}</h2>
-          <p className="mt-2 text-fg-muted">{posts === null ? t.loading : error ? t.builds.loadError : builders > 0 ? t.builds.count(builders) : t.builds.none}</p>
+          <p className="mt-2 text-fg-muted">{posts === null ? t.loading : error ? t.builds.loadError
+            : counts && counts.builders > 0 ? (counts.working > 0 ? t.builds.countWorking(counts.builders, counts.working) : t.builds.count(counts.builders))
+            : posts.length > 0 ? t.builds.count(new Set(posts.map((p) => p.user_id)).size) : t.builds.none}</p>
         </div>
         <button type="button" onClick={share}
           className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-accent px-5 text-sm font-semibold text-ink-950 shadow-glow hover:bg-accent-hover">

@@ -4,7 +4,7 @@
  */
 export const COMPONENT_IDS = [
   // Boards
-  "arduino-uno", "arduino-nano", "arduino-mega", "esp32-devkit", "esp8266-nodemcu", "esp32-cam", "raspberry-pi-4", "raspberry-pi-pico",
+  "arduino-uno", "arduino-nano", "arduino-mega", "esp32-devkit", "esp8266-nodemcu", "esp32-cam", "raspberry-pi-4", "raspberry-pi-5", "raspberry-pi-pico",
   // Passives & basic I/O
   "led", "rgb-led", "resistor", "potentiometer", "push-button", "slide-switch", "ldr", "buzzer-active", "buzzer-passive", "capacitor",
   "diode", "npn-transistor", "mosfet-n", "ir-led",

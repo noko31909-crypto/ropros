@@ -38,6 +38,7 @@ export const community = defineMessages({
     xpGained: (n: number) => `Published · +${n} XP`,
     xpCapped: "Published · daily XP cap reached (3 rewarded posts a day)",
     open: (title: string) => `Open ${title}`,
+    hiddenBadge: "Hidden by moderators",
     comments: {
       title: "Comments", count: (n: number) => `${n} ${n === 1 ? "comment" : "comments"}`,
       aria: (n: number, title: string) => `${n} ${n === 1 ? "comment" : "comments"} on ${title}`,
@@ -53,6 +54,9 @@ export const community = defineMessages({
     builds: {
       title: "Built by the community",
       count: (n: number) => `${n} ${n === 1 ? "maker has" : "makers have"} shared this build.`,
+      countWorking: (n: number, w: number) => `${n} ${n === 1 ? "maker has" : "makers have"} shared this build · ${w} got it working.`,
+      badge: (n: number) => `Works for ${n} ${n === 1 ? "maker" : "makers"}`,
+      badgeTitle: "Makers who shared this build marked as 100% working",
       none: "Nobody has shared this build yet. Built it? Be the first.",
       cta: "I built this", auth: "Sign in to share your build.",
       loadError: "Couldn’t load the build logs.",
@@ -95,6 +99,7 @@ export const community = defineMessages({
     xpGained: (n: number) => `Опубликовано · +${n} XP`,
     xpCapped: "Опубликовано · дневной лимит XP исчерпан (3 награждаемые публикации в день)",
     open: (title: string) => `Открыть: ${title}`,
+    hiddenBadge: "Скрыто модератором",
     comments: {
       title: "Комментарии", count: (n: number) => `${n} ${ruPlural(n, "комментарий", "комментария", "комментариев")}`,
       aria: (n: number, title: string) => `${n} ${ruPlural(n, "комментарий", "комментария", "комментариев")} к посту ${title}`,
@@ -110,6 +115,9 @@ export const community = defineMessages({
     builds: {
       title: "Собрали в сообществе",
       count: (n: number) => `Этой сборкой ${ruPlural(n, "поделился", "поделились", "поделились")} ${n} ${ruPlural(n, "мейкер", "мейкера", "мейкеров")}.`,
+      countWorking: (n: number, w: number) => `Этой сборкой ${ruPlural(n, "поделился", "поделились", "поделились")} ${n} ${ruPlural(n, "мейкер", "мейкера", "мейкеров")} · работает у ${w}.`,
+      badge: (n: number) => `Работает у ${n} ${ruPlural(n, "мейкера", "мейкеров", "мейкеров")}`,
+      badgeTitle: "Мейкеры, которые выложили эту сборку со статусом «Работает на 100%»",
       none: "Этой сборкой ещё никто не поделился. Собрали? Поделитесь первыми.",
       cta: "Показать свою сборку", auth: "Войдите, чтобы поделиться сборкой.",
       loadError: "Не удалось загрузить журналы сборок.",
@@ -152,6 +160,7 @@ export const community = defineMessages({
     xpGained: (n: number) => `Жарияланды · +${n} XP`,
     xpCapped: "Жарияланды · күндік XP шегіне жеттіңіз (күніне 3 марапатталатын жарияланым)",
     open: (title: string) => `Ашу: ${title}`,
+    hiddenBadge: "Модератор жасырған",
     comments: {
       title: "Пікірлер", count: (n: number) => `${n} пікір`,
       aria: (n: number, title: string) => `${title} постына ${n} пікір`,
@@ -167,6 +176,9 @@ export const community = defineMessages({
     builds: {
       title: "Қауымдастық жинады",
       count: (n: number) => `Бұл құрастырумен ${n} мейкер бөлісті.`,
+      countWorking: (n: number, w: number) => `Бұл құрастырумен ${n} мейкер бөлісті · ${w} мейкерде жұмыс істейді.`,
+      badge: (n: number) => `${n} мейкерде жұмыс істейді`,
+      badgeTitle: "Бұл құрастыруды «100% жұмыс істейді» күйімен бөліскен мейкерлер",
       none: "Бұл құрастырумен әлі ешкім бөліспеді. Жинадыңыз ба? Бірінші болыңыз.",
       cta: "Мен мұны жинадым", auth: "Құрастыруыңызбен бөлісу үшін кіріңіз.",
       loadError: "Құрастыру журналдарын жүктеу мүмкін болмады.",

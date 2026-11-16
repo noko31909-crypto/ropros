@@ -6,7 +6,7 @@ export const guideMessages = defineMessages({
     hub: "Project Hub", robotics: "Robotics", iot: "IoT", breadcrumb: "Breadcrumb",
     buildHours: (h: number) => `${h} h build`, xpReward: (n: number) => `+${n} XP`,
     welcome: "Welcome to the build", stepsCount: (n: number) => `${n} steps`, partsCount: (n: number) => `${n} parts`,
-    save: "Save guide", saved: "Saved", savedToast: "Guide saved on this device",
+    save: "Save guide", saved: "Saved", savedToast: "Guide saved on this device", savedToastAccount: "Guide saved to your account",
     tabs: { parts: "Parts", wiring: "Wiring diagram", steps: "Steps", code: "Code", troubleshooting: "Troubleshooting", label: "Guide sections", all: "All sections", showAll: "Show all", tabbed: "Tabbed view" },
     parts: { caption: "Parts list", part: "Part", qty: "Qty", spec: "Spec", role: "Role", optional: "optional", optionalShort: "opt." },
     diagram: {
@@ -34,7 +34,7 @@ export const guideMessages = defineMessages({
     hub: "Project Hub", robotics: "Робототехника", iot: "IoT", breadcrumb: "Хлебные крошки",
     buildHours: (h: number) => `${h.toLocaleString("ru-RU")} ч сборки`, xpReward: (n: number) => `+${n} XP`,
     welcome: "Добро пожаловать в сборку", stepsCount: (n: number) => `${n} ${ruPlural(n, "шаг", "шага", "шагов")}`, partsCount: (n: number) => `${n} ${ruPlural(n, "деталь", "детали", "деталей")}`,
-    save: "Сохранить гайд", saved: "Сохранено", savedToast: "Гайд сохранён на этом устройстве",
+    save: "Сохранить гайд", saved: "Сохранено", savedToast: "Гайд сохранён на этом устройстве", savedToastAccount: "Гайд сохранён в аккаунте",
     tabs: { parts: "Детали", wiring: "Схема", steps: "Шаги", code: "Код", troubleshooting: "Неполадки", label: "Разделы гайда", all: "Все разделы", showAll: "Показать всё", tabbed: "Вкладки" },
     parts: { caption: "Список деталей", part: "Деталь", qty: "Кол-во", spec: "Характеристики", role: "Назначение", optional: "опционально", optionalShort: "опц." },
     diagram: {
@@ -62,7 +62,7 @@ export const guideMessages = defineMessages({
     hub: "Project Hub", robotics: "Робототехника", iot: "IoT", breadcrumb: "Навигация жолы",
     buildHours: (h: number) => `${h.toLocaleString("kk-KZ")} сағ құрастыру`, xpReward: (n: number) => `+${n} XP`,
     welcome: "Құрастыруға қош келдіңіз", stepsCount: (n: number) => `${n} қадам`, partsCount: (n: number) => `${n} бөлшек`,
-    save: "Нұсқаулықты сақтау", saved: "Сақталды", savedToast: "Нұсқаулық осы құрылғыда сақталды",
+    save: "Нұсқаулықты сақтау", saved: "Сақталды", savedToast: "Нұсқаулық осы құрылғыда сақталды", savedToastAccount: "Нұсқаулық аккаунтта сақталды",
     tabs: { parts: "Бөлшектер", wiring: "Схема", steps: "Қадамдар", code: "Код", troubleshooting: "Ақаулар", label: "Нұсқаулық бөлімдері", all: "Барлық бөлімдер", showAll: "Барлығын көрсету", tabbed: "Қойындылар" },
     parts: { caption: "Бөлшектер тізімі", part: "Бөлшек", qty: "Саны", spec: "Сипаттамасы", role: "Мақсаты", optional: "міндетті емес", optionalShort: "қос." },
     diagram: {

@@ -17,7 +17,7 @@ import { workbenchMessages } from "@/lib/i18n/messages/workbench";
 import { useWorkbench } from "@/components/workbench/workbench-provider";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useToast } from "@/components/ui/toast";
-import { useSavedBuilds } from "@/lib/saved";
+import { useSavedBuilds } from "@/components/saved/saved-provider";
 
 /** Long enough for the phase animation to read; matching itself is instant and pure. */
 const SEARCH_MS = 1600;

@@ -13,6 +13,8 @@ export type FeedPost = {
   author: string; authorLevel?: number; signedUrl?: string;
   /** Slug of the guide the build follows (community_posts.project_id), if any. */
   guide?: string;
+  /** Hidden by a moderator: only its author (and moderators) still see it. */
+  hidden?: boolean;
 };
 
 export function PostCard({ post, liked, mine, onLike, onDeleted, onOpen }: { post: FeedPost; liked: boolean; mine: boolean; onLike: () => void; onDeleted?: (id: string) => void; onOpen?: () => void }) {
@@ -25,8 +27,9 @@ export function PostCard({ post, liked, mine, onLike, onDeleted, onOpen }: { pos
           ? <img src={post.signedUrl} alt={post.title} loading="lazy" className="block h-auto min-h-40 w-full object-cover transition-transform duration-700 group-hover:scale-[1.04] motion-reduce:group-hover:scale-100" />
           : <div className="aspect-[4/5] w-full bg-ink-800 bg-grid" />}
         <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-ink-950/90 via-ink-950/30 to-transparent" />
-        <div className="absolute left-2 top-2 origin-top-left scale-[.82] sm:left-3 sm:top-3 sm:scale-100">
+        <div className="absolute left-2 top-2 flex origin-top-left scale-[.82] flex-col items-start gap-1.5 sm:left-3 sm:top-3 sm:scale-100">
           <StatusBadge status={post.status} label={t.status[post.status]} />
+          {post.hidden && <span className="rounded-full border border-accent/50 bg-ink-950/80 px-2.5 py-1 font-mono text-[11px] text-accent backdrop-blur-md">{t.hiddenBadge}</span>}
         </div>
         <h3 className="absolute inset-x-3 bottom-2.5 text-[13px] font-semibold leading-snug text-fg drop-shadow sm:inset-x-4 sm:bottom-3 sm:text-[17px]">{post.title}</h3>
         {/* The photo opens the post with its comments. */}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { clsx } from "clsx";
-import { Bug, CheckCircle2, Crown, Heart, Layers, ListChecks, Lock, LogOut, Package, Terminal, type LucideIcon } from "lucide-react";
+import { Bug, CheckCircle2, Crown, Heart, Layers, ListChecks, Lock, LogOut, Package, ShieldAlert, Terminal, type LucideIcon } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { levelBand, useAuth } from "@/components/auth/auth-provider";
 import { Avatar } from "@/components/auth/avatar";
@@ -17,9 +17,12 @@ import { Cover } from "@/components/cards/covers";
 import { coverImage } from "@/lib/covers";
 import { PlatformPill } from "@/components/cards/project-card";
 import { getProject, projectHref } from "@/lib/projects";
-import { useSavedBuilds } from "@/lib/saved";
+import { useSavedBuilds } from "@/components/saved/saved-provider";
 import { StatusBadge, type BuildStatus } from "@/components/community/status-badge";
 import { WorkbenchSummary } from "@/components/workbench/workbench-summary";
+import { DeleteAccount } from "./delete-account";
+import { useIsAdmin } from "@/components/moderation/use-is-admin";
+import { moderationMessages } from "@/lib/i18n/messages/moderation";
 
 type Stats = { simulated: number; completed: number; posts: number; working: number; debugging: number; likes: number };
 type XpEvent = { id: number; reason: string; amount: number; created_at: string };
@@ -51,7 +54,9 @@ export function ProfileView() {
   const [history, setHistory] = useState<XpEvent[]>([]);
   const [posts, setPosts] = useState<OwnPost[]>([]);
   const [error, setError] = useState(false);
-  const { saved } = useSavedBuilds();
+  const { saved, where: savedWhere } = useSavedBuilds();
+  const isAdmin = useIsAdmin();
+  const mod = useMessages(moderationMessages).admin;
   const savedProjects = saved.map((s) => getProject(s)).filter((p) => p !== undefined);
 
   useEffect(() => {
@@ -129,9 +134,16 @@ export function ProfileView() {
             <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-ink-800" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={band.pct}>
               <div className="h-full rounded-full bg-gradient-to-r from-signal to-accent transition-[width] duration-700 motion-reduce:transition-none" style={{ width: `${band.pct}%` }} />
             </div>
-            <button type="button" onClick={() => void signOut()} className="mt-4 inline-flex h-9 items-center gap-2 rounded-xl border border-line px-3 text-sm text-fg-muted hover:text-fg">
-              <LogOut className="h-4 w-4" aria-hidden />{t.signOut}
-            </button>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button type="button" onClick={() => void signOut()} className="inline-flex h-9 items-center gap-2 rounded-xl border border-line px-3 text-sm text-fg-muted hover:text-fg">
+                <LogOut className="h-4 w-4" aria-hidden />{t.signOut}
+              </button>
+              {isAdmin && (
+                <Link href="/admin" className="inline-flex h-9 items-center gap-2 rounded-xl border border-accent/40 px-3 text-sm text-accent hover:bg-accent-soft">
+                  <ShieldAlert className="h-4 w-4" aria-hidden />{mod.link}
+                </Link>
+              )}
+            </div>
           </div>
         </div>,
       )}
@@ -177,7 +189,7 @@ export function ProfileView() {
           <div className="mb-5 flex items-baseline justify-between gap-3">
             <div className="flex items-baseline gap-3">
               <h2 className="text-xl font-semibold text-fg">{t.savedTitle}</h2>
-              <span className="font-mono text-xs text-fg-subtle">{t.savedNote}</span>
+              <span className="font-mono text-xs text-fg-subtle">{savedWhere === "account" ? t.savedNoteAccount : t.savedNote}</span>
             </div>
             <Link href="/projects" className="text-sm font-semibold text-accent hover:underline">{t.savedBrowse}</Link>
           </div>
@@ -248,6 +260,7 @@ export function ProfileView() {
             )}
           </section>
         </div>
+        <DeleteAccount userId={profile.id} name={profile.name} />
       </Container>
     </>
   );

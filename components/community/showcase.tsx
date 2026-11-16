@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { clsx } from "clsx";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Camera, Info, Plus, Users } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -18,7 +19,7 @@ import { PostDialog } from "./post-dialog";
 type Filter = "all" | "working" | "debugging";
 type Sort = "newest" | "popular";
 
-export function CommunityShowcase() {
+export function CommunityShowcase({ initialPost }: { initialPost?: string }) {
   const t = useMessages(community);
   const { locale } = useLocale();
   const supabase = getSupabaseBrowserClient();
@@ -31,29 +32,44 @@ export function CommunityShowcase() {
   const [sort, setSort] = useState<Sort>("newest");
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
-  const [openPost, setOpenPost] = useState<string | null>(null);
-  const closePost = useCallback(() => setOpenPost(null), []);
+  const [openPost, setOpenPost] = useState<string | null>(initialPost ?? null);
+  // A notification can link here while the feed is already open: follow the new ?post= too.
+  useEffect(() => { if (initialPost) setOpenPost(initialPost); }, [initialPost]);
+  const router = useRouter();
+  const closePost = useCallback(() => {
+    setOpenPost(null);
+    if (initialPost) router.replace("/community", { scroll: false });   // a refresh should not reopen it
+  }, [initialPost, router]);
   const countComments = useCallback((delta: number) => {
     setPosts((ps) => ps?.map((p) => (p.id === openPost ? { ...p, comments_count: Math.max(0, p.comments_count + delta) } : p)) ?? null);
   }, [openPost]);
 
   const load = useCallback(async () => {
-    const feed = (counts: boolean) => supabase
-      .from("community_posts")
-      .select(`id, user_id, title, status, image_url, likes_count,${counts ? " comments_count," : ""} created_at, users!community_posts_user_id_fkey(name, level), projects!community_posts_project_id_fkey(slug)`)
-      .order("created_at", { ascending: false })
-      .limit(90);
-    let { data, error: err } = await feed(true);
-    // 42703: comments_count is missing until migration 0003 runs. Keep the feed up without comment counts.
-    if (err?.code === "42703") ({ data, error: err } = await feed(false));
+    const feed = (extra: string, only?: string) => {
+      const q = supabase
+        .from("community_posts")
+        .select(`id, user_id, title, status, image_url, likes_count,${extra} created_at, users!community_posts_user_id_fkey(name, level), projects!community_posts_project_id_fkey(slug)`);
+      return only ? q.eq("id", only) : q.order("created_at", { ascending: false }).limit(90);
+    };
+    // 42703: a column from a migration that has not run yet (hidden: 0004, comments_count: 0003). Keep the feed up without it.
+    let extra = " comments_count, hidden,";
+    let { data, error: err } = await feed(extra);
+    if (err?.code === "42703") ({ data, error: err } = await feed((extra = " comments_count,")));
+    if (err?.code === "42703") ({ data, error: err } = await feed((extra = "")));
     if (err) { setError(true); setPosts([]); return; }
     setError(false);
-    const rows = (data ?? []) as unknown as (Omit<FeedPost, "author" | "authorLevel" | "signedUrl" | "guide"> & { users: { name: string; level: number } | null; projects: { slug: string } | null })[];
+    type Row = Omit<FeedPost, "author" | "authorLevel" | "signedUrl" | "guide"> & { users: { name: string; level: number } | null; projects: { slug: string } | null };
+    const rows = (data ?? []) as unknown as Row[];
+    // A post opened from a notification may be older than the latest 90.
+    if (initialPost && !rows.some((r) => r.id === initialPost)) {
+      const one = await feed(extra, initialPost);
+      if (!one.error && one.data?.length) rows.unshift(...(one.data as unknown as Row[]));
+    }
     const paths = rows.map((r) => r.image_url);
     const signed = paths.length ? (await supabase.storage.from("community").createSignedUrls(paths, 3600)).data ?? [] : [];
     const urlByPath = new Map(signed.map((s) => [s.path, s.signedUrl]));
     setPosts(rows.map(({ users, projects, ...r }) => ({ ...r, comments_count: r.comments_count ?? 0, author: users?.name ?? "maker", authorLevel: users?.level, signedUrl: urlByPath.get(r.image_url) ?? undefined, guide: projects?.slug })));
-  }, [supabase]);
+  }, [supabase, initialPost]);
 
   useEffect(() => { void load(); }, [load]);
   useEffect(() => {

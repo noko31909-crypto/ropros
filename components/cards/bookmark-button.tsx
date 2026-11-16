@@ -5,7 +5,7 @@ import { Bookmark, BookmarkCheck } from "lucide-react";
 import type { MouseEvent } from "react";
 import { projects as projectsMsg } from "@/lib/i18n/messages/projects";
 import { useMessages } from "@/components/i18n/locale-provider";
-import { useSavedBuilds } from "@/lib/saved";
+import { useSavedBuilds } from "@/components/saved/saved-provider";
 
 /** Bookmark toggle that sits inside a card link: it must not trigger navigation. */
 export function BookmarkButton({ slug, title }: { slug: string; title: string }) {

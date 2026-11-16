@@ -75,6 +75,9 @@ import g_pi_pico_led_matrix from "./pi-pico-led-matrix.ts";
 import g_pi_smart_fan_controller from "./pi-smart-fan-controller.ts";
 import g_pi_temperature_logger from "./pi-temperature-logger.ts";
 import g_pi_traffic_light_python from "./pi-traffic-light-python.ts";
+import g_pi5_bme280_weather_logger from "./pi5-bme280-weather-logger.ts";
+import g_pi5_parking_sensor from "./pi5-parking-sensor.ts";
+import g_pi5_reaction_duel from "./pi5-reaction-duel.ts";
 import g_pico_plant_moisture_alarm from "./pico-plant-moisture-alarm.ts";
 import g_pico_reaction_game from "./pico-reaction-game.ts";
 import g_pico_servo_radar from "./pico-servo-radar.ts";
@@ -179,6 +182,9 @@ export const CONTENT_GUIDES: GuideContent[] = [
   g_pi_smart_fan_controller,
   g_pi_temperature_logger,
   g_pi_traffic_light_python,
+  g_pi5_bme280_weather_logger,
+  g_pi5_parking_sensor,
+  g_pi5_reaction_duel,
   g_pico_plant_moisture_alarm,
   g_pico_reaction_game,
   g_pico_servo_radar,

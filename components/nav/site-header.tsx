@@ -14,6 +14,7 @@ import { Container } from "@/components/ui/container";
 import { Avatar } from "@/components/auth/avatar";
 import { levelBand, useAuth } from "@/components/auth/auth-provider";
 import { SiteSearch } from "@/components/search/site-search";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 /** Accessible dropdown: opens on click, closes on Escape, outside click or route change. */
 function NavDropdown({ item, active }: { item: Extract<NavItem, { children: unknown }>; active: boolean }) {
@@ -120,6 +121,7 @@ export function SiteHeader() {
         <div className="ml-auto flex items-center gap-2">
           <SiteSearch />
           <div className="hidden sm:block"><LocaleSwitcher /></div>
+          <NotificationBell />
           {profile ? (
             <Link href="/profile#saved" aria-label={t.nav.saved}
               className="hidden h-9 w-9 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-ink-800 hover:text-fg sm:inline-flex">

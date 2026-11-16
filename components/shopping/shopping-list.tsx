@@ -6,7 +6,7 @@ import { useLocale, useMessages } from "@/components/i18n/locale-provider";
 import { workbenchMessages } from "@/lib/i18n/messages/workbench";
 import { useWorkbench } from "@/components/workbench/workbench-provider";
 import { useToast } from "@/components/ui/toast";
-import { useSavedBuilds } from "@/lib/saved";
+import { useSavedBuilds } from "@/components/saved/saved-provider";
 import { shoppingList, shoppingText, storesFor, type ShoppingGuide } from "@/lib/shopping";
 
 /** Missing parts for the saved builds, minus the workbench. Ticking a part moves it onto the workbench. */
