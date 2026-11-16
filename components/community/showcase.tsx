@@ -8,7 +8,8 @@ import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useToast } from "@/components/ui/toast";
 import { Container } from "@/components/ui/container";
-import { useMessages } from "@/components/i18n/locale-provider";
+import { useLocale, useMessages } from "@/components/i18n/locale-provider";
+import { GUIDE_SLUGS, PROJECT_TITLES } from "@/lib/finder/projects-data";
 import { community } from "@/lib/i18n/messages/community";
 import { PostCard, type FeedPost } from "./post-card";
 import { ShareModal } from "./share-modal";
@@ -19,6 +20,7 @@ type Sort = "newest" | "popular";
 
 export function CommunityShowcase() {
   const t = useMessages(community);
+  const { locale } = useLocale();
   const supabase = getSupabaseBrowserClient();
   const { userId, profile, openAuth, refreshProfile } = useAuth();
   const toast = useToast();
@@ -161,9 +163,11 @@ export function CommunityShowcase() {
         )}
       </Container>
       {open && userId && <ShareModal userId={userId} onClose={close} onPublished={() => void onPublished()} />}
-      {openPost && posts?.some((p) => p.id === openPost) && (
-        <PostDialog post={posts.find((p) => p.id === openPost)!} onClose={closePost} onCountChange={countComments} />
-      )}
+      {openPost && posts?.some((p) => p.id === openPost) && (() => {
+        const post = posts.find((p) => p.id === openPost)!;
+        const guideTitle = post.guide && GUIDE_SLUGS.has(post.guide) ? PROJECT_TITLES.get(post.guide)?.[locale] : undefined;
+        return <PostDialog post={post} guideTitle={guideTitle} onClose={closePost} onCountChange={countComments} />;
+      })()}
     </>
   );
 }

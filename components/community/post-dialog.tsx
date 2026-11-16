@@ -4,17 +4,18 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { BookOpen, Heart, X } from "lucide-react";
 import { Avatar } from "@/components/auth/avatar";
-import { useLocale, useMessages } from "@/components/i18n/locale-provider";
+import { useMessages } from "@/components/i18n/locale-provider";
 import { community } from "@/lib/i18n/messages/community";
-import { GUIDE_SLUGS, PROJECT_TITLES } from "@/lib/finder/projects-data";
 import { Comments } from "./comments";
 import { StatusBadge } from "./status-badge";
 import type { FeedPost } from "./post-card";
 
-/** One build log: the photo, who built it, the guide it follows, and its comments. Escape or the backdrop closes it. */
-export function PostDialog({ post, onClose, onCountChange }: { post: FeedPost; onClose: () => void; onCountChange?: (delta: number) => void }) {
+/**
+ * One build log: the photo, who built it, the guide it follows, and its comments. Escape or the backdrop closes it.
+ * `guideTitle` (the linked guide's title in the page language) comes from the caller, so this stays free of the guide index.
+ */
+export function PostDialog({ post, guideTitle, onClose, onCountChange }: { post: FeedPost; guideTitle?: string; onClose: () => void; onCountChange?: (delta: number) => void }) {
   const t = useMessages(community);
-  const { locale } = useLocale();
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export function PostDialog({ post, onClose, onCountChange }: { post: FeedPost; o
     return () => { document.body.style.overflow = prev; window.removeEventListener("keydown", onKey); opener?.focus(); };
   }, [onClose]);
 
-  const guide = post.guide && GUIDE_SLUGS.has(post.guide) ? { slug: post.guide, title: PROJECT_TITLES.get(post.guide)?.[locale] ?? post.guide } : null;
+  const guide = post.guide && guideTitle ? { slug: post.guide, title: guideTitle } : null;
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-6">

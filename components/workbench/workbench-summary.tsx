@@ -1,14 +1,24 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { clsx } from "clsx";
 import { ArrowRight, ShoppingCart, Wrench } from "lucide-react";
-import { useWorkbench, useWorkbenchMatches } from "./workbench-provider";
+import { useWorkbench } from "./workbench-provider";
+import { matchPartIds } from "@/lib/finder/projects-data";
+import type { FinderResult } from "@/lib/finder/match";
 import { useMessages } from "@/components/i18n/locale-provider";
 import { workbenchMessages } from "@/lib/i18n/messages/workbench";
 import { PART_BY_ID } from "@/lib/parts-catalog";
 
 const MAX_CHIPS = 24;
+
+/** What the workbench builds: null until it is loaded or while it is empty. Lives here, not in the provider, so the
+ *  guide index only loads on pages that show the summary. */
+function useWorkbenchMatches(): FinderResult | null {
+  const { ready, parts } = useWorkbench();
+  return useMemo(() => (ready && parts.length ? matchPartIds(parts) : null), [ready, parts]);
+}
 
 /**
  * "Your workbench: 12 parts · 5 ready to build · 9 one part away". Real numbers from the matcher only:

@@ -6,8 +6,6 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { useToast } from "@/components/ui/toast";
 import { useMessages } from "@/components/i18n/locale-provider";
 import { workbenchMessages } from "@/lib/i18n/messages/workbench";
-import { matchPartIds } from "@/lib/finder/projects-data";
-import type { FinderResult } from "@/lib/finder/match";
 import { MAX_WORKBENCH_PARTS, WORKBENCH_KEY, cleanPartIds, clearLocalWorkbench, readLocalWorkbench, writeLocalWorkbench } from "@/lib/workbench";
 
 type WorkbenchCtx = {
@@ -28,12 +26,6 @@ export function useWorkbench(): WorkbenchCtx {
   const ctx = useContext(WorkbenchContext);
   if (!ctx) throw new Error("useWorkbench must be used inside <WorkbenchProvider>");
   return ctx;
-}
-
-/** What the workbench builds: null until it is loaded or while it is empty. */
-export function useWorkbenchMatches(): FinderResult | null {
-  const { ready, parts } = useWorkbench();
-  return useMemo(() => (ready && parts.length ? matchPartIds(parts) : null), [ready, parts]);
 }
 
 /**

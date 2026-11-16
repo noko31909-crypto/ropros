@@ -109,7 +109,7 @@ export function BuildLogs({ projectId, slug, title }: { projectId: string; slug:
         </ul>
       )}
       {sharing && userId && <ShareModal userId={userId} onClose={closeShare} onPublished={() => void onPublished()} initialProjectId={projectId} initialTitle={title} />}
-      {current && <PostDialog post={current} onClose={closePost} onCountChange={countComments} />}
+      {current && <PostDialog post={current} guideTitle={title} onClose={closePost} onCountChange={countComments} />}
     </section>
   );
 }
