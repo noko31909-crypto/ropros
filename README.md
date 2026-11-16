@@ -49,6 +49,9 @@ Type: IBM Plex Sans (UI), JetBrains Mono (pins, code, labels), Gloock (logo and 
 ## Next steps
 - Replace the logo SVG with your exported vector in `components/brand/logo.tsx`.
 - Set `CONTACT_EMAIL` (server-only) in Vercel so the privacy policy and terms show a contact address.
+- Add yourself as a moderator: in the SQL editor, `insert into public.app_admins (user_id) select id from public.users where name = '<your maker name>';`
+  then open `/admin` (also linked from your profile).
+- Set `SITE_URL` once a custom domain is live (the sitemap and share links use it; Vercel's production domain otherwise).
 
 ## Project Finder API
 `POST /api/finder` with `{ "parts": ["Arduino Uno", "HC-SR04", "DC Motor"] }` returns:
@@ -63,7 +66,8 @@ Note: `npm test` uses Node's TypeScript stripping, which needs `.ts` extensions 
 
 ## Auth + database (Supabase)
 1. Create a Supabase project, copy `.env.example` to `.env.local` and fill in the URL and anon key.
-2. Run `supabase/migrations/0001_init.sql`, `0002_security_hardening.sql` and `0003_workbench_comments.sql` in order
+2. Run `supabase/migrations/0001_init.sql`, `0002_security_hardening.sql`, `0003_workbench_comments.sql` and
+   `0004_moderation_notifications.sql` in order, then `supabase/seed-guides.sql`
    (Supabase CLI: `supabase db push`, or paste the files from `supabase/dashboard/` into the SQL editor, in order).
 3. `POST /api/progress` with `{ projectId, action: "simulate" | "complete" }` saves progress for the signed-in user.
    `components/guide/progress-actions.tsx` has the "Run Simulator" / "Mark as Completed" buttons that call it.
