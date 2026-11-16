@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/toast";
 import { useLocale, useMessages } from "@/components/i18n/locale-provider";
 import { LOCALE_TAG } from "@/lib/i18n/config";
 import { moderationMessages } from "@/lib/i18n/messages/moderation";
+import { common } from "@/lib/i18n/messages/common";
 import type { ReportReason } from "@/components/community/report-dialog";
 
 type Named = { name: string } | null;
@@ -32,6 +33,7 @@ const REPORTS = "id, reason, note, created_at, post_id, comment_id, reporter:use
 export function AdminPanel() {
   const t = useMessages(moderationMessages);
   const a = t.admin;
+  const c = useMessages(common);
   const { locale } = useLocale();
   const { ready, userId, openAuth } = useAuth();
   const toast = useToast();
@@ -102,7 +104,7 @@ export function AdminPanel() {
       <div className="rounded-[28px] border border-line bg-ink-850 p-6 sm:p-8">
         <ShieldAlert className="h-6 w-6 text-fg-subtle" aria-hidden />
         <p className="mt-4 text-fg">{a.notAllowed}</p>
-        {!userId && <button type="button" onClick={() => openAuth()} className="mt-4 inline-flex h-10 items-center rounded-xl bg-accent px-4 text-sm font-semibold text-ink-950 hover:bg-accent-hover">{t.signIn}</button>}
+        {!userId && <button type="button" onClick={() => openAuth()} className="mt-4 inline-flex h-10 items-center rounded-xl bg-accent px-4 text-sm font-semibold text-ink-950 hover:bg-accent-hover">{c.auth.signIn}</button>}
       </div>
     );
   }
