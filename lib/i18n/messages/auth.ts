@@ -15,6 +15,7 @@ export const authMessages = defineMessages({
     perks: "Save progress, earn XP and share your builds.",
     welcomeToast: (n: string) => `Welcome, @${n}`, signedOut: "Signed out",
     needAuth: "Sign in to save progress and earn XP",
+    agree: { before: "By creating an account you accept the ", terms: "Terms of Use", middle: " and the ", privacy: "Privacy Policy", after: "." },
   },
   ru: {
     welcome: "С возвращением", join: "Присоединяйтесь к ropros", signIn: "Вход", register: "Регистрация", close: "Закрыть",
@@ -30,6 +31,7 @@ export const authMessages = defineMessages({
     perks: "Сохраняйте прогресс, получайте XP и делитесь сборками.",
     welcomeToast: (n: string) => `Добро пожаловать, @${n}`, signedOut: "Вы вышли",
     needAuth: "Войдите, чтобы сохранять прогресс и получать XP",
+    agree: { before: "Создавая аккаунт, вы принимаете ", terms: "Условия использования", middle: " и ", privacy: "Политику конфиденциальности", after: "." },
   },
   kk: {
     welcome: "Қайта қош келдіңіз", join: "ropros-қа қосылыңыз", signIn: "Кіру", register: "Тіркелу", close: "Жабу",
@@ -45,5 +47,6 @@ export const authMessages = defineMessages({
     perks: "Прогресті сақтаңыз, XP жинаңыз және құрастыруларыңызбен бөлісіңіз.",
     welcomeToast: (n: string) => `Қош келдіңіз, @${n}`, signedOut: "Сіз шықтыңыз",
     needAuth: "Прогресті сақтап, XP алу үшін кіріңіз",
+    agree: { before: "Аккаунт жасай отырып, сіз ", terms: "Пайдалану шарттарын", middle: " және ", privacy: "Құпиялық саясатын", after: " қабылдайсыз." },
   },
 });

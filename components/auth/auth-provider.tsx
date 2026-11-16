@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import Link from "next/link";
 import { clsx } from "clsx";
 import { X } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
@@ -155,6 +156,12 @@ function AuthModal({ reason, onClose }: { reason?: string; onClose: () => void }
           <button type="submit" disabled={busy || !captcha} className="h-11 w-full rounded-xl bg-accent text-sm font-semibold text-ink-950 shadow-glow hover:bg-accent-hover disabled:opacity-60">
             {busy ? t.wait : mode === "signin" ? t.submitSignIn : t.submitRegister}
           </button>
+          {mode === "register" && (
+            <p className="text-xs leading-relaxed text-fg-subtle">
+              {t.agree.before}<Link href="/terms" onClick={onClose} className="text-fg-muted underline underline-offset-2 hover:text-fg">{t.agree.terms}</Link>
+              {t.agree.middle}<Link href="/privacy" onClick={onClose} className="text-fg-muted underline underline-offset-2 hover:text-fg">{t.agree.privacy}</Link>{t.agree.after}
+            </p>
+          )}
         </form>
       </div>
     </div>
