@@ -4,17 +4,17 @@ import { Bookmark, BookmarkCheck } from "lucide-react";
 import { guideMessages } from "@/lib/i18n/messages/guide";
 import { useMessages } from "@/components/i18n/locale-provider";
 import { useToast } from "@/components/ui/toast";
-import { useSavedBuilds } from "@/lib/saved";
+import { useSavedBuilds } from "@/components/saved/saved-provider";
 
-/** "Save guide": a device-local bookmark. */
+/** "Save guide": a bookmark kept in the account when signed in, else on this device. */
 export function GuideActions({ slug }: { slug: string }) {
   const t = useMessages(guideMessages);
   const toast = useToast();
-  const { isSaved, toggle: toggleSaved } = useSavedBuilds();
+  const { isSaved, toggle: toggleSaved, where } = useSavedBuilds();
   const saved = isSaved(slug);
 
   const toggle = () => {
-    if (toggleSaved(slug)) toast(t.savedToast);
+    if (toggleSaved(slug)) toast(where === "account" ? t.savedToastAccount : t.savedToast);
   };
 
   return (

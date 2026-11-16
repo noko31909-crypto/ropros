@@ -17,7 +17,7 @@ import { Cover } from "@/components/cards/covers";
 import { coverImage } from "@/lib/covers";
 import { PlatformPill } from "@/components/cards/project-card";
 import { getProject, projectHref } from "@/lib/projects";
-import { useSavedBuilds } from "@/lib/saved";
+import { useSavedBuilds } from "@/components/saved/saved-provider";
 import { StatusBadge, type BuildStatus } from "@/components/community/status-badge";
 import { WorkbenchSummary } from "@/components/workbench/workbench-summary";
 
@@ -51,7 +51,7 @@ export function ProfileView() {
   const [history, setHistory] = useState<XpEvent[]>([]);
   const [posts, setPosts] = useState<OwnPost[]>([]);
   const [error, setError] = useState(false);
-  const { saved } = useSavedBuilds();
+  const { saved, where: savedWhere } = useSavedBuilds();
   const savedProjects = saved.map((s) => getProject(s)).filter((p) => p !== undefined);
 
   useEffect(() => {
@@ -177,7 +177,7 @@ export function ProfileView() {
           <div className="mb-5 flex items-baseline justify-between gap-3">
             <div className="flex items-baseline gap-3">
               <h2 className="text-xl font-semibold text-fg">{t.savedTitle}</h2>
-              <span className="font-mono text-xs text-fg-subtle">{t.savedNote}</span>
+              <span className="font-mono text-xs text-fg-subtle">{savedWhere === "account" ? t.savedNoteAccount : t.savedNote}</span>
             </div>
             <Link href="/projects" className="text-sm font-semibold text-accent hover:underline">{t.savedBrowse}</Link>
           </div>
